@@ -5,11 +5,11 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  apiKey: "AIzaSyATQlhb1tAJQX9DRG8R95RvNETW6t5_xEY",
+  authDomain: "studio-8678152470-9ee44.firebaseapp.com",
+  projectId: "studio-8678152470-9ee44",
+  appId: "1:740380887001:web:c8619a656ae9b861c3fbc8",
+  messagingSenderId: "740380887001",
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
