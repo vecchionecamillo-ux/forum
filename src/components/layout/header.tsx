@@ -11,7 +11,6 @@ const navLinks = [
   { href: '#tessera', label: 'La Tessera' },
   { href: '#piattaforma', label: 'Piattaforma' },
   { href: '#news', label: 'News' },
-  { href: '#area-riservata', label: 'Area Riservata' },
 ];
 
 export function Header() {
