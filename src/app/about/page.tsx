@@ -4,6 +4,7 @@ import { MarketplaceSection } from '../page-sections/marketplace-section';
 import { NewsSection } from '../page-sections/news-section';
 import { DynamicBackground } from '@/components/layout/dynamic-background';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { ScrollRevealWrapper } from '@/components/scroll-reveal';
 
 const backgroundSections = [
   { id: 'piattaforma', image: PlaceHolderImages.find(img => img.id === 'training-placeholder') },
@@ -18,14 +19,16 @@ export default function AboutPage() {
     <>
       <DynamicBackground sections={backgroundSections} />
       <main className="pt-16 relative z-10">
-          <section className="py-24 text-center bg-background">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">
-                  Chi Siamo
-              </h1>
-              <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80 px-4">
-                  Cantiere Culturale è un ecosistema digitale dove arte e innovazione si incontrano. La nostra missione è plasmare il futuro creativo europeo, offrendo una piattaforma per artisti, curatori e appassionati per connettersi, imparare e crescere.
-              </p>
-          </section>
+          <ScrollRevealWrapper>
+            <section className="py-24 text-center bg-background">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">
+                    Chi Siamo
+                </h1>
+                <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80 px-4">
+                    Cantiere Culturale è un ecosistema digitale dove arte e innovazione si incontrano. La nostra missione è plasmare il futuro creativo europeo, offrendo una piattaforma per artisti, curatori e appassionati per connettersi, imparare e crescere.
+                </p>
+            </section>
+          </ScrollRevealWrapper>
         <PlatformSection />
         <MembershipSection />
         <MarketplaceSection />
