@@ -3,33 +3,33 @@
   "placeholderImages": [
     {
       "id": "nft-placeholder",
-      "description": "Abstract, glowing network lines on a dark background, representing digital connection.",
-      "imageUrl": "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "digital network"
+      "description": "Un gruppo di giovani creativi che interagiscono con installazioni luminose in un ambiente buio, simboleggiando l'arte digitale.",
+      "imageUrl": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "digital art"
     },
     {
       "id": "art-placeholder",
-      "description": "A minimalist, well-lit modern art gallery interior.",
-      "imageUrl": "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "modern gallery"
+      "description": "Giovani che ammirano opere d'arte in una galleria moderna e luminosa.",
+      "imageUrl": "https://images.unsplash.com/photo-1531988042231-f39a6cc12a3b?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "art gallery"
     },
     {
       "id": "training-placeholder",
-      "description": "People collaborating in a modern, bright workshop setting.",
-      "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "collaborative workshop"
+      "description": "Un gruppo di studenti sorridenti che collaborano e imparano insieme in un'aula moderna.",
+      "imageUrl": "https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "students collaborating"
     },
     {
       "id": "events-placeholder",
-      "description": "An audience listening to a speaker at a modern conference.",
-      "imageUrl": "https://images.unsplash.com/photo-1540553016722-983e48a2cd10?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "conference audience"
+      "description": "Una folla di giovani che si divertono a un concerto o a un festival, con luci colorate.",
+      "imageUrl": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "fun event"
     },
     {
       "id": "community-placeholder",
-      "description": "Abstract swirl of light trails, representing community and connection.",
-      "imageUrl": "https://images.unsplash.com/photo-1534532222805-0e145f0613d3?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "abstract light"
+      "description": "Un gruppo eterogeneo di amici che ridono e si divertono all'aperto.",
+      "imageUrl": "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "group fun"
     }
   ]
 }
