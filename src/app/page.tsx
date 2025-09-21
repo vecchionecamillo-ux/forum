@@ -99,7 +99,6 @@ export default function Home() {
                   data-ai-hint={image.imageHint}
                   priority
                 />
-                <div className="absolute inset-0 bg-black/50" />
               </div>
             </CarouselItem>
           ))}
@@ -107,10 +106,10 @@ export default function Home() {
       </Carousel>
 
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4">
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none animate-fade-in-up">
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none animate-fade-in-up" style={{textShadow: '0 2px 10px rgba(0,0,0,0.5)'}}>
           Cantiere Culturale
         </h1>
-        <p className="mt-6 max-w-2xl text-lg md:text-xl text-white/80 animate-fade-in-up animation-delay-300">
+        <p className="mt-6 max-w-2xl text-lg md:text-xl text-white/90 animate-fade-in-up animation-delay-300" style={{textShadow: '0 1px 5px rgba(0,0,0,0.5)'}}>
           Un'esperienza dove arte digitale e innovazione si incontrano per plasmare il futuro creativo europeo.
         </p>
       </div>
@@ -118,6 +117,7 @@ export default function Home() {
        <button
         onClick={handleNavigation}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-white animate-bounce"
+        style={{textShadow: '0 1px 5px rgba(0,0,0,0.5)'}}
       >
         <span className="text-sm font-medium uppercase tracking-widest">Scorri per scoprire</span>
         <ChevronDown className="h-6 w-6" />

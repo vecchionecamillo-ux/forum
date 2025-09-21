@@ -2,39 +2,39 @@
   "placeholderImages": [
     {
       "id": "nft-placeholder",
-      "description": "Abstract digital art representing an NFT.",
-      "imageUrl": "https://picsum.photos/seed/nft/600/400",
-      "imageHint": "abstract digital"
+      "description": "A colorful child's drawing of a robot.",
+      "imageUrl": "https://picsum.photos/seed/robot/600/400",
+      "imageHint": "child drawing robot"
     },
     {
       "id": "art-placeholder",
-      "description": "A modern sculpture representing physical art.",
-      "imageUrl": "https://picsum.photos/seed/art/600/400",
-      "imageHint": "modern sculpture"
+      "description": "A child's drawing of a house and sun.",
+      "imageUrl": "https://picsum.photos/seed/house/600/400",
+      "imageHint": "child drawing house"
     },
     {
       "id": "merch-placeholder",
-      "description": "Stylish apparel with a logo, representing merchandise.",
-      "imageUrl": "https://picsum.photos/seed/merch/600/400",
-      "imageHint": "stylish apparel"
+      "description": "A child's drawing of a colorful abstract pattern.",
+      "imageUrl": "https://picsum.photos/seed/pattern/600/400",
+      "imageHint": "child drawing abstract"
     },
     {
       "id": "training-placeholder",
-      "description": "A person engaged in a creative workshop, representing training.",
-      "imageUrl": "https://picsum.photos/seed/training/600/400",
-      "imageHint": "creative workshop"
+      "description": "A child's drawing of animals.",
+      "imageUrl": "https://picsum.photos/seed/animals/600/400",
+      "imageHint": "child drawing animals"
     },
     {
       "id": "events-placeholder",
-      "description": "A crowd at a digital art exhibition, representing events.",
-      "imageUrl": "https://picsum.photos/seed/events/600/400",
-      "imageHint": "art exhibition"
+      "description": "A child's drawing of a family.",
+      "imageUrl": "https://picsum.photos/seed/family/600/400",
+      "imageHint": "child drawing family"
     },
     {
       "id": "community-placeholder",
-      "description": "A group of diverse people collaborating, representing community.",
-      "imageUrl": "https://picsum.photos/seed/community/600/400",
-      "imageHint": "diverse collaboration"
+      "description": "A child's drawing of flowers and nature.",
+      "imageUrl": "https://picsum.photos/seed/nature/600/400",
+      "imageHint": "child drawing nature"
     }
   ]
 }

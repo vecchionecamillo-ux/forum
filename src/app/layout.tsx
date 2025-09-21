@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/layout/header';
-import { WebGLBackground } from '@/components/layout/webgl-background';
 import { AuthProvider } from '@/hooks/use-auth';
 
 export const metadata: Metadata = {
@@ -16,7 +15,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it">
+    <html lang="it" className="light">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
@@ -24,7 +23,6 @@ export default function RootLayout({
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
-          <WebGLBackground />
           <Header />
           <div className="relative z-10">
             {children}
