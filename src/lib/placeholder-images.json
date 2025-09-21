@@ -2,39 +2,39 @@
   "placeholderImages": [
     {
       "id": "nft-placeholder",
-      "description": "Minimalist graphic design with geometric shapes.",
-      "imageUrl": "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "minimalist graphic"
+      "description": "A renaissance fresco painting of a cloudy sky.",
+      "imageUrl": "https://images.unsplash.com/photo-1596200184478-37597d3f1146?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "renaissance sky"
     },
     {
       "id": "art-placeholder",
-      "description": "Vibrant abstract graphic design with flowing lines.",
-      "imageUrl": "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "vibrant abstract"
+      "description": "A close up of a fresco painting.",
+      "imageUrl": "https://images.unsplash.com/photo-1618063259402-53c8699c27e0?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "fresco painting"
     },
     {
       "id": "merch-placeholder",
-      "description": "A minimal and colorful graphic pattern.",
-      "imageUrl": "https://images.unsplash.com/photo-1604079628040-94301bb21b91?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "minimal pattern"
+      "description": "Architectural detail of a classical building.",
+      "imageUrl": "https://images.unsplash.com/photo-1542845082-539959585a95?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "classical architecture"
     },
     {
       "id": "training-placeholder",
-      "description": "A vibrant graphic illustration with a minimalist feel.",
-      "imageUrl": "https://images.unsplash.com/photo-1629838023831-5056716a04a0?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "vibrant illustration"
+      "description": "Dramatic clouds in a painted sky.",
+      "imageUrl": "https://images.unsplash.com/photo-1601575239108-e04f6305f884?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "painted clouds"
     },
     {
       "id": "events-placeholder",
-      "description": "An abstract composition of shapes and colors.",
-      "imageUrl": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "abstract composition"
+      "description": "The ceiling of a grand, classical building.",
+      "imageUrl": "https://images.unsplash.com/photo-1634571804475-4e7d1d4a259a?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "classical ceiling"
     },
     {
       "id": "community-placeholder",
-      "description": "A minimal graphic design with a focus on color gradients.",
-      "imageUrl": "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "minimal gradient"
+      "description": "A textured wall resembling old plaster or fresco.",
+      "imageUrl": "https://images.unsplash.com/photo-1561139420-53f5101183c0?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "plaster texture"
     }
   ]
 }
