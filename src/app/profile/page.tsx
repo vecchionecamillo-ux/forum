@@ -56,7 +56,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card>
+              <Card className="bg-background/50">
                 <CardHeader>
                   <CardTitle className="flex items-center text-xl">
                     <Star className="mr-2 h-5 w-5 text-primary" />
@@ -68,7 +68,7 @@ export default function ProfilePage() {
                   <p className="text-sm text-muted-foreground mt-1">Punti totali accumulati.</p>
                 </CardContent>
               </Card>
-              <Card>
+              <Card className="bg-background/50">
                 <CardHeader>
                   <CardTitle className="flex items-center text-xl">
                     <Award className="mr-2 h-5 w-5 text-primary" />
