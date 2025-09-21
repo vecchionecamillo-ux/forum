@@ -1,3 +1,40 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "nft-placeholder",
+      "description": "Abstract digital art representing an NFT.",
+      "imageUrl": "https://picsum.photos/seed/nft/600/400",
+      "imageHint": "abstract digital"
+    },
+    {
+      "id": "art-placeholder",
+      "description": "A modern sculpture representing physical art.",
+      "imageUrl": "https://picsum.photos/seed/art/600/400",
+      "imageHint": "modern sculpture"
+    },
+    {
+      "id": "merch-placeholder",
+      "description": "Stylish apparel with a logo, representing merchandise.",
+      "imageUrl": "https://picsum.photos/seed/merch/600/400",
+      "imageHint": "stylish apparel"
+    },
+    {
+      "id": "training-placeholder",
+      "description": "A person engaged in a creative workshop, representing training.",
+      "imageUrl": "https://picsum.photos/seed/training/600/400",
+      "imageHint": "creative workshop"
+    },
+    {
+      "id": "events-placeholder",
+      "description": "A crowd at a digital art exhibition, representing events.",
+      "imageUrl": "https://picsum.photos/seed/events/600/400",
+      "imageHint": "art exhibition"
+    },
+    {
+      "id": "community-placeholder",
+      "description": "A group of diverse people collaborating, representing community.",
+      "imageUrl": "https://picsum.photos/seed/community/600/400",
+      "imageHint": "diverse collaboration"
+    }
+  ]
 }
