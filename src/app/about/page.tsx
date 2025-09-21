@@ -8,8 +8,16 @@ import { ScrollRevealWrapper } from '@/components/scroll-reveal';
 
 
 export default function AboutPage() {
+  const sections = [
+    { id: 'piattaforma', image: PlaceHolderImages.find(img => img.id === 'art-placeholder')! },
+    { id: 'tessera', image: PlaceHolderImages.find(img => img.id === 'training-placeholder')! },
+    { id: 'marketplace', image: PlaceHolderImages.find(img => img.id === 'events-placeholder')! },
+    { id: 'news', image: PlaceHolderImages.find(img => img.id === 'community-placeholder')! }
+  ];
+
   return (
     <>
+      <DynamicBackground sections={sections} />
       <main className="pt-16 relative z-10">
           <ScrollRevealWrapper>
             <section className="py-24 text-center">

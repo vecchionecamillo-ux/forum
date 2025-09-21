@@ -14,12 +14,6 @@
       "imageHint": "modern gallery"
     },
     {
-      "id": "merch-placeholder",
-      "description": "Close-up of clean, geometric architectural lines.",
-      "imageUrl": "https://images.unsplash.com/photo-1494783367193-149034c05e8f?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "geometric architecture"
-    },
-    {
       "id": "training-placeholder",
       "description": "People collaborating in a modern, bright workshop setting.",
       "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&h=400&auto=format&fit=crop",
