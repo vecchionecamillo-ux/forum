@@ -1,40 +1,41 @@
+
 {
   "placeholderImages": [
     {
       "id": "nft-placeholder",
-      "description": "A renaissance fresco painting of a cloudy sky.",
-      "imageUrl": "https://images.unsplash.com/photo-1596200184478-37597d3f1146?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "renaissance sky"
+      "description": "Abstract, glowing network lines on a dark background, representing digital connection.",
+      "imageUrl": "https://images.unsplash.com/photo-1531297484001-80022131f5a1?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "digital network"
     },
     {
       "id": "art-placeholder",
-      "description": "A close up of a fresco painting.",
-      "imageUrl": "https://images.unsplash.com/photo-1618063259402-53c8699c27e0?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "fresco painting"
+      "description": "A minimalist, well-lit modern art gallery interior.",
+      "imageUrl": "https://images.unsplash.com/photo-1507925921958-8a62f3d1a50d?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "modern gallery"
     },
     {
       "id": "merch-placeholder",
-      "description": "Architectural detail of a classical building.",
-      "imageUrl": "https://images.unsplash.com/photo-1542845082-539959585a95?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "classical architecture"
+      "description": "Close-up of clean, geometric architectural lines.",
+      "imageUrl": "https://images.unsplash.com/photo-1494783367193-149034c05e8f?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "geometric architecture"
     },
     {
       "id": "training-placeholder",
-      "description": "Dramatic clouds in a painted sky.",
-      "imageUrl": "https://images.unsplash.com/photo-1601575239108-e04f6305f884?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "painted clouds"
+      "description": "People collaborating in a modern, bright workshop setting.",
+      "imageUrl": "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "collaborative workshop"
     },
     {
       "id": "events-placeholder",
-      "description": "The ceiling of a grand, classical building.",
-      "imageUrl": "https://images.unsplash.com/photo-1634571804475-4e7d1d4a259a?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "classical ceiling"
+      "description": "An audience listening to a speaker at a modern conference.",
+      "imageUrl": "https://images.unsplash.com/photo-1540553016722-983e48a2cd10?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "conference audience"
     },
     {
       "id": "community-placeholder",
-      "description": "A textured wall resembling old plaster or fresco.",
-      "imageUrl": "https://images.unsplash.com/photo-1561139420-53f5101183c0?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "plaster texture"
+      "description": "Abstract swirl of light trails, representing community and connection.",
+      "imageUrl": "https://images.unsplash.com/photo-1534532222805-0e145f0613d3?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "abstract light"
     }
   ]
 }

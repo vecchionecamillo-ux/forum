@@ -12,7 +12,7 @@ const navLinks = [
   { href: '/about', label: 'Chi Siamo' },
   { href: '/eventi', label: 'Eventi' },
   { href: '/community', label: 'Community' },
-  { href: '/#news', label: 'News' },
+  { href: '/about#news', label: 'News' },
 ];
 
 export function Header() {
@@ -54,16 +54,16 @@ export function Header() {
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 px-4 md:px-6 transition-all duration-300 text-white',
-        isScrolled ? 'bg-black/50 backdrop-blur-sm border-b border-white/10' : 'bg-transparent'
+        (isScrolled || !isHome) ? 'bg-black/50 backdrop-blur-sm border-b border-white/10' : 'bg-transparent'
       )}
     >
       <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-blue-300"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         <span className="hidden sm:inline">Cantiere Culturale</span>
       </Link>
       <nav className="hidden md:flex items-center gap-6">
         {navContent}
-        <Button asChild variant="outline" size="sm" className="bg-transparent border-blue-300 text-blue-300 hover:bg-blue-300 hover:text-black ml-4">
+        <Button asChild variant="outline" size="sm" className="bg-transparent border-primary text-primary hover:bg-primary hover:text-primary-foreground ml-4">
           <Link href="/style-guide">
             <PenSquare className="mr-2 h-4 w-4" />
             Style Guide AI
@@ -84,7 +84,7 @@ export function Header() {
             <Button asChild variant="ghost" size="sm" className="hover:bg-white/10">
               <Link href="/login">Login</Link>
             </Button>
-            <Button asChild size="sm" className="bg-blue-400 hover:bg-blue-500 text-white">
+            <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               <Link href="/signup">Registrati</Link>
             </Button>
           </>
@@ -101,7 +101,7 @@ export function Header() {
           <SheetContent side="right" className="bg-black/80 backdrop-blur-lg text-white border-l-white/20">
             <nav className="flex flex-col gap-6 mt-8 p-4">
               {navContent}
-              <Button asChild variant="default" className="bg-blue-400 text-white mt-4">
+              <Button asChild variant="default" className="bg-primary text-primary-foreground mt-4">
                 <Link href="/style-guide" onClick={handleLinkClick}>
                   <PenSquare className="mr-2 h-4 w-4" />
                   Style Guide AI
@@ -123,7 +123,7 @@ export function Header() {
                       <Button asChild variant="ghost" size="sm" className="justify-start hover:bg-white/10">
                          <Link href="/login" onClick={handleLinkClick}>Login</Link>
                       </Button>
-                      <Button asChild size="sm" className="bg-blue-400 text-white">
+                      <Button asChild size="sm" className="bg-primary text-primary-foreground">
                         <Link href="/signup" onClick={handleLinkClick}>Registrati</Link>
                       </Button>
                     </>

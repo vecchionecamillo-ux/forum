@@ -4,17 +4,17 @@ import { Award, Gift, Star } from 'lucide-react';
 
 const benefits = [
   {
-    icon: <Star className="h-8 w-8 text-yellow-300" />,
+    icon: <Star className="h-8 w-8 text-primary" />,
     title: 'Guadagna Punti',
     description: 'Partecipa a workshop, eventi e call to action per accumulare punti e sbloccare ricompense uniche.',
   },
   {
-    icon: <Gift className="h-8 w-8 text-yellow-300" />,
+    icon: <Gift className="h-8 w-8 text-primary" />,
     title: 'Accesso Esclusivo',
     description: 'Utilizza i tuoi punti per accedere a contenuti riservati, aree speciali del sito e prodotti esclusivi nel marketplace.',
   },
   {
-    icon: <Award className="h-8 w-8 text-yellow-300" />,
+    icon: <Award className="h-8 w-8 text-primary" />,
     title: 'Status e Riconoscimenti',
     description: 'Più partecipi, più il tuo status nella community cresce, dandoti accesso a vantaggi sempre maggiori.',
   },
@@ -23,31 +23,35 @@ const benefits = [
 
 export function MembershipSection() {
   return (
-    <section id="tessera" className="min-h-screen flex flex-col items-center justify-center px-4 py-24 sm:px-6 lg:px-8">
-       <ScrollRevealWrapper className="w-full max-w-6xl mx-auto">
+    <ScrollRevealWrapper id="tessera">
+      <section className="min-h-screen flex flex-col items-center justify-center px-4 py-24 sm:px-6 lg:px-8">
+       <div className="w-full max-w-6xl mx-auto">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white" style={{textShadow: '0 2px 10px rgba(0,0,0,0.5)'}}>La Tessera Digitale</h2>
-          <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-white/90" style={{textShadow: '0 1px 5px rgba(0,0,0,0.5)'}}>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white">La Tessera Digitale</h2>
+          <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-white/90">
             La tessera è la tua chiave d'accesso a un mondo di vantaggi. Accumula punti partecipando attivamente alla vita del Cantiere Culturale e spendili per ottenere ricompense esclusive.
           </p>
         </div>
 
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-          {benefits.map((benefit) => (
-            <Card key={benefit.title} className="bg-black/20 backdrop-blur-sm border-white/10 text-white text-center transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent/20">
-              <CardHeader className="items-center">
-                <div className="p-4 bg-yellow-300/10 rounded-full mb-4">
-                  {benefit.icon}
-                </div>
-                <CardTitle className="text-2xl font-bold text-yellow-300">{benefit.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-white/80">{benefit.description}</p>
-              </CardContent>
-            </Card>
+          {benefits.map((benefit, index) => (
+            <ScrollRevealWrapper key={benefit.title} className={`animation-delay-${index * 150}`}>
+                <Card className="bg-black/20 backdrop-blur-sm border-white/10 text-white text-center transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20 h-full">
+                <CardHeader className="items-center">
+                    <div className="p-4 bg-primary/10 rounded-full mb-4">
+                    {benefit.icon}
+                    </div>
+                    <CardTitle className="text-2xl font-bold text-primary">{benefit.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <p className="text-white/80">{benefit.description}</p>
+                </CardContent>
+                </Card>
+            </ScrollRevealWrapper>
           ))}
         </div>
-      </ScrollRevealWrapper>
+      </div>
     </section>
+   </ScrollRevealWrapper>
   );
 }
