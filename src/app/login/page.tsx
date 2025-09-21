@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -22,6 +23,7 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setResetMessage(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
@@ -45,6 +47,32 @@ export default function LoginPage() {
     }
   };
 
+  const handlePasswordReset = async () => {
+    if (!email) {
+      setError('Per favore, inserisci la tua email per reimpostare la password.');
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    setResetMessage(null);
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setResetMessage('Email di recupero inviata! Controlla la tua casella di posta.');
+    } catch (error: any) {
+       switch (error.code) {
+        case 'auth/user-not-found':
+          setError('Nessun utente trovato con questa email.');
+          break;
+        default:
+          setError('Si è verificato un errore durante l\'invio dell\'email. Riprova.');
+          break;
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-secondary/10 p-4">
       <Card className="w-full max-w-md">
@@ -58,6 +86,11 @@ export default function LoginPage() {
            {error && (
               <Alert variant="destructive" className="mb-6">
                 <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            {resetMessage && (
+              <Alert className="mb-6 border-green-500 text-green-700">
+                 <AlertDescription>{resetMessage}</AlertDescription>
               </Alert>
             )}
           <form onSubmit={handleLogin} className="space-y-6">
@@ -74,7 +107,12 @@ export default function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+                <div className="flex items-center justify-between">
+                    <Label htmlFor="password">Password</Label>
+                     <button type="button" onClick={handlePasswordReset} className="text-sm text-primary hover:underline focus:outline-none" disabled={loading}>
+                        Password dimenticata?
+                    </button>
+                </div>
               <Input
                 id="password"
                 type="password"
