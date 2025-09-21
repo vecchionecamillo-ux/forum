@@ -88,10 +88,30 @@ export default {
             height: '0',
           },
         },
+        'fade-in-up': {
+          from: {
+              opacity: '0',
+              transform: 'translateY(20px)',
+          },
+          to: {
+              opacity: '1',
+              transform: 'translateY(0)',
+          },
+        },
+        'fade-out': {
+            from: {
+                opacity: '1',
+            },
+            to: {
+                opacity: '0',
+            },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'fade-in-up': 'fade-in-up 0.8s both',
+        'page-exit': 'fade-out 0.8s ease-in-out forwards',
       },
     },
   },

@@ -9,6 +9,8 @@ import Autoplay from 'embla-carousel-autoplay';
 import Image from 'next/image';
 import { ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
+import { cn } from '@/lib/utils';
 
 const backgroundImages = [
   PlaceHolderImages.find((img) => img.id === 'art-placeholder'),
@@ -18,13 +20,61 @@ const backgroundImages = [
 ].filter(Boolean) as (typeof PlaceHolderImages)[0][];
 
 export default function Home() {
-    const router = useRouter();
+  const router = useRouter();
+  const [isExiting, setIsExiting] = useState(false);
+  const [hasScrolled, setHasScrolled] = useState(false);
 
-  const handleScrollClick = () => {
-    router.push('/about');
-  };
+  const handleNavigation = useCallback(() => {
+    if (hasScrolled) return;
+    setHasScrolled(true);
+    setIsExiting(true);
+    setTimeout(() => {
+      router.push('/about');
+    }, 800); // Duration should match the animation
+  }, [router, hasScrolled]);
+
+  useEffect(() => {
+    const handleWheel = (event: WheelEvent) => {
+      if (event.deltaY > 0) {
+        handleNavigation();
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') {
+        handleNavigation();
+      }
+    };
+    
+    // For touch devices
+    let touchstartY = 0;
+    const handleTouchStart = (event: TouchEvent) => {
+        touchstartY = event.changedTouches[0].screenY;
+    };
+
+    const handleTouchEnd = (event: TouchEvent) => {
+        const touchendY = event.changedTouches[0].screenY;
+        if (touchendY < touchstartY) { // Swiped up
+            handleNavigation();
+        }
+    };
+
+    window.addEventListener('wheel', handleWheel);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('touchstart', handleTouchStart);
+    window.addEventListener('touchend', handleTouchEnd);
+
+
+    return () => {
+      window.removeEventListener('wheel', handleWheel);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [handleNavigation]);
+
   return (
-    <div className="relative h-screen w-screen overflow-hidden">
+    <div className={cn("relative h-screen w-screen overflow-hidden", isExiting && 'animate-page-exit')}>
       <Carousel
         className="absolute inset-0 w-full h-full"
         plugins={[
@@ -66,7 +116,7 @@ export default function Home() {
       </div>
 
        <button
-        onClick={handleScrollClick}
+        onClick={handleNavigation}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-white animate-bounce"
       >
         <span className="text-sm font-medium uppercase tracking-widest">Scorri per scoprire</span>
