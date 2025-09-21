@@ -2,18 +2,20 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, PenSquare } from 'lucide-react';
+import { Menu, PenSquare, LogOut, User, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
 
 const navLinks = [
-  { href: '#marketplace', label: 'Marketplace' },
-  { href: '#tessera', label: 'La Tessera' },
-  { href: '#piattaforma', label: 'Piattaforma' },
-  { href: '#news', label: 'News' },
+  { href: '/#marketplace', label: 'Marketplace' },
+  { href: '/#tessera', label: 'La Tessera' },
+  { href: '/#piattaforma', label: 'Piattaforma' },
+  { href: '/#news', label: 'News' },
 ];
 
 export function Header() {
+  const { user, isModerator, logout } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isSheetOpen, setSheetOpen] = useState(false);
 
@@ -32,10 +34,15 @@ export function Header() {
   const navContent = (
     <>
       {navLinks.map((link) => (
-        <a key={link.href} href={link.href} onClick={handleLinkClick} className="text-sm font-medium transition-colors hover:text-foreground/80">
+        <Link key={link.href} href={link.href} onClick={handleLinkClick} className="text-sm font-medium transition-colors hover:text-foreground/80">
           {link.label}
-        </a>
+        </Link>
       ))}
+      {isModerator && (
+         <Link href="/admin" onClick={handleLinkClick} className="text-sm font-medium transition-colors hover:text-foreground/80 flex items-center">
+           <Shield className="mr-2 h-4 w-4" /> Admin
+         </Link>
+      )}
     </>
   );
 
@@ -58,6 +65,26 @@ export function Header() {
             Style Guide AI
           </Link>
         </Button>
+        {user ? (
+          <>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/profile"><User className="mr-2 h-4 w-4" />Profilo</Link>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={logout}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/login">Login</Link>
+            </Button>
+            <Button asChild size="sm">
+              <Link href="/signup">Registrati</Link>
+            </Button>
+          </>
+        )}
       </nav>
       <div className="md:hidden">
         <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
@@ -76,6 +103,28 @@ export function Header() {
                   Style Guide AI
                 </Link>
               </Button>
+               <div className="mt-4 pt-4 border-t border-border/20 flex flex-col gap-4">
+                {user ? (
+                    <>
+                      <Button asChild variant="ghost" size="sm" className="justify-start">
+                        <Link href="/profile" onClick={handleLinkClick}><User className="mr-2 h-4 w-4"/>Profilo</Link>
+                      </Button>
+                      <Button variant="ghost" size="sm" onClick={() => { logout(); handleLinkClick(); }} className="justify-start text-red-500 hover:text-red-400">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Button asChild variant="ghost" size="sm" className="justify-start">
+                         <Link href="/login" onClick={handleLinkClick}>Login</Link>
+                      </Button>
+                      <Button asChild size="sm" className="bg-accent text-accent-foreground">
+                        <Link href="/signup" onClick={handleLinkClick}>Registrati</Link>
+                      </Button>
+                    </>
+                  )}
+              </div>
             </nav>
           </SheetContent>
         </Sheet>
