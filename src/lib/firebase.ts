@@ -1,7 +1,7 @@
 'use client';
 
 import { initializeApp, getApp, getApps } from 'firebase/app';
-import { initializeAuth, getAuth, indexedDBLocalPersistence } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
 
@@ -15,14 +15,7 @@ const firebaseConfig = {
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-// Explicitly initialize Auth with persistence to solve issues in some environments
-const auth = initializeAuth(app, {
-  persistence: indexedDBLocalPersistence,
-  // This explicitly sets the auth domain, which can resolve redirect issues.
-  authDomain: firebaseConfig.authDomain,
-});
-
+const auth = getAuth(app);
 const db = getFirestore(app);
 const database = getDatabase(app);
 
