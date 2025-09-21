@@ -2,22 +2,28 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { ScrollRevealWrapper } from '@/components/scroll-reveal';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from 'lucide-react';
 
 const platformItems = [
   {
     title: 'Formazione',
     description: 'Accedi a workshop, masterclass e corsi tenuti da professionisti del settore creativo e tecnologico.',
     image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+    link: '/formazione',
   },
   {
     title: 'Eventi',
     description: 'Partecipa a mostre virtuali, talk, performance in diretta e festival digitali esclusivi.',
     image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
+    link: '/eventi',
   },
   {
     title: 'Community',
     description: 'Connettiti, collabora e cresci insieme a una rete internazionale di artisti, curatori e innovatori.',
     image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
+    link: '/community',
   },
 ];
 
@@ -33,7 +39,7 @@ export function PlatformSection() {
         </div>
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {platformItems.map((item) => (
-            <Card key={item.title} className="bg-card/50 backdrop-blur-lg border-white/10 overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent/10">
+            <Card key={item.title} className="bg-card/50 backdrop-blur-lg border-white/10 overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent/10 flex flex-col">
                {item.image && (
                 <div className="aspect-video overflow-hidden">
                   <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
@@ -42,8 +48,14 @@ export function PlatformSection() {
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-accent">{item.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <CardDescription className="text-foreground/80 text-base">{item.description}</CardDescription>
+              <CardContent className="flex flex-col flex-grow">
+                <CardDescription className="text-foreground/80 text-base flex-grow mb-4">{item.description}</CardDescription>
+                <Button asChild variant="link" className="text-accent p-0 mt-auto self-start">
+                  <Link href={item.link}>
+                    Scopri di più
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
               </CardContent>
             </Card>
           ))}
