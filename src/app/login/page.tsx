@@ -15,15 +15,16 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isResetMode, setIsResetMode] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    setResetMessage(null);
+    setMessage(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
@@ -35,11 +36,8 @@ export default function LoginPage() {
         case 'auth/wrong-password':
           setError('Password errata. Riprova.');
           break;
-        case 'auth/invalid-credential':
-            setError('Credenziali non valide. Controlla email e password.');
-            break;
         default:
-          setError('Si è verificato un errore durante l\'accesso. Riprova.');
+          setError('Credenziali non valide. Controlla email e password e riprova.');
           break;
       }
     } finally {
@@ -47,21 +45,23 @@ export default function LoginPage() {
     }
   };
 
-  const handlePasswordReset = async () => {
+  const handlePasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!email) {
       setError('Per favore, inserisci la tua email per reimpostare la password.');
       return;
     }
     setLoading(true);
     setError(null);
-    setResetMessage(null);
+    setMessage(null);
     try {
       await sendPasswordResetEmail(auth, email);
-      setResetMessage('Email di recupero inviata! Controlla la tua casella di posta.');
+      setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
+      setIsResetMode(false); // Torna alla schermata di login
     } catch (error: any) {
        switch (error.code) {
         case 'auth/user-not-found':
-          setError('Nessun utente trovato con questa email.');
+          setError('Nessun utente trovato con questa email. Impossibile inviare il link di recupero.');
           break;
         default:
           setError('Si è verificato un errore durante l\'invio dell\'email. Riprova.');
@@ -72,14 +72,22 @@ export default function LoginPage() {
     }
   };
 
+  const toggleResetMode = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setIsResetMode(!isResetMode);
+    setError(null);
+    setMessage(null);
+    setPassword('');
+  }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-secondary/10 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-black">Accedi</CardTitle>
+          <CardTitle className="text-3xl font-black">{isResetMode ? 'Recupera Password' : 'Accedi'}</CardTitle>
           <CardDescription>
-            Accedi al tuo account per continuare.
+            {isResetMode ? 'Inserisci la tua email per ricevere un link di recupero.' : 'Accedi al tuo account per continuare.'}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -88,51 +96,84 @@ export default function LoginPage() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-            {resetMessage && (
+            {message && (
               <Alert className="mb-6 border-green-500 text-green-700">
-                 <AlertDescription>{resetMessage}</AlertDescription>
+                 <AlertDescription>{message}</AlertDescription>
               </Alert>
             )}
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="mario.rossi@email.com"
-                required
-                disabled={loading}
-              />
-            </div>
-            <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
-                </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={loading}
-              />
-            </div>
-             <div className="text-sm">
-                <button type="button" onClick={handlePasswordReset} className="font-medium text-primary hover:underline focus:outline-none" disabled={loading}>
+          
+          {isResetMode ? (
+             <form onSubmit={handlePasswordReset} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email-reset">Email</Label>
+                <Input
+                  id="email-reset"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="mario.rossi@email.com"
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Invio in corso...' : 'Invia link di recupero'}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleLogin} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="mario.rossi@email.com"
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Password</Label>
+                  </div>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? 'Accesso in corso...' : 'Accedi'}
+              </Button>
+            </form>
+          )}
+
+          <div className="mt-4 text-center text-sm">
+            {isResetMode ? (
+              <>
+                Tornare al login?{' '}
+                <button onClick={toggleResetMode} className="underline text-primary" disabled={loading}>
+                  Accedi
+                </button>
+              </>
+            ) : (
+              <>
+                <button type="button" onClick={toggleResetMode} className="font-medium text-primary hover:underline focus:outline-none" disabled={loading}>
                     Password dimenticata?
                 </button>
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Accesso in corso...' : 'Accedi'}
-            </Button>
-          </form>
-           <div className="mt-4 text-center text-sm">
-            Non hai un account?{' '}
-            <Link href="/signup" className="underline text-primary">
-              Registrati
-            </Link>
+                 <div className="mt-2">
+                  Non hai un account?{' '}
+                  <Link href="/signup" className="underline text-primary">
+                    Registrati
+                  </Link>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
