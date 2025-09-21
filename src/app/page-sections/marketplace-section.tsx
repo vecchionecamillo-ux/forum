@@ -27,7 +27,7 @@ const marketplaceItems = [
 
 export function MarketplaceSection() {
   return (
-    <section id="marketplace" className="min-h-screen flex flex-col justify-center items-center px-4 py-24 sm:px-6 lg:px-8 bg-black/20">
+    <section id="marketplace" className="min-h-screen flex flex-col justify-center items-center px-4 py-24 sm:px-6 lg:px-8">
       <ScrollRevealWrapper className="w-full max-w-6xl mx-auto">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Marketplace Esclusivo</h2>
