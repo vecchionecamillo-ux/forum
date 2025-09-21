@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollRevealWrapper } from '@/components/scroll-reveal';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const newsItems = [
@@ -14,6 +14,7 @@ const newsItems = [
     image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
     cta: 'Partecipa',
     link: '#',
+    points: 150,
   },
   {
     title: 'Annuncio Workshop: "Creative Coding"',
@@ -22,6 +23,7 @@ const newsItems = [
     image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
     cta: 'Prenota Ora',
     link: '#',
+    points: 250,
   },
   {
     title: 'Articolo: Il Futuro dell\'Arte è Digitale?',
@@ -46,12 +48,17 @@ export function NewsSection() {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {newsItems.map((item) => (
             <Card key={item.title} className="bg-card/50 backdrop-blur-lg border-white/10 overflow-hidden flex flex-col transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10">
-              {item.image && (
-                <div className="aspect-video overflow-hidden relative">
+              <div className="aspect-video overflow-hidden relative">
+                {item.image && (
                   <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
-                   <Badge variant="default" className="absolute top-2 right-2 bg-accent text-accent-foreground">{item.category}</Badge>
-                </div>
-              )}
+                )}
+                 <Badge variant="default" className="absolute top-2 left-2 bg-accent text-accent-foreground">{item.category}</Badge>
+                 {item.points && (
+                    <Badge variant="secondary" className="absolute top-2 right-2 bg-primary/80 text-primary-foreground backdrop-blur-sm">
+                      <Star className="mr-1 h-3 w-3" /> {item.points} Punti
+                    </Badge>
+                  )}
+              </div>
               <CardHeader>
                 <CardTitle className="text-2xl font-bold">{item.title}</CardTitle>
               </CardHeader>
