@@ -16,7 +16,7 @@ const ranks = [
   { level: 2, name: 'Membro', color: 'bg-blue-500' },
   { level: 3, name: 'Partecipante Attivo', color: 'bg-green-500' },
   { level: 4, name: 'Creatore', color: 'bg-purple-500' },
-  { level: 5, name: 'Ambasciatore', color: 'bg-yellow-500' },
+  { level: 5, name: 'Ambasciatore', color: 'bg-yellow-500 text-black' },
 ];
 
 type User = {
@@ -31,7 +31,7 @@ async function fetchUsers(): Promise<User[]> {
   return [
     { _id: '1a', username: 'creative.user@email.com', points: 850, rankLevel: 2 },
     { _id: '2b', username: 'digital.artist@email.com', points: 1240, rankLevel: 3 },
-    { _id: '3c', username: 'visionary.collector@email.com', points: 3200, rankLevel: 5 },
+    { _id: '3c', username: 'vecchionecamillo@gmail.com', points: 400, rankLevel: 5 },
     { _id: '4d', username: 'new.innovator@email.com', points: 150, rankLevel: 1 },
   ];
 }
@@ -138,7 +138,7 @@ export function ModeratorPanel() {
                        </div>
                        <SubmitButton>
                           <ArrowUp className="mr-2 h-4 w-4"/> Aggiorna Grado
-                       </SubmitButton>
+                       </Button>
                     </form>
                   </CardContent>
                 </Card>

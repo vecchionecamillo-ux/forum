@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 
 // --- DEVELOPMENT ONLY ---
 // Add email addresses here to automatically grant them moderator privileges.
-const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com'];
+const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com', 'vecchionecamillo1@gmail.com'];
 // --------------------
 
 type AuthContextType = {
