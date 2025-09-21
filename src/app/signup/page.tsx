@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
 
-const GoogleIcon = () => <svg className="h-5 w-5" viewBox="0 0 24 24"><path fill="currentColor" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12.5C5,8.75 8.36,5.73 12.19,5.73C15.22,5.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2.5 12.19,2.5C6.42,2.5 2,7.03 2,12.5C2,17.97 6.42,22.5 12.19,22.5C17.6,22.5 21.5,18.33 21.5,12.91C21.5,11.76 21.35,11.1 21.35,11.1Z"></path></svg>;
+const GoogleIcon = () => <svg className="h-5 w-5 mr-2" viewBox="0 0 24 24"><path fill="currentColor" d="M21.35,11.1H12.18V13.83H18.69C18.36,17.64 15.19,19.27 12.19,19.27C8.36,19.27 5,16.25 5,12.5C5,8.75 8.36,5.73 12.19,5.73C15.22,5.73 17.1,6.7 17.1,6.7L19,4.72C19,4.72 16.56,2.5 12.19,2.5C6.42,2.5 2,7.03 2,12.5C2,17.97 6.42,22.5 12.19,22.5C17.6,22.5 21.5,18.33 21.5,12.91C21.5,11.76 21.35,11.1 21.35,11.1Z"></path></svg>;
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -34,19 +34,14 @@ export default function SignupPage() {
     }
   };
 
-  const handleProviderLogin = async (providerName: 'google') => {
+  const handleProviderLogin = async (provider: GoogleAuthProvider) => {
     setLoading(true);
     setError(null);
     try {
-      let provider;
-      if (providerName === 'google') {
-        provider = new GoogleAuthProvider();
-      }
-      await signInWithPopup(auth, provider);
-      router.push('/profile');
+      await signInWithRedirect(auth, provider);
+      // La pagina verrà ricaricata da Firebase dopo il redirect, quindi il routing qui non è necessario.
     } catch (error: any) {
       setError(error.message);
-    } finally {
       setLoading(false);
     }
   };
@@ -69,9 +64,9 @@ export default function SignupPage() {
           )}
 
           <div className="grid grid-cols-1 gap-4">
-            <Button variant="outline" onClick={() => handleProviderLogin('google')} disabled={loading} className="border-white/20">
+            <Button variant="outline" onClick={() => handleProviderLogin(new GoogleAuthProvider())} disabled={loading} className="border-white/20">
               <GoogleIcon />
-              Google
+              Registrati con Google
             </Button>
           </div>
 
