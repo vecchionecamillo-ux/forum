@@ -109,9 +109,6 @@ export default function LoginPage() {
             <div className="space-y-2">
                 <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                     <button type="button" onClick={handlePasswordReset} className="text-sm text-primary hover:underline focus:outline-none" disabled={loading}>
-                        Password dimenticata?
-                    </button>
                 </div>
               <Input
                 id="password"
@@ -121,6 +118,11 @@ export default function LoginPage() {
                 required
                 disabled={loading}
               />
+            </div>
+             <div className="text-sm">
+                <button type="button" onClick={handlePasswordReset} className="font-medium text-primary hover:underline focus:outline-none" disabled={loading}>
+                    Password dimenticata?
+                </button>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? 'Accesso in corso...' : 'Accedi'}
