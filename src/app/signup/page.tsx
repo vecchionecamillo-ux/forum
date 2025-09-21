@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,12 +10,15 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
+import { Separator } from '@/components/ui/separator';
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
   const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -29,6 +32,28 @@ export default function SignupPage() {
       setError(error.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: 'google' | 'apple') => {
+    setError(null);
+    let authProvider;
+    if (provider === 'google') {
+      setGoogleLoading(true);
+      authProvider = new GoogleAuthProvider();
+    } else {
+      setAppleLoading(true);
+      authProvider = new OAuthProvider('apple.com');
+    }
+
+    try {
+      await signInWithPopup(auth, authProvider);
+      router.push('/profile');
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setGoogleLoading(false);
+      setAppleLoading(false);
     }
   };
 
@@ -47,6 +72,21 @@ export default function SignupPage() {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
+
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <Button variant="outline" onClick={() => handleSocialLogin('google')} disabled={googleLoading || loading}>
+              {googleLoading ? 'Caricamento...' : 'Continua con Google'}
+            </Button>
+            <Button variant="outline" onClick={() => handleSocialLogin('apple')} disabled={appleLoading || loading}>
+               {appleLoading ? 'Caricamento...' : 'Continua con Apple'}
+             </Button>
+          </div>
+
+          <div className="flex items-center my-4">
+            <Separator className="flex-grow" />
+            <span className="mx-4 text-xs text-muted-foreground">OPPURE</span>
+            <Separator className="flex-grow" />
+          </div>
           
           <form onSubmit={handleSignup} className="space-y-6">
             <div className="space-y-2">
@@ -75,13 +115,13 @@ export default function SignupPage() {
                 disabled={loading}
               />
             </div>
-            <Button type="submit" className="w-full bg-accent hover:bg-accent/90" disabled={loading}>
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
               {loading ? 'Creazione in corso...' : 'Registrati con Email'}
             </Button>
           </form>
            <div className="mt-4 text-center text-sm">
             Hai già un account?{' '}
-            <Link href="/login" className="underline text-accent">
+            <Link href="/login" className="underline text-primary">
               Accedi
             </Link>
           </div>
