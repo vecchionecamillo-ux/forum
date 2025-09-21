@@ -4,10 +4,12 @@ import { ScrollRevealWrapper } from '@/components/scroll-reveal';
 import Image from 'next/image';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ArrowRight } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 const newsItems = [
   {
     title: 'Nuova Call per Volontari',
+    category: 'Volontariato',
     description: 'Stiamo cercando persone appassionate che vogliano contribuire alla crescita del Cantiere Culturale. Unisciti a noi e fai la differenza!',
     image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
     cta: 'Partecipa',
@@ -15,6 +17,7 @@ const newsItems = [
   },
   {
     title: 'Annuncio Workshop: "Creative Coding"',
+    category: 'Workshop',
     description: 'Impara a creare arte con il codice nel nostro prossimo workshop intensivo. Prenota il tuo slot, i posti sono limitati!',
     image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
     cta: 'Prenota Ora',
@@ -22,6 +25,7 @@ const newsItems = [
   },
   {
     title: 'Articolo: Il Futuro dell\'Arte è Digitale?',
+    category: 'Articolo',
     description: 'Un approfondimento del nostro curatore sul ruolo crescente della tecnologia nel mondo dell\'arte contemporanea. Leggi l\'articolo completo.',
     image: PlaceHolderImages.find(img => img.id === 'nft-placeholder'),
     cta: 'Leggi di più',
@@ -43,8 +47,9 @@ export function NewsSection() {
           {newsItems.map((item) => (
             <Card key={item.title} className="bg-card/50 backdrop-blur-lg border-white/10 overflow-hidden flex flex-col transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10">
               {item.image && (
-                <div className="aspect-video overflow-hidden">
+                <div className="aspect-video overflow-hidden relative">
                   <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
+                   <Badge variant="default" className="absolute top-2 right-2 bg-accent text-accent-foreground">{item.category}</Badge>
                 </div>
               )}
               <CardHeader>
