@@ -5,7 +5,16 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Award, Shield, Star } from 'lucide-react';
+import { Award, Shield, Star, Crown } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+
+const ranks = [
+  { level: 1, name: 'Visitatore', color: 'bg-gray-500' },
+  { level: 2, name: 'Membro', color: 'bg-blue-500' },
+  { level: 3, name: 'Partecipante Attivo', color: 'bg-green-500' },
+  { level: 4, name: 'Creatore', color: 'bg-purple-500' },
+  { level: 5, name: 'Ambasciatore', color: 'bg-yellow-500 text-black' },
+];
 
 export default function ProfilePage() {
   const { user, isModerator, loading } = useAuth();
@@ -28,6 +37,8 @@ export default function ProfilePage() {
   const userInitial = user.email ? user.email.charAt(0).toUpperCase() : '?';
   // Mock data, replace with real data from your backend
   const userPoints = 1250; 
+  const userRankLevel = 3; // Mock rank level
+  const userRank = ranks.find(r => r.level === userRankLevel) || ranks[0];
   const userHistory = [
     { id: 1, action: 'Partecipazione Workshop "Creative Coding"', points: 250 },
     { id: 2, action: 'Volontariato Evento "Visioni Digitali"', points: 150 },
@@ -46,12 +57,15 @@ export default function ProfilePage() {
             </Avatar>
             <div>
               <CardTitle className="text-2xl font-bold">{user.email}</CardTitle>
-              {isModerator && (
-                <p className="text-sm text-accent font-semibold flex items-center justify-center mt-1">
-                  <Shield className="mr-1 h-4 w-4" />
-                  Moderatore
-                </p>
-              )}
+              <div className="flex items-center justify-center gap-2 mt-2">
+                <Badge className={`${userRank.color} text-white`}>{userRank.name}</Badge>
+                {isModerator && (
+                  <Badge variant="destructive" className="flex items-center gap-1">
+                    <Shield className="h-3 w-3" />
+                    Moderatore
+                  </Badge>
+                )}
+              </div>
             </div>
           </CardHeader>
           <CardContent className="mt-6">
