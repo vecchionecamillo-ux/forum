@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,25 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    const checkRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          router.push('/profile');
+        } else {
+          setIsVerifying(false);
+        }
+      } catch (error: any) {
+        setError(error.message);
+        setIsVerifying(false);
+      }
+    };
+    checkRedirectResult();
+  }, [router]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,21 +54,30 @@ export default function SignupPage() {
 
   const handleSocialLogin = async (provider: 'google') => {
     setError(null);
+    setGoogleLoading(true);
     let authProvider;
     if (provider === 'google') {
-      setGoogleLoading(true);
       authProvider = new GoogleAuthProvider();
+    } else {
+        setGoogleLoading(false);
+        return;
     }
 
     try {
-      await signInWithPopup(auth, authProvider);
-      router.push('/profile');
+      await signInWithRedirect(auth, authProvider);
     } catch (error: any) {
       setError(error.message);
-    } finally {
       setGoogleLoading(false);
     }
   };
+
+  if (isVerifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Verifica in corso...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-secondary/10 p-4">
@@ -70,7 +97,7 @@ export default function SignupPage() {
 
           <div className="mb-6">
             <Button variant="outline" onClick={() => handleSocialLogin('google')} disabled={googleLoading || loading} className="w-full">
-              {googleLoading ? 'Caricamento...' : 'Continua con Google'}
+              {googleLoading ? 'Reindirizzamento...' : 'Continua con Google'}
             </Button>
           </div>
 
