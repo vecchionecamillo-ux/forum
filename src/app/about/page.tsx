@@ -17,14 +17,13 @@ const backgroundSections = [
 export default function AboutPage() {
   return (
     <>
-      <DynamicBackground sections={backgroundSections} />
       <main className="pt-16 relative z-10">
           <ScrollRevealWrapper>
-            <section className="py-24 text-center bg-background">
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">
+            <section className="py-24 text-center">
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white" style={{textShadow: '0 2px 10px rgba(0,0,0,0.5)'}}>
                     Chi Siamo
                 </h1>
-                <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80 px-4">
+                <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-white/90 px-4" style={{textShadow: '0 1px 5px rgba(0,0,0,0.5)'}}>
                     Cantiere Culturale è un ecosistema digitale dove arte e innovazione si incontrano. La nostra missione è plasmare il futuro creativo europeo, offrendo una piattaforma per artisti, curatori e appassionati per connettersi, imparare e crescere.
                 </p>
             </section>

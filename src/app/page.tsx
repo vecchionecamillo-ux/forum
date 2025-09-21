@@ -6,8 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 
-const backgroundImage = PlaceHolderImages.find((img) => img.id === 'art-placeholder');
-
 export default function Home() {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
@@ -64,18 +62,8 @@ export default function Home() {
 
   return (
     <div className={cn("relative h-screen w-screen overflow-hidden", isExiting && 'animate-page-exit')}>
-      {backgroundImage && (
-        <Image
-          src={backgroundImage.imageUrl}
-          alt={backgroundImage.description}
-          fill
-          className="object-cover"
-          data-ai-hint={backgroundImage.imageHint}
-          priority
-        />
-      )}
       
-      <div className="absolute inset-0 bg-background/50"></div>
+      <div className="absolute inset-0 bg-transparent"></div>
 
       <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4">
         <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none animate-fade-in-up" style={{textShadow: '0 2px 10px rgba(0,0,0,0.5)'}}>

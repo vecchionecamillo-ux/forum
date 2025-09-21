@@ -40,21 +40,21 @@ export function NewsSection() {
     <section id="news" className="min-h-screen flex flex-col justify-center items-center px-4 py-24 sm:px-6 lg:px-8">
       <ScrollRevealWrapper className="w-full max-w-6xl mx-auto">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">News & Annunci</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-foreground/80">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white" style={{textShadow: '0 2px 10px rgba(0,0,0,0.5)'}}>News & Annunci</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-white/90" style={{textShadow: '0 1px 5px rgba(0,0,0,0.5)'}}>
             Rimani aggiornato sugli ultimi articoli, annunci, eventi e opportunità di volontariato.
           </p>
         </div>
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {newsItems.map((item) => (
-            <Card key={item.title} className="bg-card/50 backdrop-blur-lg border-white/10 overflow-hidden flex flex-col transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10">
+            <Card key={item.title} className="bg-black/20 backdrop-blur-sm border-white/10 text-white overflow-hidden flex flex-col transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20">
               <div className="aspect-video overflow-hidden relative">
                 {item.image && (
                   <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
                 )}
-                 <Badge variant="default" className="absolute top-2 left-2 bg-accent text-accent-foreground">{item.category}</Badge>
+                 <Badge variant="default" className="absolute top-2 left-2 bg-yellow-400 text-black">{item.category}</Badge>
                  {item.points && (
-                    <Badge variant="secondary" className="absolute top-2 right-2 bg-primary/80 text-primary-foreground backdrop-blur-sm">
+                    <Badge variant="secondary" className="absolute top-2 right-2 bg-blue-400/80 text-white backdrop-blur-sm">
                       <Star className="mr-1 h-3 w-3" /> {item.points} Punti
                     </Badge>
                   )}
@@ -63,10 +63,10 @@ export function NewsSection() {
                 <CardTitle className="text-2xl font-bold">{item.title}</CardTitle>
               </CardHeader>
               <CardContent className="flex-grow">
-                <CardDescription className="text-foreground/80 text-base">{item.description}</CardDescription>
+                <CardDescription className="text-white/80 text-base">{item.description}</CardDescription>
               </CardContent>
               <CardFooter>
-                 <Button asChild variant="link" className="text-accent p-0">
+                 <Button asChild variant="link" className="text-yellow-300 p-0">
                     <a href={item.link}>
                       {item.cta}
                       <ArrowRight className="ml-2 h-4 w-4" />
