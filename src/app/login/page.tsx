@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword, signInWithRedirect, GoogleAuthProvider, getRedirectResult } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,34 +10,13 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
-import { Separator } from '@/components/ui/separator';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(true);
   const router = useRouter();
-
-  useEffect(() => {
-    const checkRedirectResult = async () => {
-      try {
-        const result = await getRedirectResult(auth);
-        if (result) {
-          // User has successfully signed in via redirect.
-          router.push('/profile');
-        } else {
-          setIsVerifying(false);
-        }
-      } catch (error: any) {
-        setError(error.message);
-        setIsVerifying(false);
-      }
-    };
-    checkRedirectResult();
-  }, [router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,44 +26,28 @@ export default function LoginPage() {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {
-      setError(error.message);
+      switch (error.code) {
+        case 'auth/user-not-found':
+          setError('Nessun utente trovato con questa email.');
+          break;
+        case 'auth/wrong-password':
+          setError('Password errata. Riprova.');
+          break;
+        case 'auth/invalid-credential':
+            setError('Credenziali non valide. Controlla email e password.');
+            break;
+        default:
+          setError('Si è verificato un errore durante l\'accesso. Riprova.');
+          break;
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSocialLogin = async (provider: 'google') => {
-    setError(null);
-    setGoogleLoading(true);
-    let authProvider;
-    if (provider === 'google') {
-      authProvider = new GoogleAuthProvider();
-    } else {
-        setGoogleLoading(false);
-        return;
-    }
-
-    try {
-      await signInWithRedirect(auth, authProvider);
-      // The user is redirected, so no further code here will execute.
-    } catch (error: any) {
-      setError(error.message);
-      setGoogleLoading(false);
-    }
-  };
-  
-  if (isVerifying) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Verifica in corso...</p>
-      </div>
-    );
-  }
-
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-secondary/10 p-4">
-      <Card className="w-full max-w-md bg-card/70 backdrop-blur-lg">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-black">Accedi</CardTitle>
           <CardDescription>
@@ -97,18 +60,6 @@ export default function LoginPage() {
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
-           <div className="mb-6">
-             <Button variant="outline" onClick={() => handleSocialLogin('google')} disabled={googleLoading || loading} className="w-full">
-               {googleLoading ? 'Reindirizzamento...' : 'Accedi con Google'}
-             </Button>
-           </div>
-
-           <div className="flex items-center my-4">
-              <Separator className="flex-grow" />
-              <span className="mx-4 text-xs text-muted-foreground">OPPURE</span>
-              <Separator className="flex-grow" />
-            </div>
-
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
@@ -119,7 +70,6 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="mario.rossi@email.com"
                 required
-                className="bg-background/50"
                 disabled={loading}
               />
             </div>
@@ -131,12 +81,11 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="bg-background/50"
                 disabled={loading}
               />
             </div>
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={loading}>
-              {loading ? 'Accesso in corso...' : 'Accedi con Email'}
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? 'Accesso in corso...' : 'Accedi'}
             </Button>
           </form>
            <div className="mt-4 text-center text-sm">
