@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, AppleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -44,7 +44,7 @@ export default function SignupPage() {
       if (providerName === 'google') {
         provider = new GoogleAuthProvider();
       } else {
-        provider = new OAuthProvider('apple.com');
+        provider = new AppleAuthProvider();
       }
       await signInWithPopup(auth, provider);
       router.push('/profile');
