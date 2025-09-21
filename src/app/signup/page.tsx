@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, OAuthProvider } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +18,6 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [appleLoading, setAppleLoading] = useState(false);
   const router = useRouter();
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -35,15 +34,12 @@ export default function SignupPage() {
     }
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'apple') => {
+  const handleSocialLogin = async (provider: 'google') => {
     setError(null);
     let authProvider;
     if (provider === 'google') {
       setGoogleLoading(true);
       authProvider = new GoogleAuthProvider();
-    } else {
-      setAppleLoading(true);
-      authProvider = new OAuthProvider('apple.com');
     }
 
     try {
@@ -53,7 +49,6 @@ export default function SignupPage() {
       setError(error.message);
     } finally {
       setGoogleLoading(false);
-      setAppleLoading(false);
     }
   };
 
@@ -73,13 +68,10 @@ export default function SignupPage() {
             </Alert>
           )}
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <Button variant="outline" onClick={() => handleSocialLogin('google')} disabled={googleLoading || loading}>
+          <div className="mb-6">
+            <Button variant="outline" onClick={() => handleSocialLogin('google')} disabled={googleLoading || loading} className="w-full">
               {googleLoading ? 'Caricamento...' : 'Continua con Google'}
             </Button>
-            <Button variant="outline" onClick={() => handleSocialLogin('apple')} disabled={appleLoading || loading}>
-               {appleLoading ? 'Caricamento...' : 'Continua con Apple'}
-             </Button>
           </div>
 
           <div className="flex items-center my-4">
