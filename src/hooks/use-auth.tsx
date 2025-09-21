@@ -15,6 +15,11 @@ import {
 import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 
+// --- DEVELOPMENT ONLY ---
+// Add email addresses here to automatically grant them moderator privileges.
+const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com'];
+// --------------------
+
 type AuthContextType = {
   user: User | null;
   loading: boolean;
@@ -40,7 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (user) {
         setUser(user);
         const tokenResult = await user.getIdTokenResult();
-        setIsModerator(!!tokenResult.claims.moderator);
+        // Check for official moderator claim OR if the user's email is in our dev list.
+        const hasModeratorClaim = !!tokenResult.claims.moderator;
+        const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
+        setIsModerator(hasModeratorClaim || isDevModerator);
       } else {
         setUser(null);
         setIsModerator(false);
