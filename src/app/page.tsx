@@ -63,18 +63,17 @@ export default function Home() {
   return (
     <div className={cn("relative h-screen w-screen overflow-hidden", isExiting && 'animate-page-exit')}>
       
-      <div className="absolute inset-0 bg-transparent"></div>
+      <div className="absolute inset-0 bg-transparent z-0"></div>
 
-      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4">
-        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none animate-fade-in-up" style={{textShadow: '0 2px 10px rgba(0,0,0,0.5)'}}>
+      <div className="relative z-10 flex flex-col items-center justify-center h-full text-center text-foreground px-4">
+        <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-none animate-fade-in-up">
           Benvenuto nel Cantiere Culturale
         </h1>
       </div>
 
        <button
         onClick={handleNavigation}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-white animate-bounce"
-        style={{textShadow: '0 1px 5px rgba(0,0,0,0.5)'}}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-foreground animate-bounce"
       >
         <span className="text-sm font-medium uppercase tracking-widest">Scorri per scoprire</span>
         <ChevronDown className="h-6 w-6" />

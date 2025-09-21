@@ -36,18 +36,18 @@ const newsItems = [
 export function NewsSection() {
   return (
     <ScrollRevealWrapper id="news">
-      <section className="min-h-screen flex flex-col justify-center items-center px-4 py-24 sm:px-6 lg:px-8">
+      <section className="min-h-screen flex flex-col justify-center items-center px-4 py-24 sm:px-6 lg:px-8 bg-secondary">
       <div className="w-full max-w-6xl mx-auto">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white">News & Annunci</h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-white/90">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-foreground">News & Annunci</h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-foreground/80">
             Rimani aggiornato sugli ultimi articoli, annunci ed eventi.
           </p>
         </div>
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {newsItems.map((item, index) => (
              <ScrollRevealWrapper key={item.title} className={`animation-delay-${index * 150}`}>
-                <Card className="bg-black/20 backdrop-blur-sm border-white/10 text-white overflow-hidden flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/20">
+                <Card className="overflow-hidden flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <div className="aspect-video overflow-hidden relative">
                     {item.image && (
                     <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
@@ -58,7 +58,7 @@ export function NewsSection() {
                     <CardTitle className="text-2xl font-bold">{item.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                    <CardDescription className="text-white/80 text-base">{item.description}</CardDescription>
+                    <CardDescription className="text-base">{item.description}</CardDescription>
                 </CardContent>
                 <CardFooter>
                     <Button asChild variant="link" className="text-primary p-0">

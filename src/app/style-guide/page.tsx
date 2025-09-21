@@ -3,11 +3,11 @@ import { PenSquare } from 'lucide-react';
 
 export default function StyleGuidePage() {
   return (
-    <div className="min-h-screen bg-secondary/10 flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <main className="w-full max-w-3xl mx-auto pt-24 pb-12">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-accent/10 mb-4">
-            <PenSquare className="w-8 h-8 text-accent" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+            <PenSquare className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight">
             AI Art Style Guide

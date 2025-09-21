@@ -12,7 +12,7 @@ import { Bot, Sparkles } from 'lucide-react';
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} size="lg" className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-accent-foreground">
+    <Button type="submit" disabled={pending} size="lg" className="w-full sm:w-auto">
       {pending ? (
         <>
           <Sparkles className="mr-2 h-4 w-4 animate-spin" />
@@ -50,13 +50,13 @@ export function StyleGuideForm() {
 
   return (
     <div className="space-y-8">
-      <Card className="bg-card/50 backdrop-blur-lg border-white/10">
+      <Card>
         <CardContent className="p-6">
           <form action={handleSubmit} className="space-y-4">
             <Textarea
               name="query"
               placeholder="Es: 'Dammi consigli per uno stile pittorico cyberpunk' o 'Quali sono gli elementi chiave dell'arte espressionista?'"
-              className="min-h-[120px] bg-background/50 border-white/20 text-base"
+              className="min-h-[120px] text-base"
               rows={5}
             />
             <div className="flex justify-end">
@@ -73,15 +73,15 @@ export function StyleGuideForm() {
       )}
 
       {result && (
-        <Card className="bg-card/50 backdrop-blur-lg border-white/10 animate-in fade-in-50 duration-500">
+        <Card className="animate-in fade-in-50 duration-500">
           <CardHeader>
-            <CardTitle className="flex items-center text-accent">
+            <CardTitle className="flex items-center text-primary">
               <Bot className="mr-2 h-6 w-6" />
               Guida di Stile AI
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-invert max-w-none text-foreground/90 whitespace-pre-wrap">
+            <div className="prose prose-sm sm:prose-base max-w-none text-foreground/90 whitespace-pre-wrap">
               {result.guidance}
             </div>
           </CardContent>

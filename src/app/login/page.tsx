@@ -36,8 +36,11 @@ export default function LoginPage() {
         case 'auth/wrong-password':
           setError('Password errata. Riprova.');
           break;
-        default:
+        case 'auth/invalid-credential':
           setError('Credenziali non valide. Controlla email e password e riprova.');
+          break;
+        default:
+          setError('Si è verificato un errore durante l\'accesso. Riprova.');
           break;
       }
     } finally {
@@ -82,7 +85,7 @@ export default function LoginPage() {
 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-secondary/10 p-4">
+    <div className="min-h-screen flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-3xl font-black">{isResetMode ? 'Recupera Password' : 'Accedi'}</CardTitle>
@@ -135,9 +138,7 @@ export default function LoginPage() {
                 />
               </div>
               <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Password</Label>
-                  </div>
+                <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -156,9 +157,9 @@ export default function LoginPage() {
           <div className="mt-4 text-center text-sm">
             {isResetMode ? (
               <>
-                Tornare al login?{' '}
+                Ricordi la password?{' '}
                 <button onClick={toggleResetMode} className="underline text-primary" disabled={loading}>
-                  Accedi
+                  Torna al Login
                 </button>
               </>
             ) : (

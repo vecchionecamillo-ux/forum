@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Award, Shield, Star, Crown } from 'lucide-react';
+import { Award, Shield, Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const ranks = [
-  { level: 1, name: 'Visitatore', color: 'bg-gray-500' },
+  { level: 1, name: 'Visitatore', color: 'bg-gray-400' },
   { level: 2, name: 'Membro', color: 'bg-blue-500' },
   { level: 3, name: 'Partecipante Attivo', color: 'bg-green-500' },
   { level: 4, name: 'Creatore', color: 'bg-purple-500' },
@@ -46,19 +46,19 @@ export default function ProfilePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-secondary/10 p-4 pt-24 sm:p-6 lg:p-8">
+    <div className="min-h-screen p-4 pt-24 sm:p-6 lg:p-8">
       <main className="max-w-4xl mx-auto">
-        <Card className="bg-card/70 backdrop-blur-lg">
+        <Card>
           <CardHeader className="flex flex-col items-center text-center space-y-4">
             <Avatar className="w-24 h-24 text-4xl">
-              <AvatarFallback className="bg-accent text-accent-foreground">
+              <AvatarFallback className="bg-primary text-primary-foreground">
                 {userInitial}
               </AvatarFallback>
             </Avatar>
             <div>
               <CardTitle className="text-2xl font-bold">{user.email}</CardTitle>
               <div className="flex items-center justify-center gap-2 mt-2">
-                <Badge className={`${userRank.color} text-white`}>{userRank.name}</Badge>
+                <Badge variant="secondary" className={`${userRank.color} text-white`}>{userRank.name}</Badge>
                 {isModerator && (
                   <Badge variant="destructive" className="flex items-center gap-1">
                     <Shield className="h-3 w-3" />
@@ -70,7 +70,7 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <Card className="bg-background/50">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center text-xl">
                     <Star className="mr-2 h-5 w-5 text-primary" />
@@ -78,11 +78,11 @@ export default function ProfilePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-4xl font-black text-accent">{userPoints}</p>
+                  <p className="text-4xl font-black text-yellow-500">{userPoints}</p>
                   <p className="text-sm text-muted-foreground mt-1">Punti totali accumulati.</p>
                 </CardContent>
               </Card>
-              <Card className="bg-background/50">
+              <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center text-xl">
                     <Award className="mr-2 h-5 w-5 text-primary" />
@@ -94,7 +94,7 @@ export default function ProfilePage() {
                     {userHistory.map(item => (
                        <li key={item.id} className="text-sm flex justify-between items-center">
                          <span>{item.action}</span>
-                         <span className="font-bold text-accent whitespace-nowrap">+{item.points} punti</span>
+                         <span className="font-bold text-yellow-500 whitespace-nowrap">+{item.points} punti</span>
                        </li>
                     ))}
                   </ul>

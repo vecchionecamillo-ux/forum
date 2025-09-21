@@ -9,10 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Star, Shield, ArrowUp, ArrowDown } from 'lucide-react';
+import { Star, Shield, ArrowUp } from 'lucide-react';
 
 const ranks = [
-  { level: 1, name: 'Visitatore', color: 'bg-gray-500' },
+  { level: 1, name: 'Visitatore', color: 'bg-gray-400' },
   { level: 2, name: 'Membro', color: 'bg-blue-500' },
   { level: 3, name: 'Partecipante Attivo', color: 'bg-green-500' },
   { level: 4, name: 'Creatore', color: 'bg-purple-500' },
@@ -39,7 +39,7 @@ async function fetchUsers(): Promise<User[]> {
 function SubmitButton({ children }: { children: React.ReactNode }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="bg-accent hover:bg-accent/90 text-accent-foreground w-full sm:w-auto">
+    <Button type="submit" disabled={pending} className="w-full sm:w-auto">
       {pending ? 'Applicando...' : children}
     </Button>
   );
@@ -79,21 +79,21 @@ export function ModeratorPanel() {
   const getRank = (level: number) => ranks.find(r => r.level === level) || ranks[0];
 
   return (
-    <Card className="bg-card/50 backdrop-blur-lg border-white/10">
+    <Card>
       <CardContent className="p-4 md:p-6">
         <div className="space-y-6">
           {users.length > 0 ? (
             users.map((user) => {
               const userRank = getRank(user.rankLevel);
               return (
-                <Card key={user._id} className="bg-black/20 border border-white/10 text-white">
+                <Card key={user._id} className="border">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                         <div>
                             <CardTitle className="text-lg font-medium">{user.username}</CardTitle>
-                            <CardDescription className="text-white/70 flex items-center gap-2 mt-1">
-                                <Badge className={`${userRank.color} text-white`}>{userRank.name}</Badge>
-                                <span className="flex items-center gap-1"><Star className="h-3 w-3 text-accent" /> {user.points} punti</span>
+                            <CardDescription className="text-foreground/70 flex items-center gap-2 mt-1">
+                                <Badge variant="secondary" className={`${userRank.color} text-white`}>{userRank.name}</Badge>
+                                <span className="flex items-center gap-1"><Star className="h-3 w-3 text-yellow-500" /> {user.points} punti</span>
                             </CardDescription>
                         </div>
                         <Shield className="h-6 w-6 text-primary" />
@@ -104,7 +104,7 @@ export function ModeratorPanel() {
                        <input type="hidden" name="actionType" value="addPoints" />
                        <input type="hidden" name="userId" value={user._id} />
                        <div>
-                         <label htmlFor={`points-${user._id}`} className="text-xs font-medium text-white/80 mb-1 block">Aggiungi Punti</label>
+                         <label htmlFor={`points-${user._id}`} className="text-xs font-medium text-foreground/80 mb-1 block">Aggiungi Punti</label>
                          <Input
                            id={`points-${user._id}`}
                            type="number"
@@ -112,7 +112,6 @@ export function ModeratorPanel() {
                            placeholder="Es: 150"
                            required
                            min="1"
-                           className="bg-background/50 border-white/20"
                            disabled={isPending}
                          />
                        </div>
@@ -124,9 +123,9 @@ export function ModeratorPanel() {
                        <input type="hidden" name="actionType" value="changeRank" />
                        <input type="hidden" name="userId" value={user._id} />
                        <div>
-                         <label htmlFor={`rank-${user._id}`} className="text-xs font-medium text-white/80 mb-1 block">Cambia Grado</label>
+                         <label htmlFor={`rank-${user._id}`} className="text-xs font-medium text-foreground/80 mb-1 block">Cambia Grado</label>
                          <Select name="rank" defaultValue={userRank.name} disabled={isPending}>
-                          <SelectTrigger id={`rank-${user._id}`} className="bg-background/50 border-white/20">
+                          <SelectTrigger id={`rank-${user._id}`}>
                             <SelectValue placeholder="Seleziona grado" />
                           </SelectTrigger>
                           <SelectContent>
