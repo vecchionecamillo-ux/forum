@@ -2,22 +2,26 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { ScrollRevealWrapper } from '@/components/scroll-reveal';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 const marketplaceItems = [
   {
-    title: 'NFT',
-    description: 'Opere digitali uniche e certificate, create dai talenti più visionari della scena contemporanea.',
-    image: PlaceHolderImages.find(img => img.id === 'nft-placeholder'),
+    title: 'Accesso Esclusivo: Opening Mostra "Visioni Digitali"',
+    description: 'Assicurati il tuo posto per la serata inaugurale della nostra nuova mostra. Posti limitati.',
+    image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
+    cta: 'Acquista Accesso',
   },
   {
-    title: 'ART',
-    description: 'Una selezione esclusiva di opere fisiche, dall\'illustrazione alla scultura, che uniscono tradizione e innovazione.',
+    title: 'Stampa Fine Art in Edizione Limitata',
+    description: 'Una stampa esclusiva dell\'opera "Riflessi Urbani" di Artista Famoso. Solo 50 copie disponibili.',
     image: PlaceHolderImages.find(img => img.id === 'art-placeholder'),
+    cta: 'Compra Ora',
   },
   {
-    title: 'MERCHANDISING',
-    description: 'Sostieni il progetto e porta con te un pezzo del Cantiere Culturale con la nostra linea di merchandising.',
-    image: PlaceHolderImages.find(img => img.id === 'merch-placeholder'),
+    title: 'Workshop di Scultura 3D con Artista Digitale',
+    description: 'Un workshop intensivo di 2 giorni per imparare le tecniche avanzate di scultura digitale. Accesso riservato.',
+    image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+    cta: 'Riserva il tuo Posto',
   },
 ];
 
@@ -26,24 +30,25 @@ export function MarketplaceSection() {
     <section id="marketplace" className="min-h-screen flex flex-col justify-center items-center px-4 py-24 sm:px-6 lg:px-8 bg-black/20">
       <ScrollRevealWrapper className="w-full max-w-6xl mx-auto">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Marketplace</h2>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Marketplace Esclusivo</h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg md:text-xl text-foreground/80">
-            Uno spazio curato per scoprire, collezionare e scambiare opere che definiscono la nuova era dell'arte digitale e fisica.
+            Acquista prodotti unici e assicurati l'accesso a eventi imperdibili riservati alla nostra community.
           </p>
         </div>
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {marketplaceItems.map((item) => (
-            <Card key={item.title} className="bg-card/50 backdrop-blur-lg border-white/10 overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent/10">
+            <Card key={item.title} className="bg-card/50 backdrop-blur-lg border-white/10 overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl hover:shadow-accent/10 flex flex-col">
               {item.image && (
                 <div className="aspect-video overflow-hidden">
                   <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
                 </div>
               )}
-              <CardHeader>
+              <CardHeader className="flex-grow">
                 <CardTitle className="text-2xl font-bold text-accent">{item.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <CardDescription className="text-foreground/80 text-base">{item.description}</CardDescription>
+              <CardContent className="flex flex-col flex-grow">
+                <CardDescription className="text-foreground/80 text-base flex-grow mb-4">{item.description}</CardDescription>
+                <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground mt-auto">{item.cta}</Button>
               </CardContent>
             </Card>
           ))}
