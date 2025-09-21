@@ -82,7 +82,7 @@ export function DynamicBackground({ sections }: DynamicBackgroundProps) {
         fill
         className={cn(
           "object-cover transition-opacity duration-500 ease-in-out",
-          isFading ? 'opacity-0' : 'opacity-20'
+          isFading ? 'opacity-0' : 'opacity-30'
         )}
         priority
       />

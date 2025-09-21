@@ -2,39 +2,39 @@
   "placeholderImages": [
     {
       "id": "nft-placeholder",
-      "description": "A colorful child's drawing of a robot.",
-      "imageUrl": "https://picsum.photos/seed/robot/600/400",
-      "imageHint": "child drawing robot"
+      "description": "Minimalist graphic design with geometric shapes.",
+      "imageUrl": "https://picsum.photos/seed/geometric/600/400",
+      "imageHint": "minimalist graphic"
     },
     {
       "id": "art-placeholder",
-      "description": "A child's drawing of a house and sun.",
-      "imageUrl": "https://picsum.photos/seed/house/600/400",
-      "imageHint": "child drawing house"
+      "description": "Vibrant abstract graphic design with flowing lines.",
+      "imageUrl": "https://picsum.photos/seed/abstract/600/400",
+      "imageHint": "vibrant abstract"
     },
     {
       "id": "merch-placeholder",
-      "description": "A child's drawing of a colorful abstract pattern.",
-      "imageUrl": "https://picsum.photos/seed/pattern/600/400",
-      "imageHint": "child drawing abstract"
+      "description": "A minimal and colorful graphic pattern.",
+      "imageUrl": "https://picsum.photos/seed/graphic-pattern/600/400",
+      "imageHint": "minimal pattern"
     },
     {
       "id": "training-placeholder",
-      "description": "A child's drawing of animals.",
-      "imageUrl": "https://picsum.photos/seed/animals/600/400",
-      "imageHint": "child drawing animals"
+      "description": "A vibrant graphic illustration with a minimalist feel.",
+      "imageUrl": "https://picsum.photos/seed/illustration/600/400",
+      "imageHint": "vibrant illustration"
     },
     {
       "id": "events-placeholder",
-      "description": "A child's drawing of a family.",
-      "imageUrl": "https://picsum.photos/seed/family/600/400",
-      "imageHint": "child drawing family"
+      "description": "An abstract composition of shapes and colors.",
+      "imageUrl": "https://picsum.photos/seed/composition/600/400",
+      "imageHint": "abstract composition"
     },
     {
       "id": "community-placeholder",
-      "description": "A child's drawing of flowers and nature.",
-      "imageUrl": "https://picsum.photos/seed/nature/600/400",
-      "imageHint": "child drawing nature"
+      "description": "A minimal graphic design with a focus on color gradients.",
+      "imageUrl": "https://picsum.photos/seed/gradient/600/400",
+      "imageHint": "minimal gradient"
     }
   ]
 }
