@@ -1,5 +1,5 @@
 import { MembershipForm } from './membership-form';
-import { CardStack } from 'lucide-react';
+import { Layers } from 'lucide-react';
 
 
 export default function TesseraPage() {
@@ -8,7 +8,7 @@ export default function TesseraPage() {
       <main className="w-full max-w-3xl mx-auto pt-24 pb-12">
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <CardStack className="w-8 h-8 text-primary" />
+            <Layers className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight">
             Crea la tua Tessera Digitale
