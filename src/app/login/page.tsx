@@ -25,10 +25,12 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
+    if (!auth) {
+        setError("Autenticazione non disponibile. Riprova più tardi.");
+        setLoading(false);
+        return;
+    }
     try {
-      if (!auth) {
-        throw new Error("Firebase auth is not initialized.");
-      }
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {
@@ -57,10 +59,12 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
+    if (!auth) {
+        setError("Autenticazione non disponibile. Riprova più tardi.");
+        setLoading(false);
+        return;
+    }
     try {
-       if (!auth) {
-        throw new Error("Firebase auth is not initialized.");
-      }
       await sendPasswordResetEmail(auth, email);
       setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
       setIsResetMode(false);

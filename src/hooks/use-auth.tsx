@@ -42,6 +42,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!auth) {
+      console.warn("Firebase auth is not initialized. Skipping auth state change listener.");
       setLoading(false);
       return;
     }
@@ -50,7 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(user);
         try {
           const tokenResult = await user.getIdTokenResult();
-          // Check for official moderator claim OR if the user's email is in our dev list.
           const hasModeratorClaim = !!tokenResult.claims.moderator;
           const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
           setIsModerator(hasModeratorClaim || isDevModerator);

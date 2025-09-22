@@ -22,10 +22,12 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+     if (!auth) {
+        setError("Registrazione non disponibile. Riprova più tardi.");
+        setLoading(false);
+        return;
+    }
     try {
-      if (!auth) {
-        throw new Error("Firebase auth is not initialized.");
-      }
       await createUserWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {

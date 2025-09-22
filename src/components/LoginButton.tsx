@@ -6,10 +6,12 @@ import { auth } from '../lib/firebase'; // Importiamo l'oggetto auth che hai giÃ
 export default function LoginButton() {
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
+    if (!auth) {
+        console.error("Firebase auth is not initialized.");
+        alert("Errore: servizio di autenticazione non disponibile.");
+        return;
+    }
     try {
-      if (!auth) {
-        throw new Error("Firebase auth is not initialized.");
-      }
       const result = await signInWithPopup(auth, provider);
       // Login avvenuto con successo!
       const user = result.user;
