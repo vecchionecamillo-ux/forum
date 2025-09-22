@@ -54,17 +54,20 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
+    console.log(`Tentativo di invio email di recupero a: ${email}`);
     try {
       await sendPasswordResetEmail(auth, email);
+      console.log("Email di recupero inviata con successo tramite Firebase.");
       setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
       setIsResetMode(false);
     } catch (error: any) {
+       console.error("Errore Firebase durante l'invio dell'email di recupero:", error);
        switch (error.code) {
         case 'auth/user-not-found':
           setError('Nessun utente trovato con questa email. Impossibile inviare il link di recupero.');
           break;
         default:
-          setError('Si è verificato un errore durante l\'invio dell\'email. Riprova.');
+          setError(`Si è verificato un errore durante l'invio dell'email. Dettagli: ${error.message}`);
           break;
       }
     } finally {
