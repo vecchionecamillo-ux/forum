@@ -41,14 +41,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-        const tokenResult = await user.getIdTokenResult();
-        // Check for official moderator claim OR if the user's email is in our dev list.
-        const hasModeratorClaim = !!tokenResult.claims.moderator;
-        const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
-        setIsModerator(hasModeratorClaim || isDevModerator);
+        try {
+          const tokenResult = await user.getIdTokenResult();
+          // Check for official moderator claim OR if the user's email is in our dev list.
+          const hasModeratorClaim = !!tokenResult.claims.moderator;
+          const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
+          setIsModerator(hasModeratorClaim || isDevModerator);
+        } catch (error) {
+          console.error("Error fetching token result:", error);
+          const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
+          setIsModerator(isDevModerator);
+        }
+
       } else {
         setUser(null);
         setIsModerator(false);
@@ -61,7 +72,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      await signOut(auth);
+      if(auth) {
+        await signOut(auth);
+      }
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);

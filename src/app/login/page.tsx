@@ -26,6 +26,9 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     try {
+      if (!auth) {
+        throw new Error("Firebase auth is not initialized.");
+      }
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {
@@ -37,8 +40,8 @@ export default function LoginPage() {
           setError('Password errata. Riprova.');
           break;
         case 'auth/invalid-credential':
-          setError('Credenziali non valide. Controlla email e password e riprova.');
-          break;
+           setError('Credenziali non valide. Controlla email e password e riprova.');
+           break;
         default:
           setError('Si è verificato un errore durante l\'accesso. Riprova.');
           break;
@@ -58,6 +61,9 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     try {
+       if (!auth) {
+        throw new Error("Firebase auth is not initialized.");
+      }
       await sendPasswordResetEmail(auth, email);
       setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
       setIsResetMode(false); // Torna alla schermata di login

@@ -7,6 +7,9 @@ export default function LoginButton() {
   const handleGoogleSignIn = async () => {
     const provider = new GoogleAuthProvider();
     try {
+      if (!auth) {
+        throw new Error("Firebase auth is not initialized.");
+      }
       const result = await signInWithPopup(auth, provider);
       // Login avvenuto con successo!
       const user = result.user;

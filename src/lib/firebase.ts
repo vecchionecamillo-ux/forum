@@ -24,7 +24,7 @@ const isConfigValid =
 
 // Initialize Firebase only if the configuration is valid
 // In a real app, you might want to show an error page or log this issue
-const app = isConfigValid && !getApps().length ? initializeApp(firebaseConfig) : (getApps().length > 0 ? getApp() : null);
+const app = isConfigValid ? (!getApps().length ? initializeApp(firebaseConfig) : getApp()) : null;
 
 // Throw an error during development if the config is missing
 if (process.env.NODE_ENV !== 'production' && !isConfigValid) {
