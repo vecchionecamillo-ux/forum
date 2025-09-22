@@ -1,16 +1,16 @@
-
 'use client';
 
-import { useAuth } from '@/hooks/use-auth';
+import { useAuth, type UserProfile } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { db } from '@/lib/firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Award, Shield, Star, AtSign } from 'lucide-react';
+import { Award, Shield, AtSign } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 
-// Mock data for ranks. In a real app, this would come from a config or database.
 const ranks = [
   { level: 1, name: 'Visitatore', color: 'bg-gray-400' },
   { level: 2, name: 'Membro', color: 'bg-blue-500' },
@@ -19,41 +19,33 @@ const ranks = [
   { level: 5, name: 'Ambasciatore', color: 'bg-yellow-500 text-black' },
 ];
 
-// Mock user data. In a real app, this would be fetched from your database.
-const fetchUserExtendedData = async (userId: string) => {
-  console.log(`Fetching data for user ${userId}`);
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  return {
-    points: 1250,
-    rankLevel: 3,
-    history: [
-      { id: 1, action: 'Partecipazione Workshop "Creative Coding"', points: 250, date: '2024-05-15' },
-      { id: 2, action: 'Volontariato Evento "Visioni Digitali"', points: 150, date: '2024-04-22' },
-      { id: 3, action: 'Acquisto Stampa Fine Art', points: 850, date: '2024-03-10' },
-    ],
-  };
-};
-
 export default function ProfilePage() {
   const { user, isModerator, loading } = useAuth();
   const router = useRouter();
-  
-  // State for extended user data
-  const [userProfile, setUserProfile] =
-    useEffect(() => {
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  useEffect(() => {
     if (!loading && !user) {
       router.push('/login');
     }
-    if (user) {
-      const loadData = async () => {
-        const data = await fetchUserExtendedData(user.uid);
-        setUserProfile(data);
-      };
-      loadData();
-    }
   }, [user, loading, router]);
 
+  useEffect(() => {
+    if (user) {
+      const userDocRef = doc(db, 'users', user.uid);
+      const unsubscribe = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          setUserProfile(doc.data() as UserProfile);
+        } else {
+          console.log("No such document!");
+          // Potresti voler gestire il caso in cui il documento utente non esiste
+        }
+      });
+
+      // Cleanup subscription on unmount
+      return () => unsubscribe();
+    }
+  }, [user]);
 
   if (loading || !user || !userProfile) {
     return (
@@ -79,7 +71,7 @@ export default function ProfilePage() {
                         </AvatarFallback>
                     </Avatar>
                     <div>
-                        <CardTitle className="text-2xl font-black tracking-tight">{user.displayName || user.email}</CardTitle>
+                        <CardTitle className="text-2xl font-black tracking-tight">{userProfile.displayName || user.email}</CardTitle>
                          <p className="text-sm text-muted-foreground flex items-center">
                             <AtSign className="h-3 w-3 mr-1.5" /> ID: {user.uid}
                         </p>
@@ -108,17 +100,21 @@ export default function ProfilePage() {
                 Storico Attività
               </h4>
               <Separator />
-              <ul className="space-y-4 mt-4">
-                {userProfile.history.map(item => (
-                   <li key={item.id} className="text-sm flex justify-between items-center bg-foreground/5 p-3 rounded-lg">
-                     <div>
-                        <span>{item.action}</span>
-                        <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</p>
-                     </div>
-                     <span className="font-bold text-yellow-500 whitespace-nowrap">+{item.points}</span>
-                   </li>
-                ))}
-              </ul>
+              {userProfile.history && userProfile.history.length > 0 ? (
+                <ul className="space-y-4 mt-4">
+                  {userProfile.history.map(item => (
+                     <li key={item.id} className="text-sm flex justify-between items-center bg-foreground/5 p-3 rounded-lg">
+                       <div>
+                          <span>{item.action}</span>
+                          <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</p>
+                       </div>
+                       <span className="font-bold text-yellow-500 whitespace-nowrap">+{item.points}</span>
+                     </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="text-center text-muted-foreground mt-4">Nessuna attività registrata.</p>
+              )}
             </div>
           </CardContent>
            <CardFooter className="bg-foreground/5 px-6 py-3">

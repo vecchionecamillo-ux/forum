@@ -12,13 +12,27 @@ import {
   signOut,
   type User,
 } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 // --- DEVELOPMENT ONLY ---
-// Add email addresses here to automatically grant them moderator privileges.
 const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com', 'vecchionecamillo1@gmail.com'];
 // --------------------
+
+export type UserProfile = {
+  uid: string;
+  email: string;
+  displayName: string | null;
+  photoURL: string | null;
+  points: number;
+  rankLevel: number;
+  createdAt: any;
+  country?: string;
+  isStudent?: boolean;
+  history?: { id: string, action: string, points: number, date: string }[];
+};
+
 
 type AuthContextType = {
   user: User | null;
@@ -34,6 +48,31 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
+// Helper function to create or update user in Firestore
+const createOrUpdateUserInDb = async (user: User) => {
+    const userDocRef = doc(db, 'users', user.uid);
+    const userDoc = await getDoc(userDocRef);
+
+    if (!userDoc.exists()) {
+        // New user, create the document
+        const newUserProfile: Omit<UserProfile, 'uid'> = {
+            email: user.email!,
+            displayName: user.displayName || user.email!.split('@')[0],
+            photoURL: user.photoURL,
+            points: 0,
+            rankLevel: 1, // Start at 'Visitatore'
+            createdAt: serverTimestamp(),
+            history: [],
+        };
+        await setDoc(userDocRef, newUserProfile);
+        console.log("New user document created in Firestore for", user.uid);
+    } else {
+        // User exists, maybe update some fields if needed (e.g., displayName or photoURL)
+        // For now, we just log that they exist
+        console.log("Existing user logged in:", user.uid);
+    }
+};
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -43,6 +82,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        await createOrUpdateUserInDb(user);
         setUser(user);
         const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
         setIsModerator(isDevModerator);
@@ -60,9 +100,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await signOut(auth);
-      // Ensure user state is cleared immediately on logout
-      setUser(null);
-      setIsModerator(false);
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);

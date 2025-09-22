@@ -1,6 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import { db } from '@/lib/firebase';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 
 // This is a mock server action. In a real application, you would:
 // 1. Authenticate the user to ensure they are a moderator.
@@ -9,7 +11,7 @@ import { revalidatePath } from 'next/cache';
 // 4. Handle potential errors.
 
 export async function addPoints(formData: FormData): Promise<{ success: boolean; message: string }> {
-  const userId = formData.get('userId');
+  const userId = formData.get('userId') as string;
   const points = formData.get('points');
 
   console.log(`Attempting to add ${points} points to user ${userId}`);
@@ -21,14 +23,28 @@ export async function addPoints(formData: FormData): Promise<{ success: boolean;
     return { success: false, message: 'Invalid input. Please provide a valid user and positive points value.' };
   }
 
-  // Simulate success
-  console.log(`Successfully added ${points} points to user ${userId}.`);
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userDocRef);
 
-  // Revalidate the page to show updated (mock) data.
-  // In a real app with a database, this would trigger a re-fetch.
-  revalidatePath('/');
+    if (!userDoc.exists()) {
+      return { success: false, message: 'User not found in database.' };
+    }
+    const currentPoints = userDoc.data().points || 0;
+    const newPoints = currentPoints + Number(points);
+    await updateDoc(userDocRef, { points: newPoints });
 
-  return { success: true, message: `Successfully added ${points} points.` };
+    console.log(`Successfully added ${points} points to user ${userId}.`);
+
+    revalidatePath('/admin');
+    revalidatePath(`/profile/${userId}`);
+
+    return { success: true, message: `Successfully added ${points} points.` };
+
+  } catch (error) {
+    console.error("Error adding points: ", error);
+    return { success: false, message: 'An error occurred while adding points.' };
+  }
 }
 
 // Mock server action for creating a membership card

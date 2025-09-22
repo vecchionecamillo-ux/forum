@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Star, Search } from 'lucide-react';
+import { MoreHorizontal, Search } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -24,6 +24,10 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import type { UserProfile } from '@/hooks/use-auth';
+import { db } from '@/lib/firebase';
+import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+
 
 const ranks = [
   { level: 1, name: 'Visitatore', color: 'bg-gray-400' },
@@ -33,36 +37,13 @@ const ranks = [
   { level: 5, name: 'Ambasciatore', color: 'bg-yellow-500 text-black' },
 ];
 
-type User = {
-  _id: string;
-  username: string;
-  email: string;
-  points: number;
-  rankLevel: number;
-  country: string;
-  isStudent: boolean;
-};
-
-// Mock data expanded for analyst view
-async function fetchUsers(): Promise<User[]> {
-  return [
-    { _id: '1a', username: 'creative.user', email: 'creative.user@email.com', points: 850, rankLevel: 2, country: 'Italia', isStudent: false },
-    { _id: '2b', username: 'digital.artist', email: 'digital.artist@email.com', points: 1240, rankLevel: 3, country: 'Germania', isStudent: false },
-    { _id: '3c', username: 'camillo_vecchione', email: 'vecchionecamillo1@gmail.com', points: 4000, rankLevel: 5, country: 'Italia', isStudent: true },
-    { _id: '4d', username: 'new.innovator', email: 'new.innovator@email.com', points: 150, rankLevel: 1, country: 'Francia', isStudent: true },
-    { _id: '5e', username: 'art.lover', email: 'art.lover@email.com', points: 550, rankLevel: 2, country: 'Spagna', isStudent: false },
-    { _id: '6f', username: 'tech.guru', email: 'tech.guru@email.com', points: 2100, rankLevel: 4, country: 'Stati Uniti', isStudent: false },
-  ];
-}
-
-
-function UserTableRow({ user, onAction }: { user: User, onAction: (formData: FormData) => void }) {
+function UserTableRow({ user, onAction }: { user: UserProfile, onAction: (formData: FormData) => void }) {
   const userRank = ranks.find(r => r.level === user.rankLevel) || ranks[0];
   const [pointsToAdd, setPointsToAdd] = useState('');
 
   const handleFormAction = (actionType: 'addPoints' | 'changeRank', value?: string) => {
     const formData = new FormData();
-    formData.append('userId', user._id);
+    formData.append('userId', user.uid);
     formData.append('actionType', actionType);
     if (actionType === 'addPoints') {
       formData.append('points', pointsToAdd);
@@ -75,13 +56,13 @@ function UserTableRow({ user, onAction }: { user: User, onAction: (formData: For
 
   return (
     <TableRow>
-      <TableCell className="font-medium">{user.username}</TableCell>
+      <TableCell className="font-medium">{user.displayName}</TableCell>
       <TableCell>{user.email}</TableCell>
       <TableCell className="text-center">{user.points}</TableCell>
       <TableCell>
         <Badge variant="secondary" className={`${userRank.color} text-white`}>{userRank.name}</Badge>
       </TableCell>
-      <TableCell>{user.country}</TableCell>
+      <TableCell>{user.country || 'N/A'}</TableCell>
       <TableCell className="text-center">{user.isStudent ? 'Sì' : 'No'}</TableCell>
       <TableCell>
         <DropdownMenu>
@@ -115,7 +96,7 @@ function UserTableRow({ user, onAction }: { user: User, onAction: (formData: For
                         </SelectTrigger>
                         <SelectContent>
                             {ranks.map(rank => (
-                                <SelectItem key={rank.level} value={rank.name}>{rank.name}</SelectItem>
+                                <SelectItem key={rank.level} value={rank.level.toString()}>{rank.name}</SelectItem>
                             ))}
                         </SelectContent>
                     </Select>
@@ -128,7 +109,7 @@ function UserTableRow({ user, onAction }: { user: User, onAction: (formData: For
   );
 }
 
-function UserTable({ users, onAction }: { users: User[], onAction: (formData: FormData) => void }) {
+function UserTable({ users, onAction }: { users: UserProfile[], onAction: (formData: FormData) => void }) {
   return (
     <Table>
       <TableHeader>
@@ -143,30 +124,34 @@ function UserTable({ users, onAction }: { users: User[], onAction: (formData: Fo
         </TableRow>
       </TableHeader>
       <TableBody>
-        {users.map(user => <UserTableRow key={user._id} user={user} onAction={onAction} />)}
+        {users.map(user => <UserTableRow key={user.uid} user={user} onAction={onAction} />)}
       </TableBody>
     </Table>
   );
 }
 
 export function ModeratorPanel() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<UserProfile[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
   const [filter, setFilter] = useState('');
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    fetchUsers().then(data => {
-      setUsers(data);
-      setFilteredUsers(data);
+    const usersColRef = collection(db, 'users');
+    const unsubscribe = onSnapshot(usersColRef, (snapshot) => {
+        const usersList = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
+        setUsers(usersList);
+        setFilteredUsers(usersList);
     });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     const lowercasedFilter = filter.toLowerCase();
     const filtered = users.filter(user =>
-      user.username.toLowerCase().includes(lowercasedFilter) ||
+      (user.displayName && user.displayName.toLowerCase().includes(lowercasedFilter)) ||
       user.email.toLowerCase().includes(lowercasedFilter)
     );
     setFilteredUsers(filtered);
@@ -175,35 +160,26 @@ export function ModeratorPanel() {
   const handleAction = (formData: FormData) => {
     startTransition(async () => {
       const actionType = formData.get('actionType');
+      const userId = formData.get('userId') as string;
       
       if (actionType === 'addPoints') {
         const result = await addPoints(formData);
          if (result.success) {
             toast({ title: 'Successo', description: result.message });
-            // In a real app, you'd refetch or update state, here we just refresh
-            fetchUsers().then(data => {
-                setUsers(data);
-                setFilteredUsers(data.filter(user =>
-                    user.username.toLowerCase().includes(filter.toLowerCase()) ||
-                    user.email.toLowerCase().includes(filter.toLowerCase())
-                ));
-            });
           } else {
             toast({ title: 'Errore', description: result.message, variant: 'destructive' });
           }
       } else if (actionType === 'changeRank') {
-        const userId = formData.get('userId');
-        const newRank = formData.get('rank');
-        console.log(`Rank per l'utente ${userId} cambiato a ${newRank} (simulato)`);
-        toast({ title: 'Successo', description: `Grado aggiornato per l'utente ${userId}.` });
-        // In a real app, you'd refetch or update state, here we just refresh
-         fetchUsers().then(data => {
-            setUsers(data);
-             setFilteredUsers(data.filter(user =>
-                user.username.toLowerCase().includes(filter.toLowerCase()) ||
-                user.email.toLowerCase().includes(filter.toLowerCase())
-             ));
-        });
+        const newRankLevel = Number(formData.get('rank'));
+        console.log(`Changing rank for user ${userId} to level ${newRankLevel} (simulated)`);
+        try {
+            const userDocRef = doc(db, 'users', userId);
+            await updateDoc(userDocRef, { rankLevel: newRankLevel });
+            toast({ title: 'Successo', description: `Grado aggiornato per l'utente ${userId}.` });
+        } catch (error) {
+            console.error("Error changing rank: ", error);
+            toast({ title: 'Errore', description: "Impossibile aggiornare il grado.", variant: 'destructive' });
+        }
       }
     });
   };
