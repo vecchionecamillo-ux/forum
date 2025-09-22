@@ -246,7 +246,7 @@ export default function LoginPage() {
                 </button>
                  <div className="mt-2">
                   Non hai un account?{' '}
-                  <Link href="/signup" className="underline text-primary">
+                  <Link href="/signup" className="font-medium text-primary hover:underline focus:outline-none">
                     Registrati
                   </Link>
                 </div>
