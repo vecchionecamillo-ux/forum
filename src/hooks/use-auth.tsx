@@ -49,6 +49,10 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 const createOrUpdateUserInDb = async (user: User) => {
+    if (!user.email) {
+      console.warn("User object is missing email, skipping DB creation.");
+      return;
+    }
     const userDocRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userDocRef);
 
@@ -58,7 +62,7 @@ const createOrUpdateUserInDb = async (user: User) => {
             displayName: user.displayName || user.email!.split('@')[0],
             photoURL: user.photoURL,
             points: 0,
-            rankLevel: 1, 
+            rankLevel: 1,
             createdAt: serverTimestamp(),
             history: [],
         };

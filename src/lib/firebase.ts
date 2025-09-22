@@ -1,6 +1,6 @@
 'use client';
 
-import { initializeApp, getApp, type FirebaseOptions } from 'firebase/app';
+import { initializeApp, getApp, getApps, type FirebaseOptions } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
@@ -16,14 +16,8 @@ const firebaseConfig: FirebaseOptions = {
 };
 
 
-let app;
-try {
-    app = getApp();
-} catch (e) {
-    app = initializeApp(firebaseConfig);
-}
-
-
+// Initialize Firebase
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const auth = getAuth(app);
 const db = getFirestore(app);
 const database = getDatabase(app);
