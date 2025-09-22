@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
 import { usePathname } from 'next/navigation';
+import { ThemeToggle } from '@/components/theme-toggle';
 
 const navLinks = [
   { href: '/about', label: 'Chi Siamo' },
@@ -63,75 +64,80 @@ export function Header() {
       </Link>
       <nav className="hidden md:flex items-center gap-6">
         {navContent}
-        <Button asChild variant="outline" size="sm" className="ml-4">
-          <Link href="/style-guide">
-            <PenSquare className="mr-2 h-4 w-4" />
-            Style Guide AI
-          </Link>
-        </Button>
-        {user ? (
-          <>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/profile"><User className="mr-2 h-4 w-4" />Profilo</Link>
-            </Button>
-            <Button variant="ghost" size="sm" onClick={logout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link href="/signup">Registrati</Link>
-            </Button>
-          </>
-        )}
       </nav>
-      <div className="md:hidden">
-        <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Menu />
-              <span className="sr-only">Toggle Menu</span>
+       <div className="flex items-center gap-2">
+         <div className="hidden md:flex items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+            <Link href="/style-guide">
+                <PenSquare className="mr-2 h-4 w-4" />
+                Style Guide AI
+            </Link>
             </Button>
-          </SheetTrigger>
-          <SheetContent side="right" className="bg-background">
-            <nav className="flex flex-col gap-6 mt-8 p-4">
-              {navContent}
-              <Button asChild variant="default" className="mt-4">
-                <Link href="/style-guide" onClick={handleLinkClick}>
-                  <PenSquare className="mr-2 h-4 w-4" />
-                  Style Guide AI
-                </Link>
-              </Button>
-               <div className="mt-4 pt-4 border-t flex flex-col gap-4">
-                {user ? (
-                    <>
-                      <Button asChild variant="ghost" size="sm" className="justify-start">
-                        <Link href="/profile" onClick={handleLinkClick}><User className="mr-2 h-4 w-4"/>Profilo</Link>
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => { logout(); handleLinkClick(); }} className="justify-start text-destructive hover:text-destructive/80">
-                        <LogOut className="mr-2 h-4 w-4" />
-                        Logout
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button asChild variant="ghost" size="sm" className="justify-start">
-                         <Link href="/login" onClick={handleLinkClick}>Login</Link>
-                      </Button>
-                      <Button asChild size="sm">
-                        <Link href="/signup" onClick={handleLinkClick}>Registrati</Link>
-                      </Button>
-                    </>
-                  )}
-              </div>
-            </nav>
-          </SheetContent>
-        </Sheet>
+            {user ? (
+            <>
+                <Button asChild variant="ghost" size="sm">
+                <Link href="/profile"><User className="mr-2 h-4 w-4" />Profilo</Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+                </Button>
+            </>
+            ) : (
+            <>
+                <Button asChild variant="ghost" size="sm">
+                <Link href="/login">Login</Link>
+                </Button>
+                <Button asChild size="sm">
+                <Link href="/signup">Registrati</Link>
+                </Button>
+            </>
+            )}
+         </div>
+        <ThemeToggle />
+        <div className="md:hidden">
+            <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
+            <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                <Menu />
+                <span className="sr-only">Toggle Menu</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="bg-background">
+                <nav className="flex flex-col gap-6 mt-8 p-4">
+                {navContent}
+                <Button asChild variant="default" className="mt-4">
+                    <Link href="/style-guide" onClick={handleLinkClick}>
+                    <PenSquare className="mr-2 h-4 w-4" />
+                    Style Guide AI
+                    </Link>
+                </Button>
+                <div className="mt-4 pt-4 border-t flex flex-col gap-4">
+                    {user ? (
+                        <>
+                        <Button asChild variant="ghost" size="sm" className="justify-start">
+                            <Link href="/profile" onClick={handleLinkClick}><User className="mr-2 h-4 w-4"/>Profilo</Link>
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => { logout(); handleLinkClick(); }} className="justify-start text-destructive hover:text-destructive/80">
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Logout
+                        </Button>
+                        </>
+                    ) : (
+                        <>
+                        <Button asChild variant="ghost" size="sm" className="justify-start">
+                            <Link href="/login" onClick={handleLinkClick}>Login</Link>
+                        </Button>
+                        <Button asChild size="sm">
+                            <Link href="/signup" onClick={handleLinkClick}>Registrati</Link>
+                        </Button>
+                        </>
+                    )}
+                </div>
+                </nav>
+            </SheetContent>
+            </Sheet>
+        </div>
       </div>
     </header>
   );

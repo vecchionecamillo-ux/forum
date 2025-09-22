@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Header } from '@/components/layout/header';
 import { AuthProvider } from '@/hooks/use-auth';
 import { WebGLBackground } from '@/components/layout/webgl-background';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
   title: 'Cantiere Culturale Digitale',
@@ -16,21 +17,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" className="light">
+    <html lang="it" suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet" />
       </head>
       <body className="font-body antialiased">
-        <WebGLBackground />
-        <AuthProvider>
-          <Header />
-          <div className="relative z-10">
-            {children}
-          </div>
-          <Toaster />
-        </AuthProvider>
+        <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+        >
+            <WebGLBackground />
+            <AuthProvider>
+            <Header />
+            <div className="relative z-10">
+                {children}
+            </div>
+            <Toaster />
+            </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
