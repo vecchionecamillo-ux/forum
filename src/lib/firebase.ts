@@ -1,6 +1,6 @@
 'use client';
 
-import { initializeApp, getApp, getApps, type FirebaseOptions } from 'firebase/app';
+import { initializeApp, getApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getDatabase } from 'firebase/database';
@@ -15,24 +15,14 @@ const firebaseConfig: FirebaseOptions = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Check if all required environment variables are present
-const isConfigValid =
-  firebaseConfig.apiKey &&
-  firebaseConfig.authDomain &&
-  firebaseConfig.projectId &&
-  firebaseConfig.appId;
 
-// Initialize Firebase only if the configuration is valid
-// Use getApps() to ensure singleton pattern (app is initialized only once)
-const app = isConfigValid && getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-
-
-// Throw an error during development if the config is missing
-if (process.env.NODE_ENV !== 'production' && !isConfigValid) {
-  console.error(
-    'Firebase config is missing or incomplete. Please check your .env.local file.'
-  );
+let app;
+try {
+    app = getApp();
+} catch (e) {
+    app = initializeApp(firebaseConfig);
 }
+
 
 const auth = getAuth(app);
 const db = getFirestore(app);
