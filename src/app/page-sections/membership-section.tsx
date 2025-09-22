@@ -24,7 +24,7 @@ const benefits = [
 export function MembershipSection() {
   return (
     <ScrollRevealWrapper id="tessera">
-      <section className="min-h-screen flex flex-col items-center justify-center px-4 py-24 sm:px-6 lg:px-8 bg-secondary">
+      <section className="min-h-screen flex flex-col items-center justify-center px-4 py-24 sm:px-6 lg:px-8">
        <div className="w-full max-w-6xl mx-auto">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-foreground">La Tessera Digitale</h2>
@@ -36,7 +36,7 @@ export function MembershipSection() {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {benefits.map((benefit, index) => (
             <ScrollRevealWrapper key={benefit.title} className={`animation-delay-${index * 150}`}>
-                <Card className="text-center transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl h-full">
+                <Card className="text-center transform transition-all duration-300 hover:-translate-y-2 h-full">
                 <CardHeader className="items-center">
                     <div className="p-4 bg-primary/10 rounded-full mb-4">
                     {benefit.icon}

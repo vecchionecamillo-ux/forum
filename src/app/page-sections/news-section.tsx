@@ -36,7 +36,7 @@ const newsItems = [
 export function NewsSection() {
   return (
     <ScrollRevealWrapper id="news">
-      <section className="min-h-screen flex flex-col justify-center items-center px-4 py-24 sm:px-6 lg:px-8 bg-secondary">
+      <section className="min-h-screen flex flex-col justify-center items-center px-4 py-24 sm:px-6 lg:px-8">
       <div className="w-full max-w-6xl mx-auto">
         <div className="text-center">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-foreground">News & Annunci</h2>
@@ -47,7 +47,7 @@ export function NewsSection() {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {newsItems.map((item, index) => (
              <ScrollRevealWrapper key={item.title} className={`animation-delay-${index * 150}`}>
-                <Card className="overflow-hidden flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <Card className="overflow-hidden flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2">
                 <div className="aspect-video overflow-hidden relative">
                     {item.image && (
                     <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
