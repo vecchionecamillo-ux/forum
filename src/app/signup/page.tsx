@@ -22,11 +22,6 @@ export default function SignupPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-     if (!auth) {
-        setError("Registrazione non disponibile. Riprova più tardi.");
-        setLoading(false);
-        return;
-    }
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       router.push('/profile');

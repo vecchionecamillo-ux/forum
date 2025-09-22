@@ -41,21 +41,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!auth) {
-      console.warn("Firebase auth is not initialized. Skipping auth state change listener.");
-      setLoading(false);
-      return;
-    }
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
         try {
+          // In a production app, you would rely solely on custom claims
+          // set by a backend function for security.
+          // The local email list is for development convenience.
           const tokenResult = await user.getIdTokenResult();
           const hasModeratorClaim = !!tokenResult.claims.moderator;
           const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
           setIsModerator(hasModeratorClaim || isDevModerator);
         } catch (error) {
           console.error("Error fetching token result:", error);
+          // Fallback to dev list if token fails
           const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
           setIsModerator(isDevModerator);
         }
@@ -67,14 +66,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
+    // Cleanup subscription on unmount
     return () => unsubscribe();
   }, []);
 
   const logout = async () => {
     try {
-      if(auth) {
-        await signOut(auth);
-      }
+      await signOut(auth);
+      // Ensure user state is cleared immediately on logout
+      setUser(null);
+      setIsModerator(false);
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);

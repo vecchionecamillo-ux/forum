@@ -25,11 +25,6 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
-    if (!auth) {
-        setError("Autenticazione non disponibile. Riprova più tardi.");
-        setLoading(false);
-        return;
-    }
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
@@ -59,11 +54,6 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
-    if (!auth) {
-        setError("Autenticazione non disponibile. Riprova più tardi.");
-        setLoading(false);
-        return;
-    }
     try {
       await sendPasswordResetEmail(auth, email);
       setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
