@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword, sendPasswordResetEmail, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,7 +38,7 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
         />
       </svg>
     );
-  }
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -48,6 +48,24 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setLoading(true);
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          router.push('/profile');
+        }
+      })
+      .catch((error) => {
+        console.error('Error during redirect result:', error);
+        setError(`Errore di accesso: ${error.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [router]);
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,6 +83,9 @@ export default function LoginPage() {
         case 'auth/wrong-password':
           setError('Password errata. Riprova.');
           break;
+        case 'auth/invalid-credential':
+             setError('Credenziali non valide. Controlla email e password.');
+             break;
         default:
           setError('Si è verificato un errore durante l\'accesso. Riprova.');
           break;
@@ -83,20 +104,17 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
-    console.log(`Tentativo di invio email di recupero a: ${email}`);
     try {
       await sendPasswordResetEmail(auth, email);
-      console.log("Email di recupero inviata con successo tramite Firebase.");
       setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
       setIsResetMode(false);
     } catch (error: any) {
-       console.error("Errore Firebase durante l'invio dell'email di recupero:", error);
        switch (error.code) {
         case 'auth/user-not-found':
           setError('Nessun utente trovato con questa email. Impossibile inviare il link di recupero.');
           break;
         default:
-          setError(`Si è verificato un errore durante l'invio dell'email. Dettagli: ${error.message}`);
+          setError(`Si è verificato un errore durante l'invio dell'email.`);
           break;
       }
     } finally {
@@ -109,27 +127,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      router.push('/profile');
-    } catch (error: any) {
-      switch (error.code) {
-        case 'auth/popup-closed-by-user':
-            // L'utente ha chiuso la finestra, non è un vero errore.
-            setError(null);
-            break;
-        case 'auth/cancelled-popup-request':
-            // Evita di mostrare un errore se più popup vengono aperti e cancellati.
-            setError(null);
-            break;
-        default:
-            console.error('Errore durante l\'accesso con Google:', error);
-            setError(`Errore di accesso: ${error.message}`);
-            break;
-      }
-    } finally {
-        setLoading(false);
-    }
+    await signInWithRedirect(auth, provider);
   };
 
   const toggleResetMode = (e: React.MouseEvent<HTMLButtonElement>) => {

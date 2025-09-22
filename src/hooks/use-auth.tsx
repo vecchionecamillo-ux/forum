@@ -11,14 +11,14 @@ import {
   onAuthStateChanged,
   signOut,
   type User,
+  getRedirectResult,
+  type UserCredential
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
-// --- DEVELOPMENT ONLY ---
 const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com', 'vecchionecamillo1@gmail.com'];
-// --------------------
 
 export type UserProfile = {
   uid: string;
@@ -48,28 +48,21 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
-// Helper function to create or update user in Firestore
 const createOrUpdateUserInDb = async (user: User) => {
     const userDocRef = doc(db, 'users', user.uid);
     const userDoc = await getDoc(userDocRef);
 
     if (!userDoc.exists()) {
-        // New user, create the document
         const newUserProfile: Omit<UserProfile, 'uid'> = {
             email: user.email!,
             displayName: user.displayName || user.email!.split('@')[0],
             photoURL: user.photoURL,
             points: 0,
-            rankLevel: 1, // Start at 'Visitatore'
+            rankLevel: 1, 
             createdAt: serverTimestamp(),
             history: [],
         };
         await setDoc(userDocRef, newUserProfile);
-        console.log("New user document created in Firestore for", user.uid);
-    } else {
-        // User exists, maybe update some fields if needed (e.g., displayName or photoURL)
-        // For now, we just log that they exist
-        console.log("Existing user logged in:", user.uid);
     }
 };
 
@@ -79,30 +72,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isModerator, setIsModerator] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        await createOrUpdateUserInDb(user);
-        setUser(user);
-        const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
-        setIsModerator(isDevModerator);
-      } else {
-        setUser(null);
-        setIsModerator(false);
-      }
-      setLoading(false);
-    });
+  const handleUser = async (user: User | null) => {
+    if (user) {
+      await createOrUpdateUserInDb(user);
+      setUser(user);
+      const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
+      setIsModerator(isDevModerator);
+    } else {
+      setUser(null);
+      setIsModerator(false);
+    }
+    setLoading(false);
+  };
 
-    // Cleanup subscription on unmount
+  useEffect(() => {
+    // Standard auth state listener
+    const unsubscribe = onAuthStateChanged(auth, handleUser);
+
+    // Handle redirect result on initial load
+    getRedirectResult(auth)
+      .then((result: UserCredential | null) => {
+        if (result) {
+            // This will trigger the onAuthStateChanged listener anyway,
+            // but we ensure user creation is handled.
+            createOrUpdateUserInDb(result.user);
+        }
+      })
+      .catch((error) => {
+        console.error("Error getting redirect result: ", error);
+      });
+
     return () => unsubscribe();
   }, []);
 
   const logout = async () => {
+    setLoading(true);
     try {
       await signOut(auth);
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
+    } finally {
+      setLoading(false);
     }
   };
 

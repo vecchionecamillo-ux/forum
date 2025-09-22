@@ -57,13 +57,13 @@ function UserTableRow({ user, onAction }: { user: UserProfile, onAction: (formDa
   return (
     <TableRow>
       <TableCell className="font-medium">{user.displayName}</TableCell>
-      <TableCell>{user.email}</TableCell>
-      <TableCell className="text-center">{user.points}</TableCell>
+      <TableCell className="hidden md:table-cell">{user.email}</TableCell>
+      <TableCell className="hidden sm:table-cell text-center">{user.points}</TableCell>
       <TableCell>
         <Badge variant="secondary" className={`${userRank.color} text-white`}>{userRank.name}</Badge>
       </TableCell>
-      <TableCell>{user.country || 'N/A'}</TableCell>
-      <TableCell className="text-center">{user.isStudent ? 'Sì' : 'No'}</TableCell>
+      <TableCell className="hidden lg:table-cell">{user.country || 'N/A'}</TableCell>
+      <TableCell className="hidden lg:table-cell text-center">{user.isStudent ? 'Sì' : 'No'}</TableCell>
       <TableCell>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -111,22 +111,24 @@ function UserTableRow({ user, onAction }: { user: UserProfile, onAction: (formDa
 
 function UserTable({ users, onAction }: { users: UserProfile[], onAction: (formData: FormData) => void }) {
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Username</TableHead>
-          <TableHead>Email</TableHead>
-          <TableHead className="text-center">Punti</TableHead>
-          <TableHead>Grado</TableHead>
-          <TableHead>Paese</TableHead>
-          <TableHead className="text-center">Studente</TableHead>
-          <TableHead><span className="sr-only">Azioni</span></TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {users.map(user => <UserTableRow key={user.uid} user={user} onAction={onAction} />)}
-      </TableBody>
-    </Table>
+    <div className="w-full overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Username</TableHead>
+              <TableHead className="hidden md:table-cell">Email</TableHead>
+              <TableHead className="hidden sm:table-cell text-center">Punti</TableHead>
+              <TableHead>Grado</TableHead>
+              <TableHead className="hidden lg:table-cell">Paese</TableHead>
+              <TableHead className="hidden lg:table-cell text-center">Studente</TableHead>
+              <TableHead><span className="sr-only">Azioni</span></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.map(user => <UserTableRow key={user.uid} user={user} onAction={onAction} />)}
+          </TableBody>
+        </Table>
+    </div>
   );
 }
 
@@ -152,7 +154,7 @@ export function ModeratorPanel() {
     const lowercasedFilter = filter.toLowerCase();
     const filtered = users.filter(user =>
       (user.displayName && user.displayName.toLowerCase().includes(lowercasedFilter)) ||
-      user.email.toLowerCase().includes(lowercasedFilter)
+      (user.email && user.email.toLowerCase().includes(lowercasedFilter))
     );
     setFilteredUsers(filtered);
   }, [filter, users]);
@@ -171,7 +173,6 @@ export function ModeratorPanel() {
           }
       } else if (actionType === 'changeRank') {
         const newRankLevel = Number(formData.get('rank'));
-        console.log(`Changing rank for user ${userId} to level ${newRankLevel} (simulated)`);
         try {
             const userDocRef = doc(db, 'users', userId);
             await updateDoc(userDocRef, { rankLevel: newRankLevel });

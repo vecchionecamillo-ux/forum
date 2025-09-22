@@ -28,7 +28,7 @@ export function Header() {
       setIsScrolled(window.scrollY > 10);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Check on mount
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -51,6 +51,69 @@ export function Header() {
     </>
   );
 
+  const authButtonsDesktop = (
+    <div className="hidden md:flex items-center gap-2">
+      <Button asChild variant="outline" size="sm">
+        <Link href="/style-guide">
+            <PenSquare className="mr-2 h-4 w-4" />
+            Style Guide AI
+        </Link>
+      </Button>
+      {user ? (
+        <>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/profile"><User className="mr-2 h-4 w-4" />Profilo</Link>
+          </Button>
+          <Button variant="ghost" size="sm" onClick={logout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
+        </>
+      ) : (
+        <>
+          <Button asChild variant="ghost" size="sm">
+            <Link href="/login">Login</Link>
+          </Button>
+          <Button asChild size="sm">
+            <Link href="/signup">Registrati</Link>
+          </Button>
+        </>
+      )}
+    </div>
+  );
+
+  const authButtonsMobile = (
+     <div className="mt-4 pt-4 border-t flex flex-col gap-4">
+        <Button asChild variant="default" className="w-full">
+            <Link href="/style-guide" onClick={handleLinkClick}>
+            <PenSquare className="mr-2 h-4 w-4" />
+            Style Guide AI
+            </Link>
+        </Button>
+        {user ? (
+            <>
+            <Button asChild variant="ghost" size="sm" className="justify-start">
+                <Link href="/profile" onClick={handleLinkClick}><User className="mr-2 h-4 w-4"/>Profilo</Link>
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => { logout(); handleLinkClick(); }} className="justify-start text-destructive hover:text-destructive/80">
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+            </Button>
+            </>
+        ) : (
+            <div className='flex flex-col gap-2'>
+              <Button asChild size="sm" className="w-full">
+                  <Link href="/login" onClick={handleLinkClick}>Login</Link>
+              </Button>
+              <Button asChild size="sm" variant="outline" className="w-full">
+                  <Link href="/signup" onClick={handleLinkClick}>Registrati</Link>
+              </Button>
+            </div>
+        )}
+    </div>
+  )
+
+
   return (
     <header
       className={cn(
@@ -66,34 +129,7 @@ export function Header() {
         {navContent}
       </nav>
        <div className="flex items-center gap-2">
-         <div className="hidden md:flex items-center gap-2">
-            <Button asChild variant="outline" size="sm">
-            <Link href="/style-guide">
-                <PenSquare className="mr-2 h-4 w-4" />
-                Style Guide AI
-            </Link>
-            </Button>
-            {user ? (
-            <>
-                <Button asChild variant="ghost" size="sm">
-                <Link href="/profile"><User className="mr-2 h-4 w-4" />Profilo</Link>
-                </Button>
-                <Button variant="ghost" size="sm" onClick={logout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-                </Button>
-            </>
-            ) : (
-            <>
-                <Button asChild variant="ghost" size="sm">
-                <Link href="/login">Login</Link>
-                </Button>
-                <Button asChild size="sm">
-                <Link href="/signup">Registrati</Link>
-                </Button>
-            </>
-            )}
-         </div>
+        {authButtonsDesktop}
         <ThemeToggle />
         <div className="md:hidden">
             <Sheet open={isSheetOpen} onOpenChange={setSheetOpen}>
@@ -105,35 +141,8 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="bg-background">
                 <nav className="flex flex-col gap-6 mt-8 p-4">
-                {navContent}
-                <Button asChild variant="default" className="mt-4">
-                    <Link href="/style-guide" onClick={handleLinkClick}>
-                    <PenSquare className="mr-2 h-4 w-4" />
-                    Style Guide AI
-                    </Link>
-                </Button>
-                <div className="mt-4 pt-4 border-t flex flex-col gap-4">
-                    {user ? (
-                        <>
-                        <Button asChild variant="ghost" size="sm" className="justify-start">
-                            <Link href="/profile" onClick={handleLinkClick}><User className="mr-2 h-4 w-4"/>Profilo</Link>
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => { logout(); handleLinkClick(); }} className="justify-start text-destructive hover:text-destructive/80">
-                            <LogOut className="mr-2 h-4 w-4" />
-                            Logout
-                        </Button>
-                        </>
-                    ) : (
-                        <>
-                        <Button asChild variant="ghost" size="sm" className="justify-start">
-                            <Link href="/login" onClick={handleLinkClick}>Login</Link>
-                        </Button>
-                        <Button asChild size="sm">
-                            <Link href="/signup" onClick={handleLinkClick}>Registrati</Link>
-                        </Button>
-                        </>
-                    )}
-                </div>
+                  {navContent}
+                  {authButtonsMobile}
                 </nav>
             </SheetContent>
             </Sheet>

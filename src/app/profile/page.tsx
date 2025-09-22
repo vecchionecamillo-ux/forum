@@ -38,11 +38,8 @@ export default function ProfilePage() {
           setUserProfile(doc.data() as UserProfile);
         } else {
           console.log("No such document!");
-          // Potresti voler gestire il caso in cui il documento utente non esiste
         }
       });
-
-      // Cleanup subscription on unmount
       return () => unsubscribe();
     }
   }, [user]);
@@ -63,7 +60,7 @@ export default function ProfilePage() {
       <main className="max-w-2xl mx-auto">
         <Card className="rounded-2xl shadow-2xl overflow-hidden bg-gradient-to-br from-card to-card/90 backdrop-blur-sm border-white/20">
           <CardHeader className="p-6 bg-foreground/5">
-             <div className="flex items-start justify-between">
+             <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                 <div className="flex items-center gap-4">
                     <Avatar className="w-16 h-16 text-3xl border-2 border-white/50">
                         <AvatarFallback className="bg-primary/80 text-primary-foreground">
@@ -72,12 +69,12 @@ export default function ProfilePage() {
                     </Avatar>
                     <div>
                         <CardTitle className="text-2xl font-black tracking-tight">{userProfile.displayName || user.email}</CardTitle>
-                         <p className="text-sm text-muted-foreground flex items-center">
-                            <AtSign className="h-3 w-3 mr-1.5" /> ID: {user.uid}
+                         <p className="text-sm text-muted-foreground flex items-center break-all">
+                            <AtSign className="h-3 w-3 mr-1.5 flex-shrink-0" /> {user.uid}
                         </p>
                     </div>
                 </div>
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex flex-row sm:flex-col items-start sm:items-end gap-2">
                      <Badge variant="secondary" className={`${userRank.color} text-white shadow-lg`}>{userRank.name}</Badge>
                       {isModerator && (
                         <Badge variant="destructive" className="flex items-center gap-1 shadow-lg">
@@ -91,7 +88,7 @@ export default function ProfilePage() {
           <CardContent className="p-6 space-y-8">
             <div className="text-center">
                 <p className="text-sm uppercase text-muted-foreground tracking-wider">Punti Community</p>
-                <p className="text-6xl font-black text-yellow-400 drop-shadow-lg">{userProfile.points}</p>
+                <p className="text-6xl font-black text-primary drop-shadow-lg">{userProfile.points}</p>
             </div>
             
             <div>

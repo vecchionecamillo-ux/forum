@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
-
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -39,7 +38,7 @@ function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
         />
       </svg>
     );
-  }
+}
 
 export default function SignupPage() {
   const [email, setEmail] = useState('');
@@ -47,6 +46,23 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    setLoading(true);
+    getRedirectResult(auth)
+      .then((result) => {
+        if (result) {
+          router.push('/profile');
+        }
+      })
+      .catch((error) => {
+        console.error('Error during redirect result:', error);
+        setError(`Errore di registrazione: ${error.message}`);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [router]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -58,7 +74,10 @@ export default function SignupPage() {
     } catch (error: any) {
       if (error.code === 'auth/email-already-in-use') {
         setError('Questa email è già stata utilizzata per un altro account.');
-      } else {
+      } else if (error.code === 'auth/weak-password') {
+        setError('La password è troppo debole. Deve essere di almeno 6 caratteri.');
+      }
+      else {
         setError('Si è verificato un errore durante la registrazione. Riprova.');
       }
     } finally {
@@ -70,25 +89,7 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
     const provider = new GoogleAuthProvider();
-    try {
-      await signInWithPopup(auth, provider);
-      router.push('/profile');
-    } catch (error: any) {
-      switch (error.code) {
-        case 'auth/popup-closed-by-user':
-            setError(null);
-            break;
-        case 'auth/cancelled-popup-request':
-            setError(null);
-            break;
-        default:
-            console.error('Errore durante la registrazione con Google:', error);
-            setError(`Errore di registrazione: ${error.message}`);
-            break;
-      }
-    } finally {
-        setLoading(false);
-    }
+    await signInWithRedirect(auth, provider);
   };
 
   return (
