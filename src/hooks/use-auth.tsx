@@ -75,39 +75,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isModerator, setIsModerator] = useState(false);
   const router = useRouter();
-
-  const handleUser = async (user: User | null) => {
-    if (user) {
-      await createOrUpdateUserInDb(user);
-      setUser(user);
-      const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
-      setIsModerator(isDevModerator);
-    } else {
-      setUser(null);
-      setIsModerator(false);
-    }
-    setLoading(false);
-  };
-
+  
   useEffect(() => {
-    // Standard auth state listener
+    const handleUser = async (user: User | null) => {
+      if (user) {
+        await createOrUpdateUserInDb(user);
+        setUser(user);
+        const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
+        setIsModerator(isDevModerator);
+      } else {
+        setUser(null);
+        setIsModerator(false);
+      }
+      setLoading(false);
+    };
+
     const unsubscribe = onAuthStateChanged(auth, handleUser);
 
-    // Handle redirect result on initial load
     getRedirectResult(auth)
-      .then((result: UserCredential | null) => {
+      .then(async (result: UserCredential | null) => {
         if (result) {
-            // This will trigger the onAuthStateChanged listener anyway,
-            // but we ensure user creation is handled.
-            createOrUpdateUserInDb(result.user);
+          await handleUser(result.user);
+          router.push('/profile');
         }
+        // If result is null, onAuthStateChanged will handle it
       })
       .catch((error) => {
         console.error("Error getting redirect result: ", error);
+      })
+      .finally(() => {
+        // Only set loading to false if onAuthStateChanged has already run
+        // and there was no redirect result. Otherwise, handleUser will do it.
+        if (auth.currentUser === null) {
+          setLoading(false);
+        }
       });
-
+      
     return () => unsubscribe();
-  }, []);
+  }, [router]);
 
   const logout = async () => {
     setLoading(true);
@@ -117,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error signing out:', error);
     } finally {
-      setLoading(false);
+      // After sign out, onAuthStateChanged will run and set loading to false
     }
   };
 

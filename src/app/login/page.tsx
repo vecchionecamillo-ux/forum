@@ -49,24 +49,6 @@ export default function LoginPage() {
   const [isResetMode, setIsResetMode] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    setLoading(true);
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result) {
-          router.push('/profile');
-        }
-      })
-      .catch((error) => {
-        console.error('Error during redirect result:', error);
-        setError(`Errore di accesso: ${error.message}`);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [router]);
-
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

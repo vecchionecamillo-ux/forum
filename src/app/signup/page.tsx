@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -46,23 +46,6 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setLoading(true);
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result) {
-          router.push('/profile');
-        }
-      })
-      .catch((error) => {
-        console.error('Error during redirect result:', error);
-        setError(`Errore di registrazione: ${error.message}`);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [router]);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
