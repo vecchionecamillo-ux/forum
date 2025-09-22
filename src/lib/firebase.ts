@@ -23,7 +23,6 @@ const isConfigValid =
   firebaseConfig.appId;
 
 // Initialize Firebase only if the configuration is valid
-// In a real app, you might want to show an error page or log this issue
 const app = isConfigValid ? (!getApps().length ? initializeApp(firebaseConfig) : getApp()) : null;
 
 // Throw an error during development if the config is missing
@@ -33,11 +32,8 @@ if (process.env.NODE_ENV !== 'production' && !isConfigValid) {
   );
 }
 
-// Export auth and db, but they might be null if config is invalid
 const auth = app ? getAuth(app) : null;
 const db = app ? getFirestore(app) : null;
 const database = app ? getDatabase(app) : null;
 
-// The page.tsx files that import these might need to handle the case where they are null.
-// For this specific app, we will assume the config is always present.
 export { app, auth, db, database };

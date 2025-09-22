@@ -47,8 +47,8 @@ export function NewsSection() {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {newsItems.map((item, index) => (
              <ScrollRevealWrapper key={item.title} className={`animation-delay-${index * 150}`}>
-                <Card className="overflow-hidden flex flex-col h-full transform transition-all duration-300 hover:-translate-y-2">
-                <div className="aspect-video overflow-hidden relative">
+                <Card className="overflow-hidden flex flex-col h-full bg-transparent border-0 shadow-none">
+                <div className="aspect-video overflow-hidden relative rounded-lg">
                     {item.image && (
                     <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
                     )}

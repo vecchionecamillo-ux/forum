@@ -116,9 +116,11 @@ const fragmentShader = `
             totalAlpha += particleAlpha;
         }
     }
-
-    // Set the final pixel color. The background is white.
-    gl_FragColor = vec4(vec3(1.0) - (vec3(1.0) - finalColor), 1.0);
+    
+    // We get the background color from the CSS variable.
+    // This is a bit of a trick, as we can't directly read CSS in GLSL.
+    // We'll set the canvas to be transparent and let the body's background color show through.
+    gl_FragColor = vec4(finalColor, totalAlpha);
   }
 `;
 
@@ -146,7 +148,6 @@ export function WebGLBackground() {
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
     const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, antialias: true, alpha: true });
     
-    // Set a clear background. The fragment shader will draw the white canvas.
     renderer.setClearColor(0x000000, 0); 
     
     const clock = new THREE.Clock();
@@ -157,6 +158,7 @@ export function WebGLBackground() {
       vertexShader,
       uniforms: uniforms.current,
       transparent: true,
+      blending: THREE.AdditiveBlending,
     });
 
     const plane = new THREE.Mesh(geometry, material);
@@ -188,7 +190,6 @@ export function WebGLBackground() {
         uniforms.current.u_scroll.value = window.scrollY;
     };
 
-    // Initial setup
     handleResize();
     animate();
 

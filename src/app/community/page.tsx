@@ -11,7 +11,7 @@ export default function CommunityPage() {
           Entra a far parte della nostra community. Connettiti, collabora e cresci insieme a una rete internazionale di artisti, curatori e innovatori.
         </p>
         <div className="mt-8">
-          <Button asChild variant="link" className="text-accent">
+          <Button asChild variant="link" className="text-primary">
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Torna alla Home

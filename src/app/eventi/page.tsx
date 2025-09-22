@@ -11,7 +11,7 @@ export default function EventiPage() {
           Scopri i nostri eventi esclusivi. Partecipa a mostre virtuali, talk, performance in diretta e festival digitali che non troverai da nessun'altra parte.
         </p>
         <div className="mt-8">
-          <Button asChild variant="link" className="text-accent">
+          <Button asChild variant="link" className="text-primary">
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Torna alla Home

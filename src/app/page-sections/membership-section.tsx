@@ -36,12 +36,12 @@ export function MembershipSection() {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
           {benefits.map((benefit, index) => (
             <ScrollRevealWrapper key={benefit.title} className={`animation-delay-${index * 150}`}>
-                <Card className="text-center transform transition-all duration-300 hover:-translate-y-2 h-full">
+                <Card className="text-center h-full bg-transparent border-0 shadow-none">
                 <CardHeader className="items-center">
                     <div className="p-4 bg-primary/10 rounded-full mb-4">
                     {benefit.icon}
                     </div>
-                    <CardTitle className="text-2xl font-bold text-primary">{benefit.title}</CardTitle>
+                    <CardTitle className="text-2xl font-bold">{benefit.title}</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-foreground/80">{benefit.description}</p>

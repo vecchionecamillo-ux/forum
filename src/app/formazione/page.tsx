@@ -11,7 +11,7 @@ export default function FormazionePage() {
           Dettagli sul nostro programma di formazione. Qui potrai trovare informazioni su workshop, masterclass e corsi tenuti da professionisti del settore creativo e tecnologico per accrescere le tue competenze.
         </p>
         <div className="mt-8">
-          <Button asChild variant="link" className="text-accent">
+          <Button asChild variant="link" className="text-primary">
             <Link href="/">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Torna alla Home

@@ -41,14 +41,14 @@ export function PlatformSection() {
                 <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
                 {platformItems.map((item, index) => (
                     <ScrollRevealWrapper key={item.title} className={`animation-delay-${index * 150}`}>
-                        <Card className="overflow-hidden transform transition-all duration-300 hover:-translate-y-2 flex flex-col h-full">
+                        <Card className="overflow-hidden flex flex-col h-full bg-transparent border-0 shadow-none">
                         {item.image && (
-                            <div className="aspect-video overflow-hidden">
+                            <div className="aspect-video overflow-hidden rounded-lg">
                             <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
                             </div>
                         )}
                         <CardHeader>
-                            <CardTitle className="text-2xl font-bold text-primary">{item.title}</CardTitle>
+                            <CardTitle className="text-2xl font-bold">{item.title}</CardTitle>
                         </CardHeader>
                         <CardContent className="flex flex-col flex-grow">
                             <CardDescription className="text-base flex-grow mb-4">{item.description}</CardDescription>

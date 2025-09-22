@@ -53,8 +53,8 @@ export function Header() {
   return (
     <header
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 px-4 md:px-6 transition-colors duration-300',
-        isScrolled || !isHomePage ? 'bg-background/80' : 'bg-transparent'
+        'fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 px-4 md:px-6 transition-all duration-300',
+         (isScrolled || !isHomePage) ? 'bg-background/80 backdrop-blur-sm' : 'bg-transparent'
       )}
     >
       <Link href="/" className="flex items-center gap-2 font-bold text-lg text-foreground">

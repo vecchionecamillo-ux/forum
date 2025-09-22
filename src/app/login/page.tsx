@@ -39,9 +39,6 @@ export default function LoginPage() {
         case 'auth/wrong-password':
           setError('Password errata. Riprova.');
           break;
-        case 'auth/invalid-credential':
-           setError('Credenziali non valide. Controlla email e password e riprova.');
-           break;
         default:
           setError('Si è verificato un errore durante l\'accesso. Riprova.');
           break;
@@ -66,7 +63,7 @@ export default function LoginPage() {
       }
       await sendPasswordResetEmail(auth, email);
       setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
-      setIsResetMode(false); // Torna alla schermata di login
+      setIsResetMode(false);
     } catch (error: any) {
        switch (error.code) {
         case 'auth/user-not-found':
