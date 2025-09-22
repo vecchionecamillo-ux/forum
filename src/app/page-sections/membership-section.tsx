@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollRevealWrapper } from '@/components/scroll-reveal';
-import { Award, Gift, Star } from 'lucide-react';
+import { Award, Gift, Star, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const benefits = [
   {
@@ -49,6 +51,13 @@ export function MembershipSection() {
                 </Card>
             </ScrollRevealWrapper>
           ))}
+        </div>
+        <div className="mt-20 text-center">
+             <Button asChild size="lg">
+                <Link href="/tessera">
+                    Crea la tua Tessera Digitale <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+             </Button>
         </div>
       </div>
     </section>

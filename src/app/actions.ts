@@ -30,3 +30,33 @@ export async function addPoints(formData: FormData): Promise<{ success: boolean;
 
   return { success: true, message: `Successfully added ${points} points.` };
 }
+
+// Mock server action for creating a membership card
+export async function createMembershipCard(formData: FormData): Promise<{ success: boolean; message: string }> {
+    const data = {
+        firstName: formData.get('firstName'),
+        lastName: formData.get('lastName'),
+        email: formData.get('email'),
+        birthDate: formData.get('birthDate'),
+        country: formData.get('country'),
+        profession: formData.get('profession'),
+        isStudent: formData.get('isStudent'),
+    };
+
+    console.log('Received membership card application:', data);
+
+    // Simulate network delay and processing
+    await new Promise(resolve => setTimeout(resolve, 1500));
+
+    // Basic validation simulation
+    if (!data.firstName || !data.lastName || !data.email) {
+        return { success: false, message: 'Dati incompleti. Per favore, compila tutti i campi obbligatori.' };
+    }
+
+    // In a real application, you would save this data to a database.
+    console.log('Membership card data saved successfully (simulated).');
+
+    revalidatePath('/tessera');
+
+    return { success: true, message: 'Tessera creata con successo! Benvenuto nella community.' };
+}
