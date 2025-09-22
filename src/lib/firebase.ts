@@ -22,18 +22,10 @@ const isConfigValid =
   firebaseConfig.projectId &&
   firebaseConfig.appId;
 
-function getFirebaseApp() {
-    if (typeof window === 'undefined') {
-        // On the server, we might have multiple instances, so we get or create.
-        return getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-    }
-    // On the client, we use getApps to avoid re-initializing.
-    return getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-}
-
-
 // Initialize Firebase only if the configuration is valid
-const app = isConfigValid ? getFirebaseApp() : null;
+// Use getApps() to ensure singleton pattern (app is initialized only once)
+const app = isConfigValid && getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
 
 // Throw an error during development if the config is missing
 if (process.env.NODE_ENV !== 'production' && !isConfigValid) {
@@ -42,8 +34,8 @@ if (process.env.NODE_ENV !== 'production' && !isConfigValid) {
   );
 }
 
-const auth = app ? getAuth(app) : null;
-const db = app ? getFirestore(app) : null;
-const database = app ? getDatabase(app) : null;
+const auth = getAuth(app);
+const db = getFirestore(app);
+const database = getDatabase(app);
 
 export { app, auth, db, database };
