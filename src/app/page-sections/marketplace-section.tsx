@@ -39,14 +39,14 @@ export function MarketplaceSection() {
             <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
             {marketplaceItems.map((item, index) => (
                 <ScrollRevealWrapper key={item.title} className={`animation-delay-${index * 150}`}>
-                    <Card className="overflow-hidden transform transition-all duration-300 hover:-translate-y-2 flex flex-col h-full">
+                    <Card className="overflow-hidden bg-transparent flex flex-col h-full">
                     {item.image && (
-                        <div className="aspect-video overflow-hidden">
+                        <div className="aspect-video overflow-hidden rounded-t-lg">
                         <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
                         </div>
                     )}
                     <CardHeader className="flex-grow">
-                        <CardTitle className="text-2xl font-bold text-primary">{item.title}</CardTitle>
+                        <CardTitle className="text-xl font-bold text-primary">{item.title}</CardTitle>
                     </CardHeader>
                     <CardContent className="flex flex-col flex-grow">
                         <CardDescription className="text-base flex-grow mb-4">{item.description}</CardDescription>

@@ -4,110 +4,121 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
 const fragmentShader = `
+  // 'Tela Digitale Vivente' by Cantiere Culturale Creative Tech
+  // This shader generates a living, interactive particle system.
+  // It uses noise to create organic movement and reacts to user input.
+
   uniform float u_time;
   uniform vec2 u_resolution;
   uniform vec2 u_mouse;
   uniform float u_scroll;
   varying vec2 vUv;
 
-  // Basic pseudo-random number generator
-  float rand(vec2 n) { 
-    return fract(sin(dot(n, vec2(12.9898, 4.1414))) * 43758.5453);
+  // --- Utility Functions ---
+  float random (vec2 st) {
+    return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
   }
 
-  // Simplex noise (for more organic movement)
-  vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-  vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-  vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
-
-  float snoise(vec2 v) {
-    const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
-    vec2 i  = floor(v + dot(v, C.yy) );
-    vec2 x0 = v -   i + dot(i, C.xx);
-    vec2 i1;
-    i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    vec4 x12 = x0.xyxy + C.xxzz;
-    x12.xy -= i1;
-    i = mod289(i);
-    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
-    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-    m = m*m;
-    m = m*m;
-    vec3 x = 2.0 * fract(p * C.www) - 1.0;
-    vec3 h = abs(x) - 0.5;
-    vec3 ox = floor(x + 0.5);
-    vec3 a0 = x - ox;
-    m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
-    vec3 g;
-    g.x  = a0.x  * x0.x  + h.x  * x0.y;
-    g.yz = a0.yz * x12.wz + h.yz * x12.xw;
-    return 130.0 * dot(m, g);
+  // 2D Noise function
+  float noise (vec2 st) {
+    vec2 i = floor(st);
+    vec2 f = fract(st);
+    float a = random(i);
+    float b = random(i + vec2(1.0, 0.0));
+    float c = random(i + vec2(0.0, 1.0));
+    float d = random(i + vec2(1.0, 1.0));
+    vec2 u = f*f*(3.0-2.0*f);
+    return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
   }
 
+  // --- Main Image Generation ---
   void main() {
-    vec2 st = gl_FragCoord.xy / u_resolution.xy;
-    st.x *= u_resolution.x / u_resolution.y;
-    
+    vec2 st = gl_FragCoord.xy/u_resolution.xy;
+    st.x *= u_resolution.x/u_resolution.y;
+
     vec3 finalColor = vec3(0.0);
+    float totalAlpha = 0.0;
 
-    // 3 layers of tiles
+    // We create 3 layers of particles for a parallax effect.
     for (float i = 1.0; i <= 3.0; i++) {
-        float speed_multiplier = 0.4 + (i * 0.2); // Layer 1: 0.6, Layer 2: 0.8, Layer 3: 1.0
-        float scale = 15.0 + i * 10.0; // Layer 1: 25, Layer 2: 35, Layer 3: 45
-
-        vec2 grid_uv = st * scale;
+        // --- Layer-specific properties ---
+        float layerDepth = i / 3.0; // 0.33, 0.66, 1.0
+        float scale = 10.0 + layerDepth * 20.0; // Layer 1: 16.6, Layer 2: 23.3, Layer 3: 30
+        float speedMultiplier = 0.1 + (1.0 - layerDepth) * 0.4; // Slower for deeper layers
+        
+        vec2 gridUv = st * scale;
         
         // --- Parallax Scroll Effect ---
-        // We use sine/cosine to create a looping, gentle drift
-        float scroll_effect = u_scroll * speed_multiplier * 0.1;
-        grid_uv.y += scroll_effect;
-        grid_uv.x += sin(scroll_effect * 0.5) * 0.5;
+        // Layers move at different speeds based on scroll.
+        float scrollOffset = u_scroll * speedMultiplier * 0.05;
+        gridUv.y += scrollOffset;
 
-        vec2 grid_id = floor(grid_uv);
-        vec2 grid_st = fract(grid_uv);
+        vec2 gridId = floor(gridUv);
+        vec2 gridSt = fract(gridUv);
 
-        // --- Mouse Interaction ---
-        vec2 mouse_norm = u_mouse / u_resolution;
-        mouse_norm.x *= u_resolution.x / u_resolution.y;
-        float mouse_dist = distance(grid_uv / scale, mouse_norm);
-        float mouse_effect = smoothstep(0.15, 0.0, mouse_dist) * 0.5;
+        // --- Organic Movement (Perlin Noise based) ---
+        // This gives the particles a slow, drifting, "living" motion.
+        float noiseVal = noise(gridId + u_time * speedMultiplier * 0.1);
+        gridId += vec2(sin(noiseVal * 6.283), cos(noiseVal * 6.283)) * 0.5;
 
-        // Add noise to grid for organic movement
-        grid_id.x += snoise(vec2(grid_id.y, u_time * 0.05 * speed_multiplier)) * 0.5;
-        grid_id.y += snoise(vec2(grid_id.x, u_time * 0.05 * speed_multiplier)) * 0.5;
-
-        float tile_rand = rand(grid_id);
+        // --- Particle Generation ---
+        float particleRand = random(gridId);
         
-        vec3 tile_color = vec3(1.0);
-        float opacity = 0.0;
-        
-        // Only draw a small fraction of tiles per layer
-        if (tile_rand > 0.95) {
-            // Assign color based on another random value
-            float color_rand = rand(grid_id + vec2(1.23, 4.56));
-            if (color_rand < 0.33) {
-                tile_color = vec3(0.12, 0.47, 0.87); // Blue (Primary)
-            } else if (color_rand < 0.66) {
-                tile_color = vec3(0.92, 0.26, 0.31); // Red (Accent)
-            } else {
-                tile_color = vec3(1.0, 0.76, 0.05); // Yellow
-            }
+        // Only draw a small fraction of particles per layer.
+        if (particleRand > 0.98) {
+            vec2 particleCenter = vec2(0.5, 0.5);
             
-            // Define shape (rectangles)
-            float tile_width = 0.05 + rand(grid_id + vec2(7.8, 9.0)) * 0.1; // Thin rectangles
-            if (grid_st.x > 0.5 - tile_width / 2.0 && grid_st.x < 0.5 + tile_width / 2.0) {
-                 opacity = 0.2 + (i / 3.0) * 0.3; // Fainter tiles on further layers
-            }
-        }
-        
-        // Apply mouse effect - slight brightness change
-        tile_color += mouse_effect;
-        opacity += mouse_effect * 0.2;
+            // --- Particle Shape (Ethereal fragments) ---
+            // We use noise to create irregular, soft shapes.
+            float shapeNoise = noise(gridId + vec2(u_time * 0.1, 0.0));
+            float dist = distance(gridSt, particleCenter);
+            float particleSize = 0.05 + shapeNoise * 0.2;
+            
+            float particleIntensity = smoothstep(particleSize, particleSize - 0.05, dist);
+            
+            // --- Mouse Interaction (Repulsive Force) ---
+            vec2 mouseNorm = u_mouse / u_resolution;
+            mouseNorm.y = 1.0 - mouseNorm.y; // Invert Y for shader space
+            mouseNorm.x *= u_resolution.x/u_resolution.y;
+            float mouseDist = distance(st, mouseNorm);
+            // The repulsive force is strongest near the cursor and fades out.
+            float repulsion = smoothstep(0.15, 0.0, mouseDist) * 0.5 * (1.0 - layerDepth);
+            particleIntensity *= (1.0 - repulsion);
 
-        finalColor += tile_color * opacity;
+
+            // --- Particle Color ---
+            // Colors are chosen from the vibrant accent palette.
+            vec3 particleColor;
+            float colorRand = random(gridId + vec2(1.23, 4.56));
+            if (colorRand < 0.33) {
+                particleColor = vec3(0.25, 0.52, 0.96); // Google Blue
+            } else if (colorRand < 0.66) {
+                particleColor = vec3(0.96, 0.26, 0.21); // Google Red
+            } else {
+                particleColor = vec3(1.0, 0.76, 0.05); // Google Yellow
+            }
+
+            // --- Particle Opacity ---
+            // Most particles are very faint, with a few bright ones.
+            float baseAlpha = 0.1;
+            if (random(gridId + 7.89) > 0.95) { // 5% of particles are brighter
+              baseAlpha = 0.7;
+            }
+            float particleAlpha = particleIntensity * baseAlpha * layerDepth;
+            
+            // --- Fading at edges (Lifecycle) ---
+            // Particles gently fade in and out at the screen edges.
+            float fadeEdge = smoothstep(0.0, 0.1, st.y) * smoothstep(1.0, 0.9, st.y);
+            particleAlpha *= fadeEdge;
+
+            // Blend this particle into the final color.
+            finalColor += particleColor * particleAlpha;
+            totalAlpha += particleAlpha;
+        }
     }
 
-    gl_FragColor = vec4(finalColor, 1.0);
+    // Set the final pixel color. The background is white.
+    gl_FragColor = vec4(vec3(1.0) - (vec3(1.0) - finalColor), 1.0);
   }
 `;
 
@@ -133,10 +144,10 @@ export function WebGLBackground() {
 
     const scene = new THREE.Scene();
     const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current, antialias: true, alpha: true });
     
-    // Set a solid, light gray background color
-    renderer.setClearColor(0xF8F9FA, 1); 
+    // Set a clear background. The fragment shader will draw the white canvas.
+    renderer.setClearColor(0x000000, 0); 
     
     const clock = new THREE.Clock();
 
@@ -145,6 +156,7 @@ export function WebGLBackground() {
       fragmentShader,
       vertexShader,
       uniforms: uniforms.current,
+      transparent: true,
     });
 
     const plane = new THREE.Mesh(geometry, material);
@@ -162,13 +174,14 @@ export function WebGLBackground() {
       const width = window.innerWidth;
       const height = window.innerHeight;
       renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       uniforms.current.u_resolution.value.x = width;
       uniforms.current.u_resolution.value.y = height;
     };
 
     const handleMouseMove = (event: MouseEvent) => {
         uniforms.current.u_mouse.value.x = event.clientX;
-        uniforms.current.u_mouse.value.y = window.innerHeight - event.clientY; // Invert Y
+        uniforms.current.u_mouse.value.y = event.clientY;
     };
 
     const handleScroll = () => {
@@ -194,5 +207,5 @@ export function WebGLBackground() {
     };
   }, []);
 
-  return <canvas ref={canvasRef} id="art-background" className="fixed top-0 left-0 w-full h-screen -z-20" />;
+  return <canvas ref={canvasRef} id="art-background" className="fixed top-0 left-0 w-full h-screen -z-10" />;
 }
