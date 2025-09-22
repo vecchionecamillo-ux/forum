@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { useFormStatus } from 'react-dom';
 import { addPoints } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +8,22 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { useToast } from '@/hooks/use-toast';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Star, Shield, ArrowUp } from 'lucide-react';
+import { MoreHorizontal, Star, Search } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 const ranks = [
   { level: 1, name: 'Visitatore', color: 'bg-gray-400' },
@@ -22,96 +36,141 @@ const ranks = [
 type User = {
   _id: string;
   username: string;
+  email: string;
   points: number;
   rankLevel: number;
+  country: string;
+  isStudent: boolean;
 };
 
+// Mock data expanded for analyst view
 async function fetchUsers(): Promise<User[]> {
   return [
-    { _id: '1a', username: 'creative.user@email.com', points: 850, rankLevel: 2 },
-    { _id: '2b', username: 'digital.artist@email.com', points: 1240, rankLevel: 3 },
-    { _id: '3c', username: 'vecchionecamillo1@gmail.com', points: 400, rankLevel: 5 },
-    { _id: '4d', username: 'new.innovator@email.com', points: 150, rankLevel: 1 },
+    { _id: '1a', username: 'creative.user', email: 'creative.user@email.com', points: 850, rankLevel: 2, country: 'Italia', isStudent: false },
+    { _id: '2b', username: 'digital.artist', email: 'digital.artist@email.com', points: 1240, rankLevel: 3, country: 'Germania', isStudent: false },
+    { _id: '3c', username: 'camillo_vecchione', email: 'vecchionecamillo1@gmail.com', points: 4000, rankLevel: 5, country: 'Italia', isStudent: true },
+    { _id: '4d', username: 'new.innovator', email: 'new.innovator@email.com', points: 150, rankLevel: 1, country: 'Francia', isStudent: true },
+    { _id: '5e', username: 'art.lover', email: 'art.lover@email.com', points: 550, rankLevel: 2, country: 'Spagna', isStudent: false },
+    { _id: '6f', username: 'tech.guru', email: 'tech.guru@email.com', points: 2100, rankLevel: 4, country: 'Stati Uniti', isStudent: false },
   ];
 }
 
-function SubmitButton({ children, formAction }: { children: React.ReactNode, formAction: string }) {
-  const { pending } = useFormStatus();
-  return (
-    <Button type="submit" name="actionType" value={formAction} disabled={pending} className="w-full sm:w-auto">
-      {pending ? 'Applicando...' : children}
-    </Button>
-  );
-}
 
-function UserActions({ user, isPending, handleAction }: { user: User, isPending: boolean, handleAction: (formData: FormData) => void }) {
+function UserTableRow({ user, onAction }: { user: User, onAction: (formData: FormData) => void }) {
   const userRank = ranks.find(r => r.level === user.rankLevel) || ranks[0];
-  
+  const [pointsToAdd, setPointsToAdd] = useState('');
+
+  const handleFormAction = (actionType: 'addPoints' | 'changeRank', value?: string) => {
+    const formData = new FormData();
+    formData.append('userId', user._id);
+    formData.append('actionType', actionType);
+    if (actionType === 'addPoints') {
+      formData.append('points', pointsToAdd);
+    } else if (actionType === 'changeRank' && value) {
+      formData.append('rank', value);
+    }
+    onAction(formData);
+    if (actionType === 'addPoints') setPointsToAdd('');
+  };
+
   return (
-    <Card key={user._id} className="border">
-        <CardHeader>
-        <div className="flex justify-between items-start">
-            <div>
-                <CardTitle className="text-lg font-medium">{user.username}</CardTitle>
-                <CardDescription className="text-foreground/70 flex items-center gap-2 mt-1">
-                    <Badge variant="secondary" className={`${userRank.color} text-white`}>{userRank.name}</Badge>
-                    <span className="flex items-center gap-1"><Star className="h-3 w-3 text-yellow-500" /> {user.points} punti</span>
-                </CardDescription>
-            </div>
-            <Shield className="h-6 w-6 text-primary" />
-        </div>
-        </CardHeader>
-        <CardContent>
-            <form action={handleAction} className="space-y-4">
-                <input type="hidden" name="userId" value={user._id} />
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-                    <div>
-                        <label htmlFor={`points-${user._id}`} className="text-xs font-medium text-foreground/80 mb-1 block">Aggiungi Punti</label>
+    <TableRow>
+      <TableCell className="font-medium">{user.username}</TableCell>
+      <TableCell>{user.email}</TableCell>
+      <TableCell className="text-center">{user.points}</TableCell>
+      <TableCell>
+        <Badge variant="secondary" className={`${userRank.color} text-white`}>{userRank.name}</Badge>
+      </TableCell>
+      <TableCell>{user.country}</TableCell>
+      <TableCell className="text-center">{user.isStudent ? 'Sì' : 'No'}</TableCell>
+      <TableCell>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button aria-haspopup="true" size="icon" variant="ghost">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuLabel>Azioni</DropdownMenuLabel>
+            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <div className="flex flex-col space-y-2">
+                    <div className="flex items-center space-x-2">
                         <Input
-                        id={`points-${user._id}`}
-                        type="number"
-                        name="points"
-                        placeholder="Es: 150"
-                        min="1"
-                        disabled={isPending}
+                            type="number"
+                            placeholder="Punti"
+                            value={pointsToAdd}
+                            onChange={(e) => setPointsToAdd(e.target.value)}
+                            className="h-8 w-24"
                         />
+                        <Button size="sm" onClick={() => handleFormAction('addPoints')} disabled={!pointsToAdd}>Aggiungi</Button>
                     </div>
-                    <SubmitButton formAction="addPoints">
-                        <Star className="mr-2 h-4 w-4"/> Assegna Punti
-                    </SubmitButton>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
-                    <div>
-                        <label htmlFor={`rank-${user._id}`} className="text-xs font-medium text-foreground/80 mb-1 block">Cambia Grado</label>
-                        <Select name="rank" defaultValue={userRank.name} disabled={isPending}>
-                        <SelectTrigger id={`rank-${user._id}`}>
-                            <SelectValue placeholder="Seleziona grado" />
+            </DropdownMenuItem>
+             <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                <div className="flex items-center space-x-2">
+                     <Select onValueChange={(value) => handleFormAction('changeRank', value)}>
+                        <SelectTrigger className="h-8 w-[150px]">
+                            <SelectValue placeholder="Cambia Grado" />
                         </SelectTrigger>
                         <SelectContent>
                             {ranks.map(rank => (
-                            <SelectItem key={rank.level} value={rank.name}>{rank.name}</SelectItem>
+                                <SelectItem key={rank.level} value={rank.name}>{rank.name}</SelectItem>
                             ))}
                         </SelectContent>
-                        </Select>
-                    </div>
-                    <SubmitButton formAction="changeRank">
-                        <ArrowUp className="mr-2 h-4 w-4"/> Aggiorna Grado
-                    </SubmitButton>
+                    </Select>
                 </div>
-            </form>
-        </CardContent>
-    </Card>
-  )
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
+  );
+}
+
+function UserTable({ users, onAction }: { users: User[], onAction: (formData: FormData) => void }) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Username</TableHead>
+          <TableHead>Email</TableHead>
+          <TableHead className="text-center">Punti</TableHead>
+          <TableHead>Grado</TableHead>
+          <TableHead>Paese</TableHead>
+          <TableHead className="text-center">Studente</TableHead>
+          <TableHead><span className="sr-only">Azioni</span></TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {users.map(user => <UserTableRow key={user._id} user={user} onAction={onAction} />)}
+      </TableBody>
+    </Table>
+  );
 }
 
 export function ModeratorPanel() {
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+  const [filter, setFilter] = useState('');
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    fetchUsers().then(setUsers);
+    fetchUsers().then(data => {
+      setUsers(data);
+      setFilteredUsers(data);
+    });
   }, []);
+
+  useEffect(() => {
+    const lowercasedFilter = filter.toLowerCase();
+    const filtered = users.filter(user =>
+      user.username.toLowerCase().includes(lowercasedFilter) ||
+      user.email.toLowerCase().includes(lowercasedFilter)
+    );
+    setFilteredUsers(filtered);
+  }, [filter, users]);
 
   const handleAction = (formData: FormData) => {
     startTransition(async () => {
@@ -121,32 +180,58 @@ export function ModeratorPanel() {
         const result = await addPoints(formData);
          if (result.success) {
             toast({ title: 'Successo', description: result.message });
-            // In a real app, you'd refetch or update state
+            // In a real app, you'd refetch or update state, here we just refresh
+            fetchUsers().then(data => {
+                setUsers(data);
+                setFilteredUsers(data.filter(user =>
+                    user.username.toLowerCase().includes(filter.toLowerCase()) ||
+                    user.email.toLowerCase().includes(filter.toLowerCase())
+                ));
+            });
           } else {
             toast({ title: 'Errore', description: result.message, variant: 'destructive' });
           }
       } else if (actionType === 'changeRank') {
         const userId = formData.get('userId');
         const newRank = formData.get('rank');
-        console.log(`Rank per l'utente ${userId} cambiato a ${newRank}`);
+        console.log(`Rank per l'utente ${userId} cambiato a ${newRank} (simulato)`);
         toast({ title: 'Successo', description: `Grado aggiornato per l'utente ${userId}.` });
-        // In a real app, you'd refetch or update state
+        // In a real app, you'd refetch or update state, here we just refresh
+         fetchUsers().then(data => {
+            setUsers(data);
+             setFilteredUsers(data.filter(user =>
+                user.username.toLowerCase().includes(filter.toLowerCase()) ||
+                user.email.toLowerCase().includes(filter.toLowerCase())
+             ));
+        });
       }
     });
   };
 
   return (
     <Card>
-      <CardContent className="p-4 md:p-6">
-        <div className="space-y-6">
-          {users.length > 0 ? (
-            users.map((user) => (
-                <UserActions key={user._id} user={user} isPending={isPending} handleAction={handleAction} />
-            ))
-          ) : (
-            <p className="text-center text-foreground/70">Caricamento utenti...</p>
-          )}
-        </div>
+        <CardHeader>
+            <CardTitle>Dashboard Tessere Utente</CardTitle>
+            <CardDescription>Visualizza, filtra e gestisci i membri della community.</CardDescription>
+            <div className="relative mt-4">
+              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="search"
+                placeholder="Filtra per nome o email..."
+                className="w-full pl-8"
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+              />
+            </div>
+        </CardHeader>
+      <CardContent>
+        {isPending ? (
+            <div className="text-center text-muted-foreground">Aggiornamento in corso...</div>
+        ) : filteredUsers.length > 0 ? (
+          <UserTable users={filteredUsers} onAction={handleAction} />
+        ) : (
+          <div className="text-center text-muted-foreground py-8">Nessun utente trovato.</div>
+        )}
       </CardContent>
     </Card>
   );
