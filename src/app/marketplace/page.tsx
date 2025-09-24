@@ -47,7 +47,7 @@ const allCategories = [...new Set(allItems.map(item => item.category))];
 const maxPoints = Math.max(...allItems.map(item => item.points || 0));
 
 export default function MarketplacePage() {
-    const [activeTab, setActiveTab] = useState<'earn' | 'spend'>('earn');
+    const [activeTab, setActiveTab] = useState<'earn' | 'spend'>('spend');
     const [pointRange, setPointRange] = useState<[number]>([maxPoints]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     
@@ -127,11 +127,11 @@ export default function MarketplacePage() {
             {/* Contenuto Principale */}
             <div className="flex-1">
                 <div className="flex border-b mb-8">
-                     <button onClick={() => setActiveTab('earn')} className={tabButtonStyle('earn')}>
-                        <div className="flex items-center justify-center gap-2"><Award /> Ottieni Punti</div>
-                     </button>
                      <button onClick={() => setActiveTab('spend')} className={tabButtonStyle('spend')}>
                         <div className="flex items-center justify-center gap-2"><ShoppingCart /> Spendi Punti</div>
+                     </button>
+                     <button onClick={() => setActiveTab('earn')} className={tabButtonStyle('earn')}>
+                        <div className="flex items-center justify-center gap-2"><Award /> Ottieni Punti</div>
                      </button>
                 </div>
 
