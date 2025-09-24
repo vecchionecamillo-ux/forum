@@ -3,7 +3,7 @@ import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-imag
 export type Activity = {
   title: string;
   slug: string;
-  category: 'Formazione' | 'Eventi' | 'Community' | 'Approfondimento' | 'Opportunità' | 'Arte';
+  category: 'Laboratorio' | 'Workshop' | 'Eventi' | 'Opportunità' | 'Arte' | 'Community';
   description: string;
   image?: ImagePlaceholder;
   cta: string;
@@ -20,7 +20,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
   {
     title: 'Laboratorio di Fotografia',
     slug: 'lab-fotografia',
-    category: 'Formazione',
+    category: 'Laboratorio',
     description: 'Un laboratorio permanente per imparare le basi della fotografia, dalla composizione alla post-produzione. Adatto a tutti i livelli.',
     image: PlaceHolderImages.find(img => img.id === 'art-placeholder'),
     cta: 'Scopri di più',
@@ -31,7 +31,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
   {
     title: 'Laboratorio Giovani Idee',
     slug: 'lab-giovani-idee',
-    category: 'Formazione',
+    category: 'Laboratorio',
     description: 'Uno spazio creativo per giovani menti. Trasforma le tue idee in progetti concreti con il supporto di mentor esperti.',
     image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
     cta: 'Partecipa',
@@ -42,7 +42,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
   {
     title: 'Laboratorio di Pittura',
     slug: 'lab-pittura',
-    category: 'Formazione',
+    category: 'Laboratorio',
     description: 'Esplora la tua creatività con tele e pennelli. Un corso continuo per affinare la tua tecnica pittorica.',
     image: PlaceHolderImages.find(img => img.id === 'art-gallery-placeholder'),
     cta: 'Iscriviti',
@@ -108,7 +108,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
   {
     title: 'Annuncio Workshop: "Creative Coding"',
     slug: 'workshop-creative-coding',
-    category: 'Formazione',
+    category: 'Workshop',
     description: 'Impara a creare arte con il codice nel nostro prossimo workshop intensivo. Prenota il tuo slot, i posti sono limitati!',
     image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
     cta: 'Prenota Ora',
@@ -117,19 +117,6 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     date: '2024-10-15',
     time: '18:00 - 20:00',
     duration: '2 ore'
-  },
-  {
-    title: 'Articolo: Il Futuro dell\'Arte è Digitale?',
-    slug: 'articolo-futuro-arte',
-    category: 'Approfondimento',
-    description: 'Un approfondimento del nostro curatore sul ruolo crescente della tecnologia nel mondo dell\'arte contemporanea. Leggi l\'articolo completo.',
-    image: PlaceHolderImages.find(img => img.id === 'nft-placeholder'),
-    cta: 'Leggi di più',
-    link: '/news/articolo-futuro-arte',
-    points: 10,
-    date: '2024-09-20',
-    time: 'N/A',
-    duration: '5 min di lettura'
   },
 ];
 
@@ -161,7 +148,7 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       description: 'Un workshop intensivo di 2 giorni per imparare le tecniche avanzate di scultura digitale. Accesso riservato.',
       image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
       cta: 'Usa i tuoi Punti',
-      category: 'Formazione',
+      category: 'Workshop',
       points: 800,
       link: '/news/workshop-scultura-3d',
       date: '2024-11-20',

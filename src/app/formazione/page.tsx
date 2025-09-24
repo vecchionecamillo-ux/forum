@@ -1,7 +1,7 @@
 import { allActivities } from '@/lib/activities';
 import { ActivityCard } from '@/components/activity-card';
 
-const formazioneItems = allActivities.filter(item => item.category === 'Formazione');
+const formazioneItems = allActivities.filter(item => item.category === 'Laboratorio' || item.category === 'Workshop');
 
 export default function FormazionePage() {
   return (

@@ -14,16 +14,16 @@ const platformItems = [
     link: '/formazione',
   },
   {
-    title: 'Eventi',
-    description: 'Partecipa a mostre virtuali, talk, performance in diretta e festival digitali esclusivi.',
+    title: 'Eventi & Community',
+    description: 'Partecipa a mostre, talk e festival. Connettiti e collabora con una rete di artisti e innovatori.',
     image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
     link: '/eventi',
   },
   {
-    title: 'Community',
-    description: 'Connettiti, collabora e cresci insieme a una rete internazionale di artisti, curatori e innovatori.',
-    image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
-    link: '/community',
+    title: 'Marketplace',
+    description: 'Usa i tuoi punti per riscattare premi esclusivi, accedere a contenuti unici e molto altro.',
+    image: PlaceHolderImages.find(img => img.id === 'art-placeholder'),
+    link: '/marketplace',
   },
 ];
 

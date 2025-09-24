@@ -12,7 +12,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 const navLinks = [
   { href: '/about', label: 'Chi Siamo' },
   { href: '/eventi', label: 'Eventi' },
-  { href: '/community', label: 'Community' },
+  { href: '/formazione', label: 'Formazione' },
   { href: '/marketplace', label: 'Marketplace' },
   { href: '/about#news', label: 'News' },
 ];
