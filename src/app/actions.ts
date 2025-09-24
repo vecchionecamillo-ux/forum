@@ -175,3 +175,34 @@ export async function registerUserForActivity(formData: FormData): Promise<{ suc
     return { success: false, message: error.message || "Si è verificato un errore durante l'operazione." };
   }
 }
+
+export async function submitCollaborationProposal(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const data = {
+    name: formData.get('name'),
+    lastName: formData.get('lastName'),
+    email: formData.get('email'),
+    collaborationType: formData.get('collaborationType'),
+    message: formData.get('message'),
+  };
+
+  if (!data.name || !data.lastName || !data.email || !data.collaborationType || !data.message) {
+    return { success: false, message: 'Tutti i campi sono obbligatori.' };
+  }
+
+  try {
+    const proposalsCollectionRef = collection(db, 'proposals');
+    await addDoc(proposalsCollectionRef, {
+      ...data,
+      submittedAt: serverTimestamp(),
+      status: 'new', // new, reviewed, contacted
+    });
+
+    revalidatePath('/admin');
+
+    return { success: true, message: 'La tua proposta è stata inviata con successo. Grazie per il tuo interesse!' };
+
+  } catch (error) {
+    console.error("Error submitting proposal: ", error);
+    return { success: false, message: "Si è verificato un errore durante l'invio della proposta. Riprova più tardi." };
+  }
+}

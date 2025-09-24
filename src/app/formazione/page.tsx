@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { SlidersHorizontal, BookOpenCheck, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const allCourseCategories = ['Laboratorio', 'Workshop'];
 type DurationFilter = 'all' | 'intensive' | 'long-term';
@@ -123,55 +124,10 @@ export default function FormazionePage() {
             ) : (
                 <div className="text-center py-16 text-muted-foreground">
                     <p className="text-lg">Nessun corso trovato con i filtri selezionati.</p>
-                    <p>Prova a modificare la ricerca per scoprire la nostra offerta formativa!</p>
+                    <p>Vuoi proporre un corso? Diventa nostro partner!</p>
                 </div>
             )}
         </div>
-
-        {/* Partner CTA Section */}
-        <section className="mb-16">
-             <Card className="bg-muted/30">
-                <CardHeader className="text-center">
-                    <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-4">
-                        <Handshake className="w-8 h-8 text-primary" />
-                    </div>
-                    <CardTitle className="text-3xl font-bold">Diventa un Partner Formativo</CardTitle>
-                    <p className="max-w-2xl mx-auto text-muted-foreground pt-2">
-                        Sei un artista, un professionista, un'associazione o un'istituzione? Crediamo nella collaborazione e nella condivisione della conoscenza. Proponi il tuo workshop, laboratorio o corso al Cantiere Culturale.
-                    </p>
-                </CardHeader>
-                <CardContent className="max-w-3xl mx-auto">
-                    <div className="text-left space-y-6">
-                        <div>
-                            <h4 className="font-semibold text-lg mb-2">Cosa cerchiamo?</h4>
-                            <p className="text-muted-foreground">
-                                Cerchiamo proposte innovative che uniscano arte, cultura e tecnologia. Se hai un'idea che può arricchire la nostra community, vogliamo sentirla.
-                            </p>
-                        </div>
-                        <div>
-                             <h4 className="font-semibold text-lg mb-2">Come proporre un'attività</h4>
-                             <p className="text-muted-foreground mb-4">
-                                Inviaci una proposta dettagliata via email. Assicurati di includere le seguenti informazioni per permetterci di valutare al meglio il tuo progetto:
-                             </p>
-                             <ul className="list-disc list-inside space-y-2 text-muted-foreground">
-                                <li><strong>Descrizione del Progetto:</strong> Obiettivi formativi e a chi si rivolge.</li>
-                                <li><strong>Strumenti Necessari:</strong> Elenco di attrezzature, software o materiali richiesti.</li>
-                                <li><strong>Il tuo CV o Portfolio:</strong> Per conoscere meglio te e le tue competenze.</li>
-                                <li><strong>Struttura del Programma:</strong> Suddivisione degli argomenti e delle lezioni.</li>
-                                <li><strong>Durata e Frequenza:</strong> Durata totale del corso e impegno settimanale richiesto.</li>
-                             </ul>
-                        </div>
-                        <div className="text-center pt-4">
-                            <Button asChild size="lg">
-                                <a href="mailto:info@cantiereculturale.it?subject=Proposta di Collaborazione Formativa">
-                                    Invia la tua Proposta
-                                </a>
-                            </Button>
-                        </div>
-                    </div>
-                </CardContent>
-            </Card>
-        </section>
       </main>
     </div>
   );
