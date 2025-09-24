@@ -80,6 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
  useEffect(() => {
     const processUser = async (user: User | null) => {
+      setLoading(true);
       if (user) {
         await createOrUpdateUserInDb(user);
         setUser(user);
@@ -89,8 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         setIsModerator(false);
         setUserProfile(null); // Clear profile on logout
-        setLoading(false);
       }
+      setLoading(false);
     };
 
     const unsubscribeAuth = onAuthStateChanged(auth, processUser);
@@ -106,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error("Error getting redirect result: ", error);
       })
       .finally(() => {
-        setLoading(false);
+        // The final loading state will be set by onAuthStateChanged
       });
 
     return () => unsubscribeAuth();
