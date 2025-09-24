@@ -4,7 +4,7 @@ import { allActivities } from '@/lib/activities';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ArrowLeft, Calendar, Clock, Award, Gem, Loader2, Star } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Gem, Loader2, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, useRouter } from 'next/navigation';
