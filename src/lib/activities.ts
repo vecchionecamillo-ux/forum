@@ -9,6 +9,7 @@ export type Activity = {
   cta: string;
   link?: string;
   points?: number;
+  xp?: number;
   date?: string; // Formato YYYY-MM-DD per facilitare l'ordinamento e il parsing
   time?: string;
   duration?: string;
@@ -27,6 +28,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Scopri di più',
     link: '/news/lab-fotografia',
     points: 150,
+    xp: 200,
     duration: '4 Settimane',
     durationDetail: '4 settimane, 2h/sett',
   },
@@ -39,6 +41,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Partecipa',
     link: '/news/lab-giovani-idee',
     points: 150,
+    xp: 200,
     duration: '4 Settimane',
     durationDetail: '4 settimane, 2h/sett',
   },
@@ -51,6 +54,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Iscriviti',
     link: '/news/lab-pittura',
     points: 150,
+    xp: 200,
     duration: '4 Settimane',
     durationDetail: '4 settimane, 2h/sett',
   },
@@ -63,6 +67,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Inizia a scrivere',
     link: '/news/lab-scrittura-creativa',
     points: 80,
+    xp: 100,
     duration: 'Permanente',
     durationDetail: 'Permanente',
   },
@@ -75,6 +80,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Iscriviti al workshop',
     link: '/news/workshop-excel',
     points: 40,
+    xp: 50,
     date: '2024-11-05',
     time: '18:00 - 20:00',
     duration: '2 ore',
@@ -89,6 +95,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Partecipa',
     link: '/news/workshop-python',
     points: 75,
+    xp: 100,
     date: '2024-10-22',
     time: '18:00 - 21:00',
     duration: '3 ore',
@@ -103,6 +110,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Prenota il tuo posto',
     link: '/news/workshop-marketing-digitale',
     points: 75,
+    xp: 100,
     date: '2024-11-12',
     time: '17:00 - 20:00',
     duration: '3 ore',
@@ -119,6 +127,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Partecipa',
     link: '/news/plastic-free-parco',
     points: 120,
+    xp: 150,
     date: '2024-10-02',
     time: '09:00 - 13:00',
     duration: '4 ore'
@@ -132,6 +141,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Partecipa all\'incontro',
     link: '/news/incontro-psicologa-stare-insieme',
     points: 50,
+    xp: 75,
     date: '2024-10-12',
     time: '18:00',
     duration: '1.5 ore'
@@ -145,6 +155,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Prenota il tuo posto',
     link: '/news/cineforum-lab-pittura',
     points: 100,
+    xp: 125,
     date: '2024-10-05',
     time: '20:00',
     duration: '3 ore'
@@ -158,6 +169,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Partecipa',
     link: '/news/call-volontari',
     points: 150,
+    xp: 250,
     date: '2024-09-30',
     time: 'Tutto il giorno',
     duration: 'Continuativo'
