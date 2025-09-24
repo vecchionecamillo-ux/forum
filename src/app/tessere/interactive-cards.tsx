@@ -79,7 +79,7 @@ const VerticalCarousel = ({ levels }: { levels: UserTierLevel[] }) => {
 interface InteractiveCardsProps {
   tiers: MembershipTier[];
   selectedTier: MembershipTier | null;
-  onSelectTier: (tier: MembershipTier) => void;
+  onSelectTier?: (tier: MembershipTier) => void;
 }
 
 export function InteractiveCards({ tiers, selectedTier, onSelectTier }: InteractiveCardsProps) {
@@ -87,5 +87,6 @@ export function InteractiveCards({ tiers, selectedTier, onSelectTier }: Interact
     return <VerticalCarousel levels={selectedTier.levels} />;
   }
 
+  if(!onSelectTier) return null;
   return <HorizontalCarousel tiers={tiers} onSelectTier={onSelectTier} />;
 }

@@ -28,10 +28,10 @@ export default function TesserePage() {
 
   const description = useMemo(() => {
     if (selectedTier) {
-       if (selectedTier.type === 'user') {
+       if (selectedTier.levels.length > 1) {
          return `Scopri i livelli e i vantaggi della categoria ${selectedTier.title}. Scorri in verticale per esplorarli.`;
        }
-       return `Scopri i gradi e i vantaggi esclusivi riservati ai nostri ${selectedTier.title}.`
+       return `Scopri i vantaggi esclusivi riservati ai nostri ${selectedTier.title}.`
     }
     return 'Scorri in orizzontale per scoprire le categorie. Clicca su una tessera per esplorarne i gradi.';
   }, [selectedTier]);
@@ -39,15 +39,17 @@ export default function TesserePage() {
   const renderDetails = () => {
     if (!selectedTier) return null;
 
-    if (selectedTier.type === 'user') {
+    // Use vertical carousel for any tier with more than one level
+    if (selectedTier.levels.length > 1) {
       return (
         <InteractiveCards 
-            tiers={membershipTiers}
-            selectedTier={selectedTier}
+          tiers={membershipTiers}
+          selectedTier={selectedTier}
         />
-      )
+      );
     }
-
+    
+    // Special static view for single-level tiers (like Ambassador)
     return (
        <div className="w-full max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in-50 duration-500">
         <div className="space-y-4">
@@ -67,7 +69,7 @@ export default function TesserePage() {
           </ul>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
