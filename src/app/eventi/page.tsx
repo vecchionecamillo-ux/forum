@@ -8,14 +8,18 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SlidersHorizontal } from 'lucide-react';
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 
 const allCategories = [...new Set(allActivities.map(item => item.category))];
 
 type Timeframe = 'all' | 'week' | 'month';
+type PointFilter = 'all' | 'earn' | 'spend' | 'free';
 
 export default function EventiPage() {
   const [timeframe, setTimeframe] = useState<Timeframe>('all');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [pointFilter, setPointFilter] = useState<PointFilter>('all');
 
   const filteredItems = useMemo(() => {
     const now = new Date();
@@ -28,21 +32,39 @@ export default function EventiPage() {
     }
 
     return allActivities.filter(item => {
+      // Category Filter
       const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
-      
       if (!matchesCategory) return false;
 
-      if (timeframe === 'all') return true;
-
-      if (item.date && interval) {
-        return isWithinInterval(parseISO(item.date), interval);
+      // Timeframe Filter
+      const matchesTimeframe = () => {
+        if (timeframe === 'all') return true;
+        if (item.date && interval) {
+          return isWithinInterval(parseISO(item.date), interval);
+        }
+        return timeframe === 'all';
       }
-      
-      // For items without a specific date, decide if they should be shown. 
-      // Here we only show them if no time filter is active.
-      return timeframe === 'all';
+      if (!matchesTimeframe()) return false;
+
+      // Points Filter
+      const matchesPoints = () => {
+        switch (pointFilter) {
+          case 'earn':
+            return item.type === 'earn' && (item.points || 0) > 0;
+          case 'spend':
+            return item.type === 'spend';
+          case 'free':
+            return item.type === 'earn' && (!item.points || item.points === 0);
+          case 'all':
+          default:
+            return true;
+        }
+      }
+      if(!matchesPoints()) return false;
+
+      return true;
     });
-  }, [timeframe, selectedCategories]);
+  }, [timeframe, selectedCategories, pointFilter]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories(prev => 
@@ -76,12 +98,35 @@ export default function EventiPage() {
                 <CardTitle className="flex items-center gap-2"><SlidersHorizontal /> Filtra Eventi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div>
-                    <h4 className="font-semibold mb-3">Quando?</h4>
-                    <div className="flex flex-wrap gap-2">
-                        <Button onClick={() => setTimeframe('week')} className={timeframeButtonStyle('week')}>Questa Settimana</Button>
-                        <Button onClick={() => setTimeframe('month')} className={timeframeButtonStyle('month')}>Questo Mese</Button>
-                        <Button onClick={() => setTimeframe('all')} className={timeframeButtonStyle('all')}>Tutti</Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 className="font-semibold mb-3">Quando?</h4>
+                        <div className="flex flex-wrap gap-2">
+                            <Button onClick={() => setTimeframe('week')} className={timeframeButtonStyle('week')}>Questa Settimana</Button>
+                            <Button onClick={() => setTimeframe('month')} className={timeframeButtonStyle('month')}>Questo Mese</Button>
+                            <Button onClick={() => setTimeframe('all')} className={timeframeButtonStyle('all')}>Tutti</Button>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 className="font-semibold mb-3">Punti</h4>
+                        <RadioGroup defaultValue="all" onValueChange={(value: PointFilter) => setPointFilter(value)} className="flex flex-wrap gap-x-4 gap-y-2">
+                             <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="all" id="p-all" />
+                                <Label htmlFor="p-all">Tutti</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="earn" id="p-earn" />
+                                <Label htmlFor="p-earn">Guadagna Punti</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="spend" id="p-spend" />
+                                <Label htmlFor="p-spend">Richiede Punti</Label>
+                            </div>
+                             <div className="flex items-center space-x-2">
+                                <RadioGroupItem value="free" id="p-free" />
+                                <Label htmlFor="p-free">Gratuito</Label>
+                            </div>
+                        </RadioGroup>
                     </div>
                 </div>
                  <div>
