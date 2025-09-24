@@ -124,7 +124,7 @@ export const membershipTiers: MembershipTier[] = [
     ],
   },
   {
-    type: 'sponsor', // AUTUNNO: Calore e Ricchezza (palette calda, terrosa)
+    type: 'sponsor', // NUOVA PALETTE BLU
     title: 'Tessera Sponsor',
     description: 'Per le aziende che sostengono la nostra missione culturale.',
     benefits: [
@@ -137,28 +137,28 @@ export const membershipTiers: MembershipTier[] = [
       {
         name: 'Sponsor',
         xpThreshold: 0,
-        backgroundColor: 'bg-[#10342A]', // Verde Bosco
+        backgroundColor: 'bg-[#0F5298]', // Blu Zaffiro
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-amber-700/80',
-        badgeColor: 'bg-green-700',
+        accentColor: 'text-cyan-400/80',
+        badgeColor: 'bg-blue-700',
         benefits: [],
       },
       {
         name: 'Sponsor Premium',
         xpThreshold: 1,
-        backgroundColor: 'bg-[#10342A]',
+        backgroundColor: 'bg-[#0F5298]',
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-amber-500',
-        badgeColor: 'bg-green-600',
+        accentColor: 'text-cyan-300',
+        badgeColor: 'bg-blue-600',
         benefits: [],
       },
        {
         name: 'Sponsor Master',
         xpThreshold: 2,
-        backgroundColor: 'bg-[#10342A]',
+        backgroundColor: 'bg-[#0F5298]',
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-yellow-400',
-        badgeColor: 'bg-yellow-500',
+        accentColor: 'text-white',
+        badgeColor: 'bg-cyan-500',
         benefits: [],
       },
     ],
