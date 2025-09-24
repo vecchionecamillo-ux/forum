@@ -9,16 +9,19 @@ import { cn } from '@/lib/utils';
 export default function Home() {
   const router = useRouter();
   const [isExiting, setIsExiting] = useState(false);
-  const [hasScrolled, setHasScrolled] = useState(false);
+  const [hasNavigated, setHasNavigated] = useState(false);
+
+  // Pre-fetch the /about route as soon as the component mounts
+  useEffect(() => {
+    router.prefetch('/about');
+  }, [router]);
 
   const handleNavigation = useCallback(() => {
-    if (hasScrolled) return;
-    setHasScrolled(true);
+    if (hasNavigated) return;
+    setHasNavigated(true);
     setIsExiting(true);
-    setTimeout(() => {
-      router.push('/about');
-    }, 800); // Duration should match the animation
-  }, [router, hasScrolled]);
+    // The navigation will be triggered by onAnimationEnd
+  }, [hasNavigated]);
 
   useEffect(() => {
     const handleWheel = (event: WheelEvent) => {
@@ -29,11 +32,11 @@ export default function Home() {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'ArrowDown' || event.key === 'PageDown' || event.key === ' ') {
+        event.preventDefault(); // Prevent default scroll behavior
         handleNavigation();
       }
     };
     
-    // For touch devices
     let touchstartY = 0;
     const handleTouchStart = (event: TouchEvent) => {
         touchstartY = event.changedTouches[0].screenY;
@@ -46,13 +49,14 @@ export default function Home() {
         }
     };
 
-    window.addEventListener('wheel', handleWheel);
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('wheel', handleWheel, { once: true });
+    window.addEventListener('keydown', handleKeyDown, { once: true });
     window.addEventListener('touchstart', handleTouchStart);
     window.addEventListener('touchend', handleTouchEnd);
 
 
     return () => {
+      // Clean up listeners that might not have been triggered
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('touchstart', handleTouchStart);
@@ -60,8 +64,18 @@ export default function Home() {
     };
   }, [handleNavigation]);
 
+  const onAnimationEnd = () => {
+    if (isExiting) {
+      router.push('/about');
+    }
+  };
+
+
   return (
-    <div className={cn("relative h-screen w-screen overflow-hidden", isExiting && 'animate-page-exit')}>
+    <div 
+      className={cn("relative h-screen w-screen overflow-hidden", isExiting && 'animate-page-exit')}
+      onAnimationEnd={onAnimationEnd}
+    >
       
       <div className="absolute inset-0 bg-transparent z-0"></div>
 
@@ -74,6 +88,7 @@ export default function Home() {
        <button
         onClick={handleNavigation}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-foreground animate-bounce"
+        aria-label="Scorri per scoprire"
       >
         <span className="text-sm font-medium uppercase tracking-widest">Scorri per scoprire</span>
         <ChevronDown className="h-6 w-6" />
