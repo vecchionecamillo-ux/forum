@@ -177,16 +177,11 @@ export async function registerUserForActivity(formData: FormData): Promise<{ suc
 }
 
 export async function submitCollaborationProposal(formData: FormData): Promise<{ success: boolean; message: string }> {
-  const data = {
-    name: formData.get('name'),
-    lastName: formData.get('lastName'),
-    email: formData.get('email'),
-    collaborationType: formData.get('collaborationType'),
-    message: formData.get('message'),
-  };
+  const data = Object.fromEntries(formData.entries());
 
-  if (!data.name || !data.lastName || !data.email || !data.collaborationType || !data.message) {
-    return { success: false, message: 'Tutti i campi sono obbligatori.' };
+  // Basic validation
+  if (!data.collaborationType || !data.email) {
+    return { success: false, message: 'Tutti i campi obbligatori devono essere compilati.' };
   }
 
   try {

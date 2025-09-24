@@ -14,21 +14,25 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Loader2 } from 'lucide-react';
 
 const formSchema = z.object({
-  firstName: z.string().min(2, 'Il nome deve contenere almeno 2 caratteri.'),
-  lastName: z.string().min(2, 'Il cognome deve contenere almeno 2 caratteri.'),
+  name: z.string().min(2, 'Il nome deve contenere almeno 2 caratteri.'),
+  sector: z.string().min(2, 'Il settore deve contenere almeno 2 caratteri.'),
   email: z.string().email('Inserisci un indirizzo email valido.'),
   message: z.string().min(10, 'Il messaggio deve contenere almeno 10 caratteri.').max(1000, 'Il messaggio non può superare i 1000 caratteri.'),
 });
 
-export function VolunteerForm() {
+interface InterestFormProps {
+  type: 'partner' | 'sponsor';
+}
+
+export function InterestForm({ type }: InterestFormProps) {
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
+      name: '',
+      sector: '',
       email: '',
       message: '',
     },
@@ -37,14 +41,14 @@ export function VolunteerForm() {
   function onSubmit(values: z.infer<typeof formSchema>) {
     startTransition(async () => {
       const formData = new FormData();
-      formData.append('collaborationType', 'volunteer');
+      formData.append('collaborationType', type);
       Object.entries(values).forEach(([key, value]) => {
         formData.append(key, value);
       });
 
       const result = await submitCollaborationProposal(formData);
       if (result.success) {
-        toast({ title: 'Candidatura Inviata!', description: result.message });
+        toast({ title: 'Proposta Inviata!', description: result.message });
         form.reset();
       } else {
         toast({ title: 'Errore', description: result.message, variant: 'destructive' });
@@ -58,12 +62,12 @@ export function VolunteerForm() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
             control={form.control}
-            name="firstName"
+            name="name"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Nome</FormLabel>
+                <FormLabel>Nome Azienda / Referente</FormLabel>
                 <FormControl>
-                  <Input placeholder="Mario" {...field} disabled={isPending} />
+                  <Input placeholder="Es: Azienda S.p.A." {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -71,12 +75,12 @@ export function VolunteerForm() {
           />
           <FormField
             control={form.control}
-            name="lastName"
+            name="sector"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Cognome</FormLabel>
+                <FormLabel>Settore</FormLabel>
                 <FormControl>
-                  <Input placeholder="Rossi" {...field} disabled={isPending} />
+                  <Input placeholder="Es: Arte, Tecnologia, Food..." {...field} disabled={isPending} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -88,9 +92,9 @@ export function VolunteerForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>Email di Contatto</FormLabel>
               <FormControl>
-                <Input placeholder="mario.rossi@email.com" {...field} disabled={isPending} />
+                <Input placeholder="info@azienda.com" {...field} disabled={isPending} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -101,11 +105,11 @@ export function VolunteerForm() {
           name="message"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Parlaci di te</FormLabel>
+              <FormLabel>Breve messaggio (opzionale)</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Descrivi perché vuoi diventare un volontario, le tue competenze o come vorresti contribuire..."
-                  className="min-h-[150px]"
+                  placeholder="Vorremmo discutere di una potenziale partnership..."
+                  className="min-h-[120px]"
                   {...field}
                   disabled={isPending}
                 />
@@ -121,7 +125,7 @@ export function VolunteerForm() {
               Invio in corso...
             </>
           ) : (
-            'Invia Candidatura'
+            'Invia Manifestazione di Interesse'
           )}
         </Button>
       </form>

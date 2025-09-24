@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { SlidersHorizontal, BookOpenCheck, Handshake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 // Definiamo quali categorie appartengono alla formazione
 const formazioneCategories = ['Laboratorio', 'Workshop'];
@@ -132,38 +133,6 @@ export default function FormazionePage() {
             )}
         </div>
         
-        {/* Become a Partner Section */}
-        <section className="mb-16">
-            <Card className="bg-muted/30 border-dashed">
-                <CardHeader className="text-center">
-                     <div className="mx-auto w-fit p-3 bg-primary/10 rounded-full mb-4">
-                        <Handshake className="w-8 h-8 text-primary"/>
-                    </div>
-                    <CardTitle className="text-3xl font-bold">Diventa un Partner Formativo</CardTitle>
-                     <p className="mt-2 max-w-2xl mx-auto text-muted-foreground">
-                        Sei un artista, un professionista o un'organizzazione con un'idea per un corso? Proponi la tua collaborazione!
-                    </p>
-                </CardHeader>
-                <CardContent className="flex flex-col items-center gap-6">
-                    <div className="prose prose-sm dark:prose-invert text-center">
-                        <p>Cerchiamo partner per arricchire la nostra offerta formativa. Se hai un workshop, un laboratorio o un corso che vorresti proporre, inviaci un'email con i seguenti dettagli:</p>
-                        <ul>
-                            <li>Descrizione e obiettivi del progetto</li>
-                            <li>Strumenti e tecnologie necessarie</li>
-                            <li>Il tuo CV o quello del docente</li>
-                            <li>Struttura del programma (argomenti, ore)</li>
-                            <li>Durata e frequenza proposta</li>
-                        </ul>
-                        <p>Offriamo visibilità nella nostra community e vantaggi esclusivi per i nostri partner.</p>
-                    </div>
-                    <Button asChild size="lg">
-                        <a href="mailto:info@cantiereculturale.it?subject=Proposta di Collaborazione Formativa">
-                            Invia la tua Proposta
-                        </a>
-                    </Button>
-                </CardContent>
-            </Card>
-        </section>
       </main>
     </div>
   );
