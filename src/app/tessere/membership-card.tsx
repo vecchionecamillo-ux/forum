@@ -1,8 +1,8 @@
 'use client';
-import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { UserTierLevel } from '@/lib/membership-tiers';
 import { Layers } from 'lucide-react';
+import React from 'react';
 
 interface MembershipCardProps {
   level: UserTierLevel;
@@ -10,16 +10,19 @@ interface MembershipCardProps {
   userName?: string;
   userXP?: number;
   style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
-export const MembershipCard = motion(
-  ({
-    level,
-    className,
-    userName,
-    userXP,
-    ...props
-  }: MembershipCardProps) => {
+export const MembershipCard = React.forwardRef<HTMLDivElement, MembershipCardProps>(
+  (
+    {
+      level,
+      className,
+      userName,
+      userXP,
+      onClick,
+      ...props
+    }, ref) => {
     const isSpecial =
       level.name === 'Partner' ||
       level.name === 'Sponsor' ||
@@ -30,6 +33,8 @@ export const MembershipCard = motion(
 
     return (
       <div
+        ref={ref}
+        onClick={onClick}
         className={cn(baseCardClasses, level.backgroundColor, level.textColor, className)}
         {...props}
       >
@@ -79,3 +84,4 @@ export const MembershipCard = motion(
     );
   }
 );
+MembershipCard.displayName = "MembershipCard";
