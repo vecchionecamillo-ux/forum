@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Award, Shield, AtSign, Star, Gem } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { membershipTiers, getUserTier } from '@/lib/membership-tiers';
+import { getUserTier } from '@/lib/membership-tiers';
 
 export default function ProfilePage() {
   const { user, userProfile, isModerator, loading } = useAuth();
@@ -61,7 +61,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 <div className="flex flex-row sm:flex-col items-start sm:items-end gap-2">
-                     <Badge variant="secondary" className={`${userTier.color} ${userTier.textColor || 'text-white'} shadow-lg`}>{userTier.name}</Badge>
+                     <Badge variant="secondary" className={`${userTier.badgeColor} ${userTier.textColor} shadow-lg`}>{userTier.name}</Badge>
                       {isModerator && (
                         <Badge variant="destructive" className="flex items-center gap-1 shadow-lg">
                             <Shield className="h-3 w-3" />

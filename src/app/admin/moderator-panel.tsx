@@ -53,7 +53,7 @@ function UserTableRow({ user, onAction, isPending }: { user: UserProfile, onActi
       <TableCell className="hidden sm:table-cell text-center">{user.points}</TableCell>
        <TableCell className="hidden sm:table-cell text-center">{user.xp || 0}</TableCell>
       <TableCell>
-        <Badge variant="secondary" className={`${userTier.color} ${userTier.textColor || 'text-white'}`}>{userTier.name}</Badge>
+        <Badge variant="secondary" className={`${userTier.badgeColor} ${userTier.textColor}`}>{userTier.name}</Badge>
       </TableCell>
       <TableCell className="hidden lg:table-cell">{user.country || 'N/A'}</TableCell>
       <TableCell className="hidden lg:table-cell text-center">{user.isStudent ? 'Sì' : 'No'}</TableCell>
