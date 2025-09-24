@@ -13,7 +13,7 @@ const firebaseConfig: FirebaseOptions = {
 };
 
 // Initialize Firebase for SSR
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 const auth = getAuth(app);
 const database = getDatabase(app);

@@ -15,7 +15,7 @@ import {
   type UserCredential
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com', 'vecchionecamillo1@gmail.com'];
@@ -77,7 +77,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
   
   useEffect(() => {
-    const handleUser = async (user: User | null) => {
+    const processUser = async (user: User | null) => {
       if (user) {
         await createOrUpdateUserInDb(user);
         setUser(user);
@@ -90,25 +90,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     };
 
-    const unsubscribe = onAuthStateChanged(auth, handleUser);
+    const unsubscribe = onAuthStateChanged(auth, processUser);
 
     getRedirectResult(auth)
-      .then(async (result: UserCredential | null) => {
+      .then((result: UserCredential | null) => {
         if (result) {
-          await handleUser(result.user);
-          router.push('/profile');
+          // The user has just signed in via redirect.
+          // onAuthStateChanged will handle the user object.
+          // We can add any redirect-specific logic here if needed.
+          router.push('/profile'); 
         }
-        // If result is null, onAuthStateChanged will handle it
+        // If result is null, it means we are not coming from a redirect.
+        // onAuthStateChanged will still do its job for persisted sessions.
       })
       .catch((error) => {
         console.error("Error getting redirect result: ", error);
       })
       .finally(() => {
-        // Only set loading to false if onAuthStateChanged has already run
-        // and there was no redirect result. Otherwise, handleUser will do it.
-        if (auth.currentUser === null) {
-          setLoading(false);
-        }
+        // This ensures loading is false after either redirect check or auth state change.
+        setLoading(false);
       });
       
     return () => unsubscribe();
@@ -122,7 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error signing out:', error);
     } finally {
-      // After sign out, onAuthStateChanged will run and set loading to false
+      // onAuthStateChanged will handle setting user to null and loading to false
     }
   };
 
