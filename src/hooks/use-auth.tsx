@@ -14,7 +14,7 @@ import {
   getRedirectResult,
 } from 'firebase/auth';
 import { getFirebaseInstances } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, type Firestore } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com', 'vecchionecamillo1@gmail.com'];
@@ -50,8 +50,7 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 // Helper function to create user in Firestore
-const createOrUpdateUserInDb = async (user: User) => {
-  const { db } = getFirebaseInstances();
+const createOrUpdateUserInDb = async (db: Firestore, user: User) => {
   if (!user.email) {
     console.warn("User object is missing email, skipping DB creation.");
     return;
@@ -81,83 +80,77 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isModerator, setIsModerator] = useState(false);
   const router = useRouter();
   
+  // Effect for handling redirect result from Google SignIn
   useEffect(() => {
-    const { auth } = getFirebaseInstances();
+    const { auth, db } = getFirebaseInstances();
+    setLoading(true);
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result && result.user) {
+          await createOrUpdateUserInDb(db, result.user);
+          router.push('/profile');
+        }
+        // Even if there's no redirect result, we are done with this part of loading.
+        // The onAuthStateChanged listener will handle the user session.
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error getting redirect result: ", error);
+        setLoading(false);
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Runs only once on component mount
 
-    // Handle user state changes
-    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      setLoading(true);
-      if (user) {
-        setUser(user);
-        const isMod = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
-        setIsModerator(isMod);
+  // Effect for handling auth state changes and profile listening
+  useEffect(() => {
+    const { auth, db } = getFirebaseInstances();
+    
+    const unsubscribeAuth = onAuthStateChanged(auth, async (authUser) => {
+      if (authUser) {
+        setUser(authUser);
+        setIsModerator(authUser.email ? MODERATOR_EMAILS.includes(authUser.email) : false);
+
+        // User is logged in, now listen for their profile
+        const userDocRef = doc(db, 'users', authUser.uid);
+        const unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
+          if (doc.exists()) {
+            setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
+          } else {
+             // If profile doesn't exist, create it. This can happen on first email/pass signup
+            createOrUpdateUserInDb(db, authUser);
+          }
+          setLoading(false);
+        }, (error) => {
+          console.error("Error listening to user profile:", error);
+          setUserProfile(null);
+          setLoading(false);
+        });
+        
+        return () => unsubscribeProfile();
+
       } else {
         setUser(null);
         setUserProfile(null);
         setIsModerator(false);
-        setLoading(false); // Set loading to false if no user
+        setLoading(false);
       }
     });
-
-    // Handle redirect result from Google SignIn
-    getRedirectResult(auth)
-      .then(async (result) => {
-        if (result && result.user) {
-          await createOrUpdateUserInDb(result.user);
-          router.push('/profile');
-        }
-      })
-      .catch((error) => {
-        console.error("Error getting redirect result: ", error);
-      });
 
     return () => unsubscribeAuth();
-  }, [router]);
-
-
-  useEffect(() => {
-    if (!user) {
-      setUserProfile(null);
-      // No user, so we are done loading.
-      if (loading) setLoading(false); 
-      return;
-    }
-
-    const { db } = getFirebaseInstances();
-    const userDocRef = doc(db, 'users', user.uid);
-
-    // Create user in DB if they don't exist (e.g., first email/password login)
-    createOrUpdateUserInDb(user);
-    
-    // Subscribe to user profile updates
-    const unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
-      if (doc.exists()) {
-        setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
-      } else {
-        console.log("No profile document in Firestore for user:", user.uid);
-        setUserProfile(null);
-      }
-      setLoading(false); // Profile loaded (or not found), so loading is done
-    }, (error) => {
-      console.error("Error fetching user profile:", error);
-      setUserProfile(null);
-      setLoading(false); // Error occurred, so loading is done
-    });
-
-    return () => unsubscribeProfile();
-  }, [user, loading]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Re-runs if auth or db instance changes (which they shouldn't)
 
 
   const logout = async () => {
     setLoading(true);
+    const { auth } = getFirebaseInstances();
     try {
-      const { auth } = getFirebaseInstances();
       await signOut(auth);
+      // onAuthStateChanged will handle the state update
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
-    } finally {
-        // State change from onAuthStateChanged will handle setting user to null and loading to false
+      setLoading(false);
     }
   };
 

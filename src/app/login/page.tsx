@@ -115,6 +115,7 @@ export default function LoginPage() {
     setMessage(null);
     const { auth } = getFirebaseInstances();
     const provider = new GoogleAuthProvider();
+    // The redirect will be handled by the useAuth hook
     await signInWithRedirect(auth, provider);
   };
 
