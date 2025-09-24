@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useTransition } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-import { ArrowRight, Award, ShoppingCart, Filter } from 'lucide-react';
+import { ArrowRight, Award, ShoppingCart, Filter, Loader2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
@@ -12,12 +12,16 @@ import { Separator } from '@/components/ui/separator';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { newsItems as allNewsItems } from '../page-sections/news-section';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { registerUserForActivity } from '../actions';
 
 const earnPointsItems = allNewsItems.filter(item => item.points && item.points > 0);
 
 const spendPointsItems = [
     {
       title: 'Accesso Esclusivo: Opening Mostra "Visioni Digitali"',
+      slug: 'opening-visioni-digitali',
       description: 'Assicurati il tuo posto per la serata inaugurale della nostra nuova mostra. Posti limitati.',
       image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
       cta: 'Usa i tuoi Punti',
@@ -27,6 +31,7 @@ const spendPointsItems = [
     },
     {
       title: 'Stampa Fine Art in Edizione Limitata',
+      slug: 'stampa-riflessi-urbani',
       description: 'Una stampa esclusiva dell\'opera "Riflessi Urbani" di Artista Famoso. Solo 50 copie disponibili.',
       image: PlaceHolderImages.find(img => img.id === 'art-placeholder'),
       cta: 'Riscatta Ora',
@@ -36,6 +41,7 @@ const spendPointsItems = [
     },
     {
       title: 'Workshop di Scultura 3D con Artista Digitale',
+      slug: 'workshop-scultura-3d',
       description: 'Un workshop intensivo di 2 giorni per imparare le tecniche avanzate di scultura digitale. Accesso riservato.',
       image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
       cta: 'Usa i tuoi Punti',
@@ -45,12 +51,15 @@ const spendPointsItems = [
     },
 ];
 
-const allItems = [...earnPointsItems.map(item => ({...item, type: 'earn'})), ...spendPointsItems.map(item => ({...item, type: 'spend'}))];
+const allItems = [...earnPointsItems.map(item => ({...item, type: 'earn' as const})), ...spendPointsItems.map(item => ({...item, type: 'spend' as const}))];
 
 const allCategories = [...new Set(allItems.map(item => item.category))];
 const maxPoints = Math.max(...allItems.map(item => item.points || 0));
 
 export default function MarketplacePage() {
+    const { user, userProfile } = useAuth();
+    const { toast } = useToast();
+    const [isPending, startTransition] = useTransition();
     const [activeTab, setActiveTab] = useState<'spend' | 'earn'>('spend');
     const [pointRange, setPointRange] = useState<[number]>([maxPoints]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -70,6 +79,33 @@ export default function MarketplacePage() {
                 : [...prev, category]
         );
     };
+
+    const handleRedemption = (item: (typeof spendPointsItems)[0]) => {
+      if (!user || !userProfile) {
+        toast({ title: "Accesso Richiesto", description: "Devi effettuare l'accesso per riscattare i premi.", variant: 'destructive' });
+        return;
+      }
+      if ((userProfile.points || 0) < item.points) {
+        toast({ title: "Punti Insufficienti", description: "Non hai abbastanza punti per questo premio.", variant: 'destructive' });
+        return;
+      }
+
+      startTransition(async () => {
+        const formData = new FormData();
+        formData.append('userId', user.uid);
+        formData.append('itemId', item.slug);
+        formData.append('itemTitle', item.title);
+        formData.append('itemPoints', item.points.toString());
+        formData.append('activityType', 'redemption');
+
+        const result = await registerUserForActivity(formData);
+        if (result.success) {
+          toast({ title: 'Successo!', description: result.message });
+        } else {
+          toast({ title: 'Errore', description: result.message, variant: 'destructive' });
+        }
+      });
+    }
 
     const tabButtonStyle = (tabName: 'spend' | 'earn') => 
         `flex-1 py-3 px-4 text-lg font-bold transition-all duration-300 rounded-t-lg focus:outline-none ${
@@ -141,8 +177,8 @@ export default function MarketplacePage() {
 
                 {filteredItems.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {filteredItems.map((item, index) => (
-                            <Card key={`${item.title}-${index}`} className="overflow-hidden flex flex-col h-full bg-card/80 backdrop-blur-sm transform hover:-translate-y-1 transition-transform duration-300">
+                        {filteredItems.map((item) => (
+                            <Card key={item.slug} className="overflow-hidden flex flex-col h-full bg-card/80 backdrop-blur-sm transform hover:-translate-y-1 transition-transform duration-300">
                                 <div className="aspect-video overflow-hidden relative">
                                     {item.image && (
                                     <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
@@ -159,13 +195,23 @@ export default function MarketplacePage() {
                                     <CardDescription className="text-base">{item.description}</CardDescription>
                                 </CardContent>
                                 <CardFooter>
-                                    <Button asChild variant={item.type === 'earn' ? 'link' : 'default'} className={item.type === 'earn' ? 'text-primary p-0' : 'w-full'}>
-                                        <Link href={item.link || '#'}>
-                                            {item.cta}
-                                            {item.type === 'earn' && <ArrowRight className="ml-2 h-4 w-4" />}
-                                        </Link>
-
-                                    </Button>
+                                    {item.type === 'earn' ? (
+                                        <Button asChild variant="link" className="text-primary p-0">
+                                            <Link href={item.link || '#'}>
+                                                {item.cta}
+                                                <ArrowRight className="ml-2 h-4 w-4" />
+                                            </Link>
+                                        </Button>
+                                    ) : (
+                                        <Button 
+                                            className="w-full"
+                                            onClick={() => handleRedemption(item as (typeof spendPointsItems)[0])}
+                                            disabled={isPending || !user}
+                                        >
+                                          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                          {item.cta}
+                                        </Button>
+                                    )}
                                 </CardFooter>
                             </Card>
                         ))}

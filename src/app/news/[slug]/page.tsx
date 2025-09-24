@@ -1,26 +1,55 @@
+'use client';
+
 import { newsItems } from '@/app/page-sections/news-section';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ArrowLeft, Calendar, Clock, Award } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Award, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
-
-export async function generateStaticParams() {
-  return newsItems.map((item) => ({
-    slug: item.slug,
-  }));
-}
+import { notFound, useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { useTransition } from 'react';
+import { registerUserForActivity } from '@/app/actions';
 
 export default function NewsDetailPage({ params }: { params: { slug: string } }) {
   const item = newsItems.find((p) => p.slug === params.slug);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   if (!item) {
     notFound();
   }
 
   const image = item.image || PlaceHolderImages.find(img => img.id === 'art-placeholder');
+
+  const handleRegistration = () => {
+    if (!user) {
+      toast({ title: 'Accesso Richiesto', description: 'Devi effettuare l\'accesso per registrarti a questa attività.', variant: 'destructive' });
+      router.push('/login');
+      return;
+    }
+
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append('userId', user.uid);
+      formData.append('itemId', item.slug);
+      formData.append('itemTitle', item.title);
+      formData.append('itemPoints', (item.points || 0).toString());
+      formData.append('activityType', 'event');
+
+      const result = await registerUserForActivity(formData);
+
+      if (result.success) {
+        toast({ title: 'Successo!', description: result.message });
+      } else {
+        toast({ title: 'Errore', description: result.message, variant: 'destructive' });
+      }
+    });
+  }
 
   return (
     <main className="pt-24 pb-12">
@@ -62,7 +91,10 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
             </div>
 
             <footer className="mt-12">
-                <Button size="lg">{item.cta}</Button>
+                <Button size="lg" onClick={handleRegistration} disabled={isPending}>
+                  {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {item.cta}
+                </Button>
             </footer>
 
         </article>

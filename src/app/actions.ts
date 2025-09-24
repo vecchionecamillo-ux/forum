@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 
 
@@ -107,5 +107,71 @@ export async function updateUserRank(formData: FormData): Promise<{ success: boo
   } catch (error) {
     console.error("Error changing rank: ", error);
     return { success: false, message: "Impossibile aggiornare il grado." };
+  }
+}
+
+export async function registerUserForActivity(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const userId = formData.get('userId') as string;
+  const itemId = formData.get('itemId') as string;
+  const itemTitle = formData.get('itemTitle') as string;
+  const itemPoints = Number(formData.get('itemPoints'));
+  const activityType = formData.get('activityType') as 'event' | 'redemption';
+
+  if (!userId || !itemId || !itemTitle || isNaN(itemPoints) || !activityType) {
+    return { success: false, message: 'Dati per la registrazione incompleti.' };
+  }
+
+  try {
+    await runTransaction(db, async (transaction) => {
+      const userDocRef = doc(db, 'users', userId);
+      const userDoc = await transaction.get(userDocRef);
+
+      if (!userDoc.exists()) {
+        throw new Error("Utente non trovato.");
+      }
+
+      const userData = userDoc.data();
+      const currentPoints = userData.points || 0;
+      let newPoints = currentPoints;
+      
+      if (activityType === 'redemption') {
+        if (currentPoints < itemPoints) {
+          throw new Error("Punti insufficienti per riscattare questo premio.");
+        }
+        newPoints -= itemPoints;
+      } else { // 'event' or other point-earning activities
+        newPoints += itemPoints;
+      }
+
+      // Update user's points
+      transaction.update(userDocRef, { points: newPoints });
+
+      // Log the activity
+      const activityLogRef = collection(db, 'activityLog');
+      await addDoc(activityLogRef, {
+        userId,
+        userEmail: userData.email,
+        userDisplayName: userData.displayName,
+        activityType,
+        itemId,
+        itemTitle,
+        points: itemPoints,
+        timestamp: serverTimestamp(),
+      });
+    });
+
+    revalidatePath('/admin');
+    revalidatePath(`/profile/${userId}`);
+    revalidatePath('/marketplace');
+    revalidatePath(`/news/${itemId}`);
+
+    if (activityType === 'redemption') {
+      return { success: true, message: `Premio "${itemTitle}" riscattato con successo!` };
+    }
+    return { success: true, message: `Registrazione per "${itemTitle}" avvenuta con successo!` };
+
+  } catch (error: any) {
+    console.error("Error registering user for activity: ", error);
+    return { success: false, message: error.message || "Si è verificato un errore durante l'operazione." };
   }
 }
