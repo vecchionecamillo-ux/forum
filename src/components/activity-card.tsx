@@ -87,30 +87,30 @@ export function ActivityCard({ item }: { item: Activity }) {
           />
         )}
         <div className="absolute top-2 right-2 flex flex-col gap-2 items-end">
-            {item.points && item.points > 0 && (
-              <Badge
-                className={cn(
-                  'text-md shadow-lg flex items-center gap-1',
-                  pointBadgeClass
-                )}
-              >
-                <Gem className="w-3 h-3"/>
-                <span>
-                  {item.type === 'earn' ? '+' : '-'}
-                  {item.points} Punti
-                </span>
-              </Badge>
-            )}
-             {item.xp && item.xp > 0 && (
-              <Badge
-                className={cn(
-                  'text-md shadow-lg bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-1'
-                )}
-              >
-               <Star className="w-3 h-3"/>
-               <span>+{item.xp} XP</span>
-              </Badge>
-            )}
+          {item.points && item.points > 0 && (
+            <Badge
+              className={cn(
+                'text-md shadow-lg flex items-center gap-1',
+                pointBadgeClass
+              )}
+            >
+              <Gem className="w-3 h-3" />
+              <span>
+                {item.type === 'earn' ? '+' : '-'}
+                {item.points} Punti
+              </span>
+            </Badge>
+          )}
+          {item.xp && item.xp > 0 && (
+            <Badge
+              className={cn(
+                'text-md shadow-lg bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-1'
+              )}
+            >
+              <Star className="w-3 h-3" />
+              <span>+{item.xp} XP</span>
+            </Badge>
+          )}
         </div>
       </div>
       <CardHeader>
@@ -123,9 +123,9 @@ export function ActivityCard({ item }: { item: Activity }) {
         <CardDescription className="text-base">{item.description}</CardDescription>
       </CardContent>
       <CardFooter>
-        {item.type === 'earn' ? (
+        {item.type === 'earn' || !item.points ? (
           <Button asChild variant="link" className="text-primary p-0">
-            <Link href={item.link || '#'}>
+            <Link href={item.link || `/news/${item.slug}`}>
               {item.cta}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
