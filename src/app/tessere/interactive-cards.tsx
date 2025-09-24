@@ -10,6 +10,8 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], onSelectTier: (tier: MembershipTier) => void }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'center' });
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
 
   const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
   const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
@@ -17,6 +19,8 @@ const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
     setSelectedIndex(emblaApi.selectedScrollSnap());
+    setCanScrollPrev(emblaApi.canScrollPrev());
+    setCanScrollNext(emblaApi.canScrollNext());
   }, [emblaApi]);
 
   useEffect(() => {
@@ -24,6 +28,14 @@ const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], 
     onSelect();
     emblaApi.on('select', onSelect);
   }, [emblaApi, onSelect]);
+
+  const handleCardClick = (index: number, tier: MembershipTier) => {
+    if (index === selectedIndex) {
+      onSelectTier(tier);
+    } else {
+      emblaApi?.scrollTo(index);
+    }
+  };
 
   return (
     <div className="w-full relative">
@@ -33,10 +45,10 @@ const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], 
             <div key={tier.type} className="pl-4 min-w-0 flex-[0_0_90%] md:flex-[0_0_50%] lg:flex-[0_0_40%]">
               <div
                 className={cn(
-                  'transition-opacity duration-300',
-                  index === selectedIndex ? 'opacity-100' : 'opacity-40'
+                  'transition-all duration-300 transform',
+                  index === selectedIndex ? 'opacity-100 scale-100' : 'opacity-40 scale-90'
                 )}
-                onClick={() => index === selectedIndex && onSelectTier(tier)}
+                onClick={() => handleCardClick(index, tier)}
               >
                 <MembershipCard
                   level={tier.levels[0]}
@@ -48,30 +60,26 @@ const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], 
           ))}
         </div>
       </div>
-       <div className="absolute top-1/2 -translate-y-1/2 flex justify-between w-full px-2">
-        <button onClick={scrollPrev} className="text-foreground hover:text-primary transition-colors disabled:opacity-30" disabled={selectedIndex === 0}>
+      <div className="absolute top-1/2 -translate-y-1/2 flex justify-between w-full px-2 pointer-events-none">
+        <Button onClick={scrollPrev} className="text-foreground hover:text-primary transition-colors disabled:opacity-30 pointer-events-auto" variant="ghost" size="icon" disabled={!canScrollPrev}>
           <ChevronLeft className="w-10 h-10" />
-        </button>
-        <button onClick={scrollNext} className="text-foreground hover:text-primary transition-colors disabled:opacity-30" disabled={selectedIndex === tiers.length - 1}>
+        </Button>
+        <Button onClick={scrollNext} className="text-foreground hover:text-primary transition-colors disabled:opacity-30 pointer-events-auto" variant="ghost" size="icon" disabled={!canScrollNext}>
           <ChevronRight className="w-10 h-10" />
-        </button>
+        </Button>
       </div>
     </div>
   );
 };
 
-const VerticalCarousel = ({ levels }: { levels: UserTierLevel[] }) => {
-  const [emblaRef] = useEmblaCarousel({ axis: 'y', loop: false, align: 'center' });
-
+const VerticalLevelList = ({ levels }: { levels: UserTierLevel[] }) => {
   return (
-    <div className="h-[400px] w-full max-w-[500px] overflow-hidden" ref={emblaRef}>
-        <div className="flex flex-col -mt-4 h-full">
-            {levels.map((level) => (
-                <div key={level.name} className="pt-4 min-h-0 flex-[0_0_70%]">
-                     <MembershipCard level={level} userXP={level.xpThreshold} />
-                </div>
-            ))}
-        </div>
+    <div className="w-full max-w-lg space-y-8">
+        {levels.map((level) => (
+            <div key={level.name}>
+                 <MembershipCard level={level} userXP={level.xpThreshold} />
+            </div>
+        ))}
     </div>
   )
 }
@@ -84,7 +92,7 @@ interface InteractiveCardsProps {
 
 export function InteractiveCards({ tiers, selectedTier, onSelectTier }: InteractiveCardsProps) {
   if (selectedTier) {
-    return <VerticalCarousel levels={selectedTier.levels} />;
+    return <VerticalLevelList levels={selectedTier.levels} />;
   }
 
   if(!onSelectTier) return null;

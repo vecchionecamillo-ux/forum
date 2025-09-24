@@ -5,7 +5,7 @@ import { InteractiveCards } from './interactive-cards';
 import { membershipTiers, MembershipTier } from '@/lib/membership-tiers';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { MembershipCard } from './membership-card';
 
 export default function TesserePage() {
@@ -29,7 +29,7 @@ export default function TesserePage() {
   const description = useMemo(() => {
     if (selectedTier) {
        if (selectedTier.levels.length > 1) {
-         return `Scopri i livelli e i vantaggi della categoria ${selectedTier.title}. Scorri in verticale per esplorarli.`;
+         return `Scopri i livelli e i vantaggi della categoria ${selectedTier.title}. Scorri per esplorarli.`;
        }
        return `Scopri i vantaggi esclusivi riservati ai nostri ${selectedTier.title}.`
     }
@@ -39,25 +39,8 @@ export default function TesserePage() {
   const renderDetails = () => {
     if (!selectedTier) return null;
 
-    // Use vertical carousel for any tier with more than one level
-    if (selectedTier.levels.length > 1) {
-      return (
-        <InteractiveCards 
-          tiers={membershipTiers}
-          selectedTier={selectedTier}
-        />
-      );
-    }
-    
-    // Special static view for single-level tiers (like Ambassador)
-    return (
-       <div className="w-full max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in-50 duration-500">
-        <div className="space-y-4">
-           {selectedTier.levels.map(level => (
-            <MembershipCard key={level.name} level={level} userName={level.name} />
-          ))}
-        </div>
-        <Card className="p-6 md:p-8 bg-card/80">
+    const benefitsView = (
+        <Card className="p-6 md:p-8 bg-card/80 flex-shrink-0">
           <h3 className="text-2xl font-bold mb-4">Vantaggi Principali</h3>
           <ul className="space-y-3">
             {selectedTier.benefits.map(benefit => (
@@ -68,6 +51,30 @@ export default function TesserePage() {
             ))}
           </ul>
         </Card>
+    );
+
+    // Any tier with more than one level gets the vertical scroll view.
+    if (selectedTier.levels.length > 1) {
+      return (
+         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in-50 duration-500 items-start">
+            <InteractiveCards 
+                tiers={membershipTiers}
+                selectedTier={selectedTier}
+            />
+            {benefitsView}
+        </div>
+      );
+    }
+    
+    // Special static view for single-level tiers (like Ambassador)
+    return (
+       <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in-50 duration-500 items-start">
+        <div className="space-y-4">
+           {selectedTier.levels.map(level => (
+            <MembershipCard key={level.name} level={level} userName={level.name} />
+          ))}
+        </div>
+        {benefitsView}
       </div>
     );
   }
@@ -97,11 +104,13 @@ export default function TesserePage() {
         {selectedTier ? (
             renderDetails()
         ) : (
-            <InteractiveCards 
-                tiers={membershipTiers}
-                selectedTier={null}
-                onSelectTier={handleSelectTier}
-            />
+            <div className="w-full">
+                <InteractiveCards 
+                    tiers={membershipTiers}
+                    selectedTier={null}
+                    onSelectTier={handleSelectTier}
+                />
+            </div>
         )}
       </main>
     </div>
