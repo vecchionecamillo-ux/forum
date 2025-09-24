@@ -80,7 +80,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
  useEffect(() => {
     const processUser = async (user: User | null) => {
-      setLoading(true);
       if (user) {
         await createOrUpdateUserInDb(user);
         setUser(user);
@@ -89,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setUser(null);
         setIsModerator(false);
-        setUserProfile(null); // Clear profile on logout
+        setUserProfile(null);
       }
       setLoading(false);
     };
@@ -99,46 +98,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     getRedirectResult(auth)
       .then((result) => {
         if (result) {
-          processUser(result.user);
+          // This will be handled by onAuthStateChanged, but we can push the route here
           router.push('/profile');
         }
       })
       .catch((error) => {
         console.error("Error getting redirect result: ", error);
-      })
-      .finally(() => {
-        // The final loading state will be set by onAuthStateChanged
       });
 
     return () => unsubscribeAuth();
   }, [router]);
 
   useEffect(() => {
-    let unsubscribeProfile: Unsubscribe | undefined;
-
-    if (user && !loading) {
-      const userDocRef = doc(db, 'users', user.uid);
-      unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
-        if (doc.exists()) {
-          setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
-        } else {
-          console.log("No such document in Firestore for user:", user.uid);
-          setUserProfile(null);
-        }
-      }, (error) => {
-        console.error("Error fetching user profile:", error);
-        setUserProfile(null);
-      });
-    } else if (!user) {
-        setUserProfile(null);
+    if (!user) {
+      setUserProfile(null);
+      return;
     }
 
-    return () => {
-      if (unsubscribeProfile) {
-        unsubscribeProfile();
+    const userDocRef = doc(db, 'users', user.uid);
+    const unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
+      if (doc.exists()) {
+        setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
+      } else {
+        console.log("No such document in Firestore for user:", user.uid);
+        // If the doc doesn't exist, it might be in the process of being created
+        // createOrUpdateUserInDb will handle this. We just set the profile to null for now.
+        setUserProfile(null);
       }
-    };
-  }, [user, loading]);
+    }, (error) => {
+      console.error("Error fetching user profile:", error);
+      setUserProfile(null);
+    });
+
+    return () => unsubscribeProfile();
+  }, [user]);
 
 
   const logout = async () => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth, type UserProfile } from '@/hooks/use-auth';
+import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -28,13 +28,22 @@ export default function ProfilePage() {
   }, [user, loading, router]);
 
 
-  if (loading || !user || !userProfile) {
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p>Caricamento...</p>
+      </div>
+    );
+  }
+
+  if (!userProfile) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p>Caricamento della tua Tessera Digitale...</p>
       </div>
     );
   }
+
 
   const userInitial = userProfile.displayName ? userProfile.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : '?');
   const userRank = ranks.find(r => r.level === userProfile.rankLevel) || ranks[0];
