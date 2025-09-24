@@ -12,11 +12,12 @@ export type Activity = {
   date?: string; // Formato YYYY-MM-DD per facilitare l'ordinamento e il parsing
   time?: string;
   duration?: string;
+  durationDetail?: 'Permanente' | 'Workshop Intensivo' | '4 settimane, 2h/sett';
   type: 'earn' | 'spend';
 };
 
 const earnPointsItems: Omit<Activity, 'type'>[] = [
-  // FORMAZIONE
+  // --- FORMAZIONE - LAB039 ---
   {
     title: 'Laboratorio di Fotografia',
     slug: 'lab-fotografia',
@@ -26,7 +27,8 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Scopri di più',
     link: '/news/lab-fotografia',
     points: 80,
-    duration: 'Permanente'
+    duration: 'Permanente',
+    durationDetail: 'Permanente',
   },
   {
     title: 'Laboratorio Giovani Idee',
@@ -37,7 +39,8 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Partecipa',
     link: '/news/lab-giovani-idee',
     points: 80,
-    duration: 'Permanente'
+    duration: 'Permanente',
+    durationDetail: 'Permanente',
   },
   {
     title: 'Laboratorio di Pittura',
@@ -48,9 +51,65 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Iscriviti',
     link: '/news/lab-pittura',
     points: 80,
-    duration: 'Permanente'
+    duration: 'Permanente',
+    durationDetail: 'Permanente',
   },
-   // EVENTI & COMMUNITY
+  {
+    title: 'Laboratorio di Scrittura Creativa',
+    slug: 'lab-scrittura-creativa',
+    category: 'Laboratorio',
+    description: 'Libera la tua voce e impara le tecniche di storytelling per scrivere racconti, poesie e sceneggiature. Un percorso continuo.',
+    image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+    cta: 'Inizia a scrivere',
+    link: '/news/lab-scrittura-creativa',
+    points: 80,
+    duration: 'Permanente',
+    durationDetail: 'Permanente',
+  },
+  {
+    title: 'Workshop di Excel per Creativi',
+    slug: 'workshop-excel',
+    category: 'Workshop',
+    description: 'Impara a usare Excel non solo per i numeri, ma come strumento creativo per la gestione di progetti artistici e portfolio.',
+    image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+    cta: 'Iscriviti al workshop',
+    link: '/news/workshop-excel',
+    points: 40,
+    date: '2024-11-05',
+    time: '18:00 - 20:00',
+    duration: '2 ore',
+    durationDetail: 'Workshop Intensivo',
+  },
+  {
+    title: 'Workshop di Python e Tecnologia',
+    slug: 'workshop-python',
+    category: 'Workshop',
+    description: 'Un\'introduzione intensiva a Python per artisti e designer. Scopri come la tecnologia può potenziare la tua creatività.',
+    image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+    cta: 'Partecipa',
+    link: '/news/workshop-python',
+    points: 75,
+    date: '2024-10-22',
+    time: '18:00 - 21:00',
+    duration: '3 ore',
+    durationDetail: 'Workshop Intensivo',
+  },
+   {
+    title: 'Workshop di Marketing Digitale',
+    slug: 'workshop-marketing-digitale',
+    category: 'Workshop',
+    description: 'Promuovi la tua arte online. Un corso intensivo su social media, SEO e strategie di comunicazione per artisti e creativi.',
+    image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+    cta: 'Prenota il tuo posto',
+    link: '/news/workshop-marketing-digitale',
+    points: 75,
+    date: '2024-11-12',
+    time: '17:00 - 20:00',
+    duration: '3 ore',
+    durationDetail: 'Workshop Intensivo',
+  },
+
+  // --- EVENTI & COMMUNITY ---
   {
     title: 'Plastic Free: Pulizia del Parco',
     slug: 'plastic-free-parco',
@@ -103,19 +162,6 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     time: 'Tutto il giorno',
     duration: 'Continuativo'
   },
-  {
-    title: 'Annuncio Workshop: "Creative Coding"',
-    slug: 'workshop-creative-coding',
-    category: 'Workshop',
-    description: 'Impara a creare arte con il codice nel nostro prossimo workshop intensivo. Prenota il tuo slot, i posti sono limitati!',
-    image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
-    cta: 'Prenota Ora',
-    link: '/news/workshop-creative-coding',
-    points: 75,
-    date: '2024-10-15',
-    time: '18:00 - 20:00',
-    duration: '2 ore'
-  },
 ];
 
 const spendPointsItems: Omit<Activity, 'type'>[] = [
@@ -150,6 +196,7 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       points: 800,
       link: '/news/workshop-scultura-3d',
       date: '2024-11-20',
+      durationDetail: 'Workshop Intensivo',
     },
 ];
 
