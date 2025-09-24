@@ -18,6 +18,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTransition } from 'react';
 import { registerUserForActivity } from '@/app/actions';
 import type { Activity } from '@/lib/activities';
+import { cn } from '@/lib/utils';
 
 export function ActivityCard({ item }: { item: Activity }) {
   const { user, userProfile } = useAuth();
@@ -63,6 +64,11 @@ export function ActivityCard({ item }: { item: Activity }) {
     });
   };
 
+  const pointBadgeClass =
+    item.type === 'earn'
+      ? 'bg-green-500 text-white'
+      : 'bg-destructive text-destructive-foreground';
+
   return (
     <Card
       key={item.slug}
@@ -79,9 +85,14 @@ export function ActivityCard({ item }: { item: Activity }) {
             data-ai-hint={item.image.imageHint}
           />
         )}
-        {item.points && (
-          <Badge className="absolute top-2 right-2 text-lg bg-primary text-primary-foreground shadow-lg">
-            {item.type === 'earn' ? '+' : ''}
+        {item.points && item.points > 0 && (
+          <Badge
+            className={cn(
+              'absolute top-2 right-2 text-lg shadow-lg',
+              pointBadgeClass
+            )}
+          >
+            {item.type === 'earn' ? '+' : '-'}
             {item.points} Punti
           </Badge>
         )}

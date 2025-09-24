@@ -92,15 +92,23 @@ export default function ProfilePage() {
               <Separator />
               {userProfile.history && userProfile.history.length > 0 ? (
                 <ul className="space-y-4 mt-4">
-                  {userProfile.history.map(item => (
-                     <li key={item.id} className="text-sm flex justify-between items-center bg-foreground/5 p-3 rounded-lg">
-                       <div>
-                          <span>{item.action}</span>
-                          <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</p>
-                       </div>
-                       <span className="font-bold text-yellow-500 whitespace-nowrap">+{item.points}</span>
-                     </li>
-                  ))}
+                  {userProfile.history.map(item => {
+                    const isEarn = item.points > 0;
+                    const pointClass = isEarn ? 'text-green-500' : 'text-red-500';
+                    const pointPrefix = isEarn ? '+' : '';
+
+                    return (
+                        <li key={item.id} className="text-sm flex justify-between items-center bg-foreground/5 p-3 rounded-lg">
+                        <div>
+                            <span>{item.action}</span>
+                            <p className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</p>
+                        </div>
+                        <span className={`font-bold whitespace-nowrap ${pointClass}`}>
+                            {pointPrefix}{item.points}
+                        </span>
+                        </li>
+                    )
+                  })}
                 </ul>
               ) : (
                 <p className="text-center text-muted-foreground mt-4">Nessuna attività registrata.</p>

@@ -80,6 +80,11 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
 
   const backLink = item.type === 'earn' ? '/marketplace' : `/${item.category.toLowerCase()}`;
 
+  const pointClass = item.type === 'earn' ? 'text-green-500' : 'text-red-500';
+  const pointPrefix = item.type === 'earn' ? '+' : '-';
+  const pointText = item.type === 'earn' ? 'Guadagni' : 'Costo:';
+
+
   return (
     <main className="pt-24 pb-12">
       <div className="container mx-auto px-4">
@@ -99,7 +104,12 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-muted-foreground text-sm">
                     {item.date && <div className="flex items-center gap-2"><Calendar className="w-4 h-4"/><span>{item.date}</span></div>}
                     {item.time && <div className="flex items-center gap-2"><Clock className="w-4 h-4"/><span>{item.time}</span></div>}
-                    {item.points && <div className="flex items-center gap-2"><Award className="w-4 h-4 text-primary"/><span>{item.type === 'earn' ? 'Guadagna' : 'Costo:'} {item.points} punti</span></div>}
+                    {item.points && item.points > 0 && (
+                        <div className={`flex items-center gap-2 font-semibold ${pointClass}`}>
+                            <Award className="w-4 h-4"/>
+                            <span>{pointText} {pointPrefix}{item.points} punti</span>
+                        </div>
+                    )}
                 </div>
             </header>
 
