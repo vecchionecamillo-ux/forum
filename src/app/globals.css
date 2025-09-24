@@ -99,4 +99,22 @@
   .animate-fade-in-up {
     animation: fade-in-up 0.8s both;
   }
+
+  /* Animazione per il carosello dei loghi */
+  @keyframes scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      /* Sposta l'elemento a sinistra del 50% della sua larghezza. */
+      /* Poiché il contenuto è duplicato, questo crea un loop infinito. */
+      transform: translateX(-50%);
+    }
+  }
+  .animate-scroll {
+    animation: scroll 40s linear infinite;
+  }
+  .animation-direction-reverse {
+    animation-direction: reverse;
+  }
 }

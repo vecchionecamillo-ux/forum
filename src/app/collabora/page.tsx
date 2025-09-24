@@ -6,6 +6,7 @@ import { Handshake, Heart, Building, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { PartnerCarousel } from './partner-carousel';
 
 type Selection = 'partner' | 'sponsor' | 'volunteer';
 
@@ -161,6 +162,11 @@ export default function CollaboraPage() {
           )}
         </div>
       </main>
+
+      {/* Nuova sezione per il carosello dei partner */}
+      <div className="mt-24">
+        <PartnerCarousel />
+      </div>
     </div>
   );
 }
