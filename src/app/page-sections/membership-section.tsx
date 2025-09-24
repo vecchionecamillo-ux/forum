@@ -29,7 +29,7 @@ export function MembershipSection() {
       <section className="min-h-screen flex flex-col items-center justify-center px-4 py-24 sm:px-6 lg:px-8">
        <div className="w-full max-w-6xl mx-auto">
         <div className="text-center">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-foreground">La Tessera Digitale</h2>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-foreground">La Tessera del Forum dei Giovani</h2>
           <p className="mt-4 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80">
             La tessera è la tua chiave d'accesso a un mondo di vantaggi. Accumula punti partecipando attivamente alla vita del Cantiere Culturale e spendili per ottenere ricompense esclusive.
           </p>
@@ -55,7 +55,7 @@ export function MembershipSection() {
         <div className="mt-20 text-center">
              <Button asChild size="lg">
                 <Link href="/tessera">
-                    Crea la tua Tessera Digitale <ArrowRight className="ml-2 h-4 w-4" />
+                    Scopri di più e Richiedi la Tessera <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
              </Button>
         </div>

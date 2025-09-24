@@ -223,11 +223,11 @@ export function MembershipForm() {
               )}
             />
 
-            <Button type="submit" className="w-full" disabled={isPending}>
+            <Button type="submit" className="w-full" size="lg" disabled={isPending}>
               {isPending ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creazione in corso...
+                  Invio in corso...
                 </>
               ) : (
                 'Richiedi la tua Tessera'
