@@ -76,3 +76,25 @@ export async function createMembershipCard(formData: FormData): Promise<{ succes
 
     return { success: true, message: 'Tessera creata con successo! Benvenuto nella community.' };
 }
+
+export async function updateUserRank(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const userId = formData.get('userId') as string;
+  const newRankLevel = Number(formData.get('rank'));
+
+  if (!userId || !newRankLevel || newRankLevel < 1 || newRankLevel > 5) {
+    return { success: false, message: 'Invalid input for rank update.' };
+  }
+  
+  try {
+    const userDocRef = doc(db, 'users', userId);
+    await updateDoc(userDocRef, { rankLevel: newRankLevel });
+    
+    revalidatePath('/admin');
+    revalidatePath(`/profile/${userId}`);
+
+    return { success: true, message: `Grado aggiornato per l'utente ${userId}.` };
+  } catch (error) {
+    console.error("Error changing rank: ", error);
+    return { success: false, message: "Impossibile aggiornare il grado." };
+  }
+}

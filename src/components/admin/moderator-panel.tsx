@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { addPoints } from '@/app/actions';
+import { addPoints, updateUserRank } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -26,7 +26,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { UserProfile } from '@/hooks/use-auth';
 import { db } from '@/lib/firebase';
-import { collection, onSnapshot, doc, updateDoc } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 
 
 const ranks = [
@@ -37,20 +37,19 @@ const ranks = [
   { level: 5, name: 'Ambasciatore', color: 'bg-yellow-500 text-black' },
 ];
 
-function UserTableRow({ user, onAction }: { user: UserProfile, onAction: (formData: FormData) => void }) {
+function UserTableRow({ user, onAction, isPending }: { user: UserProfile, onAction: (formData: FormData, actionType: 'addPoints' | 'changeRank') => void, isPending: boolean }) {
   const userRank = ranks.find(r => r.level === user.rankLevel) || ranks[0];
   const [pointsToAdd, setPointsToAdd] = useState('');
 
   const handleFormAction = (actionType: 'addPoints' | 'changeRank', value?: string) => {
     const formData = new FormData();
     formData.append('userId', user.uid);
-    formData.append('actionType', actionType);
     if (actionType === 'addPoints') {
       formData.append('points', pointsToAdd);
     } else if (actionType === 'changeRank' && value) {
       formData.append('rank', value);
     }
-    onAction(formData);
+    onAction(formData, actionType);
     if (actionType === 'addPoints') setPointsToAdd('');
   };
 
@@ -67,7 +66,7 @@ function UserTableRow({ user, onAction }: { user: UserProfile, onAction: (formDa
       <TableCell>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button aria-haspopup="true" size="icon" variant="ghost">
+            <Button aria-haspopup="true" size="icon" variant="ghost" disabled={isPending}>
               <MoreHorizontal className="h-4 w-4" />
               <span className="sr-only">Toggle menu</span>
             </Button>
@@ -83,14 +82,15 @@ function UserTableRow({ user, onAction }: { user: UserProfile, onAction: (formDa
                             value={pointsToAdd}
                             onChange={(e) => setPointsToAdd(e.target.value)}
                             className="h-8 w-24"
+                             disabled={isPending}
                         />
-                        <Button size="sm" onClick={() => handleFormAction('addPoints')} disabled={!pointsToAdd}>Aggiungi</Button>
+                        <Button size="sm" onClick={() => handleFormAction('addPoints')} disabled={!pointsToAdd || isPending}>Aggiungi</Button>
                     </div>
                 </div>
             </DropdownMenuItem>
              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
                 <div className="flex items-center space-x-2">
-                     <Select onValueChange={(value) => handleFormAction('changeRank', value)}>
+                     <Select onValueChange={(value) => handleFormAction('changeRank', value)} disabled={isPending}>
                         <SelectTrigger className="h-8 w-[150px]">
                             <SelectValue placeholder="Cambia Grado" />
                         </SelectTrigger>
@@ -109,7 +109,7 @@ function UserTableRow({ user, onAction }: { user: UserProfile, onAction: (formDa
   );
 }
 
-function UserTable({ users, onAction }: { users: UserProfile[], onAction: (formData: FormData) => void }) {
+function UserTable({ users, onAction, isPending }: { users: UserProfile[], onAction: (formData: FormData, actionType: 'addPoints' | 'changeRank') => void, isPending: boolean }) {
   return (
     <div className="w-full overflow-x-auto">
         <Table>
@@ -125,7 +125,7 @@ function UserTable({ users, onAction }: { users: UserProfile[], onAction: (formD
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map(user => <UserTableRow key={user.uid} user={user} onAction={onAction} />)}
+            {users.map(user => <UserTableRow key={user.uid} user={user} onAction={onAction} isPending={isPending} />)}
           </TableBody>
         </Table>
     </div>
@@ -144,11 +144,13 @@ export function ModeratorPanel() {
     const unsubscribe = onSnapshot(usersColRef, (snapshot) => {
         const usersList = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
         setUsers(usersList);
-        setFilteredUsers(usersList);
+    }, (error) => {
+        console.error("Failed to subscribe to user updates:", error);
+        toast({ title: 'Errore di Sincronizzazione', description: 'Impossibile caricare i dati degli utenti in tempo reale.', variant: 'destructive' });
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     const lowercasedFilter = filter.toLowerCase();
@@ -159,29 +161,22 @@ export function ModeratorPanel() {
     setFilteredUsers(filtered);
   }, [filter, users]);
 
-  const handleAction = (formData: FormData) => {
+  const handleAction = (formData: FormData, actionType: 'addPoints' | 'changeRank') => {
     startTransition(async () => {
-      const actionType = formData.get('actionType');
-      const userId = formData.get('userId') as string;
-      
-      if (actionType === 'addPoints') {
-        const result = await addPoints(formData);
+        let result: { success: boolean; message: string };
+        if (actionType === 'addPoints') {
+            result = await addPoints(formData);
+        } else if (actionType === 'changeRank') {
+            result = await updateUserRank(formData);
+        } else {
+            result = { success: false, message: 'Azione non riconosciuta.' };
+        }
+
          if (result.success) {
             toast({ title: 'Successo', description: result.message });
           } else {
             toast({ title: 'Errore', description: result.message, variant: 'destructive' });
           }
-      } else if (actionType === 'changeRank') {
-        const newRankLevel = Number(formData.get('rank'));
-        try {
-            const userDocRef = doc(db, 'users', userId);
-            await updateDoc(userDocRef, { rankLevel: newRankLevel });
-            toast({ title: 'Successo', description: `Grado aggiornato per l'utente ${userId}.` });
-        } catch (error) {
-            console.error("Error changing rank: ", error);
-            toast({ title: 'Errore', description: "Impossibile aggiornare il grado.", variant: 'destructive' });
-        }
-      }
     });
   };
 
@@ -203,9 +198,9 @@ export function ModeratorPanel() {
         </CardHeader>
       <CardContent>
         {isPending ? (
-            <div className="text-center text-muted-foreground">Aggiornamento in corso...</div>
+            <div className="text-center text-muted-foreground py-8">Aggiornamento in corso...</div>
         ) : filteredUsers.length > 0 ? (
-          <UserTable users={filteredUsers} onAction={handleAction} />
+          <UserTable users={filteredUsers} onAction={handleAction} isPending={isPending} />
         ) : (
           <div className="text-center text-muted-foreground py-8">Nessun utente trovato.</div>
         )}
