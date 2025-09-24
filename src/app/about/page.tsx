@@ -1,6 +1,5 @@
 import { PlatformSection } from '../page-sections/platform-section';
 import { MembershipSection } from '../page-sections/membership-section';
-import { MarketplaceSection } from '../page-sections/marketplace-section';
 import { NewsSection } from '../page-sections/news-section';
 import { ScrollRevealWrapper } from '@/components/scroll-reveal';
 
@@ -21,7 +20,6 @@ export default function AboutPage() {
           </ScrollRevealWrapper>
         <PlatformSection />
         <MembershipSection />
-        <MarketplaceSection />
         <NewsSection />
       </main>
     </>

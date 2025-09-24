@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Bot, LogOut, User, Shield } from 'lucide-react';
+import { Menu, Bot, LogOut, User, Shield, ShoppingCart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
@@ -13,6 +13,7 @@ const navLinks = [
   { href: '/about', label: 'Chi Siamo' },
   { href: '/eventi', label: 'Eventi' },
   { href: '/community', label: 'Community' },
+  { href: '/marketplace', label: 'Marketplace' },
   { href: '/about#news', label: 'News' },
 ];
 
