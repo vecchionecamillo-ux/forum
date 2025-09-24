@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { collection, onSnapshot, query, where, type Firestore } from 'firebase/firestore';
+import { useEffect, useState, useMemo, useTransition } from 'react';
+import { collection, onSnapshot, query, where, type Firestore, orderBy } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,13 +9,15 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Ticket, Gift, Users } from 'lucide-react';
+import { Search, Ticket, Gift, Users, CheckCircle, Clock } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
+import { Button } from '../ui/button';
+import { confirmActivityParticipation } from '@/app/actions';
 
 type ActivityLog = {
   id: string;
@@ -26,15 +28,42 @@ type ActivityLog = {
   itemId: string;
   itemTitle: string;
   points: number;
+  xp: number;
   timestamp: { seconds: number, nanoseconds: number };
+  status: 'pending' | 'completed' | 'cancelled';
 };
+
+function ConfirmButton({ logId, disabled }: { logId: string; disabled: boolean }) {
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
+
+  const handleConfirm = () => {
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.append('logId', logId);
+      const result = await confirmActivityParticipation(formData);
+      if (result.success) {
+        toast({ title: 'Successo', description: result.message });
+      } else {
+        toast({ title: 'Errore', description: result.message, variant: 'destructive' });
+      }
+    });
+  };
+  
+  return (
+    <Button size="sm" onClick={handleConfirm} disabled={disabled || isPending}>
+      {isPending ? 'Confermo...' : 'Conferma'}
+    </Button>
+  );
+}
+
 
 export function ActivityDashboard() {
   const [db, setDb] = useState<Firestore | null>(null);
   const { toast } = useToast();
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [searchFilter, setSearchFilter] = useState('');
-  const [typeFilter, setTypeFilter] = useState<'all' | 'event' | 'redemption'>('all');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('pending');
 
   useEffect(() => {
     const { db: firestoreDb } = getFirebaseInstances();
@@ -45,7 +74,9 @@ export function ActivityDashboard() {
     if (!db) return;
 
     const activityColRef = collection(db, 'activityLog');
-    const unsubscribe = onSnapshot(activityColRef, (snapshot) => {
+    const q = query(activityColRef, orderBy('timestamp', 'desc'));
+    
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       const activityList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as ActivityLog));
       setActivities(activityList);
     }, (error) => {
@@ -58,65 +89,67 @@ export function ActivityDashboard() {
 
   const filteredActivities = useMemo(() => {
     return activities.filter(activity => {
+      if (activity.activityType !== 'event') return false; // Only show events/confirmations
+
       const searchLower = searchFilter.toLowerCase();
       const matchesSearch =
         activity.userDisplayName.toLowerCase().includes(searchLower) ||
         activity.userEmail.toLowerCase().includes(searchLower) ||
         activity.itemTitle.toLowerCase().includes(searchLower);
       
-      const matchesType = typeFilter === 'all' || activity.activityType === typeFilter;
+      const matchesStatus = statusFilter === 'all' || activity.status === statusFilter;
 
-      return matchesSearch && matchesType;
+      return matchesSearch && matchesStatus;
     });
-  }, [activities, searchFilter, typeFilter]);
+  }, [activities, searchFilter, statusFilter]);
 
   const aggregatedData = useMemo(() => {
     const data = filteredActivities.reduce((acc, activity) => {
         if (!acc[activity.itemId]) {
             acc[activity.itemId] = {
                 title: activity.itemTitle,
-                type: activity.activityType,
-                count: 0,
                 participants: []
             };
         }
-        acc[activity.itemId].count++;
         acc[activity.itemId].participants.push({
+            logId: activity.id,
             name: activity.userDisplayName,
             email: activity.userEmail,
-            date: new Date(activity.timestamp.seconds * 1000).toLocaleString()
+            date: new Date(activity.timestamp.seconds * 1000).toLocaleString(),
+            status: activity.status
         });
         return acc;
-    }, {} as Record<string, {title: string, type: string, count: number, participants: {name: string, email: string, date: string}[]}>);
+    }, {} as Record<string, {title: string, participants: {logId: string, name: string, email: string, date: string, status: ActivityLog['status']}[]}>);
     
-    return Object.values(data).sort((a,b) => b.count - a.count);
+    return Object.values(data).sort((a,b) => b.participants.length - a.participants.length);
   }, [filteredActivities]);
 
-  const totalEvents = useMemo(() => new Set(activities.filter(a => a.activityType === 'event').map(a => a.itemId)).size, [activities]);
+  const totalPending = useMemo(() => activities.filter(a => a.activityType === 'event' && a.status === 'pending').length, [activities]);
+  const totalCompleted = useMemo(() => activities.filter(a => a.activityType === 'event' && a.status === 'completed').length, [activities]);
   const totalRedemptions = useMemo(() => activities.filter(a => a.activityType === 'redemption').length, [activities]);
-  const totalParticipants = useMemo(() => activities.filter(a => a.activityType === 'event').length, [activities]);
+
 
   return (
     <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Eventi Unici</CardTitle>
-              <Ticket className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Iscrizioni da Confermare</CardTitle>
+              <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalEvents}</div>
-              <p className="text-xs text-muted-foreground">Numero di eventi con almeno un iscritto.</p>
+              <div className="text-2xl font-bold">{totalPending}</div>
+              <p className="text-xs text-muted-foreground">Partecipazioni in attesa di approvazione.</p>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Iscrizioni Totali</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Partecipazioni Confermate</CardTitle>
+              <CheckCircle className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{totalParticipants}</div>
-               <p className="text-xs text-muted-foreground">Numero totale di partecipazioni agli eventi.</p>
+              <div className="text-2xl font-bold">{totalCompleted}</div>
+               <p className="text-xs text-muted-foreground">Numero totale di partecipazioni approvate.</p>
             </CardContent>
           </Card>
           <Card>
@@ -134,27 +167,27 @@ export function ActivityDashboard() {
 
         <Card>
             <CardHeader>
-                <CardTitle>Log Attività e Iscrizioni</CardTitle>
-                <CardDescription>Visualizza le iscrizioni agli eventi e i premi riscattati dagli utenti.</CardDescription>
+                <CardTitle>Conferma Partecipazione Eventi</CardTitle>
+                <CardDescription>Approva la partecipazione degli utenti agli eventi per accreditare Punti e XP.</CardDescription>
                 <div className="flex flex-col sm:flex-row gap-4 mt-4">
                     <div className="relative flex-grow">
                         <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                         <Input
                             type="search"
-                            placeholder="Cerca per nome, email o attività..."
+                            placeholder="Cerca per nome, email o evento..."
                             className="w-full pl-8"
                             value={searchFilter}
                             onChange={(e) => setSearchFilter(e.target.value)}
                         />
                     </div>
-                    <Select value={typeFilter} onValueChange={(value) => setTypeFilter(value as any)}>
+                    <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
                         <SelectTrigger className="w-full sm:w-[180px]">
-                            <SelectValue placeholder="Filtra per tipo" />
+                            <SelectValue placeholder="Filtra per stato" />
                         </SelectTrigger>
                         <SelectContent>
-                            <SelectItem value="all">Tutte le attività</SelectItem>
-                            <SelectItem value="event">Eventi/Workshop</SelectItem>
-                            <SelectItem value="redemption">Riscatto Premi</SelectItem>
+                            <SelectItem value="all">Tutti</SelectItem>
+                            <SelectItem value="pending">In Sospeso</SelectItem>
+                            <SelectItem value="completed">Completati</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>
@@ -167,12 +200,11 @@ export function ActivityDashboard() {
                                 <AccordionTrigger>
                                     <div className="flex justify-between items-center w-full pr-4">
                                       <div className="text-left">
-                                        <Badge variant={item.type === 'event' ? 'secondary' : 'destructive'} className="mb-1">{item.type === 'event' ? 'Evento' : 'Premio'}</Badge>
                                         <p className="font-semibold">{item.title}</p>
                                       </div>
                                        <div className="text-right">
-                                            <p className="font-semibold text-lg">{item.count}</p>
-                                            <p className="text-sm text-muted-foreground">{item.type === 'event' ? 'Iscritti' : 'Riscatti'}</p>
+                                            <p className="font-semibold text-lg">{item.participants.length}</p>
+                                            <p className="text-sm text-muted-foreground">Iscritti</p>
                                         </div>
                                     </div>
                                 </AccordionTrigger>
@@ -181,16 +213,24 @@ export function ActivityDashboard() {
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead>Nome</TableHead>
-                                                <TableHead>Email</TableHead>
-                                                <TableHead>Data Registrazione</TableHead>
+                                                <TableHead>Data Iscrizione</TableHead>
+                                                <TableHead>Stato</TableHead>
+                                                <TableHead className="text-right">Azione</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {item.participants.map(p => (
-                                                <TableRow key={p.email}>
-                                                    <TableCell>{p.name}</TableCell>
-                                                    <TableCell>{p.email}</TableCell>
+                                                <TableRow key={p.logId}>
+                                                    <TableCell className="font-medium">{p.name}<br/><span className="text-xs text-muted-foreground">{p.email}</span></TableCell>
                                                     <TableCell>{p.date}</TableCell>
+                                                    <TableCell>
+                                                        <Badge variant={p.status === 'pending' ? 'secondary' : 'default'} className={p.status === 'completed' ? 'bg-green-500' : ''}>
+                                                            {p.status}
+                                                        </Badge>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        {p.status === 'pending' && <ConfirmButton logId={p.logId} disabled={p.status !== 'pending'} />}
+                                                    </TableCell>
                                                 </TableRow>
                                             ))}
                                         </TableBody>
@@ -200,7 +240,7 @@ export function ActivityDashboard() {
                         ))}
                     </Accordion>
                 ) : (
-                    <div className="text-center text-muted-foreground py-8">Nessuna attività trovata con i filtri attuali.</div>
+                    <div className="text-center text-muted-foreground py-8">Nessuna iscrizione trovata con i filtri attuali.</div>
                 )}
             </CardContent>
         </Card>

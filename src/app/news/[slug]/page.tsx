@@ -4,7 +4,7 @@ import { allActivities } from '@/lib/activities';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-import { ArrowLeft, Calendar, Clock, Award, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Award, Gem, Loader2, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound, useRouter } from 'next/navigation';
@@ -12,6 +12,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useTransition } from 'react';
 import { registerUserForActivity } from '@/app/actions';
+import { cn } from '@/lib/utils';
 
 export default function NewsDetailPage({ params }: { params: { slug: string } }) {
   const item = allActivities.find((p) => p.slug === params.slug);
@@ -26,11 +27,17 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
 
   const image = item.image || PlaceHolderImages.find(img => img.id === 'art-placeholder');
 
-  const handleRegistration = () => {
+  const handleAction = () => {
     if (!user) {
-      toast({ title: 'Accesso Richiesto', description: 'Devi effettuare l\'accesso per registrarti a questa attività.', variant: 'destructive' });
+      toast({ title: 'Accesso Richiesto', description: 'Devi effettuare l\'accesso per completare questa azione.', variant: 'destructive' });
       router.push('/login');
       return;
+    }
+    
+    // For redemption, check points on client side to provide immediate feedback
+    if (item.type === 'spend' && (user.uid || 0) < (item.points || 0)) {
+        toast({ title: "Punti Insufficienti", description: "Non hai abbastanza punti per questo premio.", variant: 'destructive' });
+        return;
     }
 
     startTransition(async () => {
@@ -39,7 +46,8 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
       formData.append('itemId', item.slug);
       formData.append('itemTitle', item.title);
       formData.append('itemPoints', (item.points || 0).toString());
-      formData.append('activityType', 'event');
+      formData.append('itemXp', (item.xp || 0).toString());
+      formData.append('activityType', item.type);
 
       const result = await registerUserForActivity(formData);
 
@@ -51,34 +59,10 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
     });
   }
 
-  const handleRedemption = () => {
-      if (!user) {
-        toast({ title: "Accesso Richiesto", description: "Devi effettuare l'accesso per riscattare i premi.", variant: 'destructive' });
-        return;
-      }
-      if ((user.uid || 0) < (item.points || 0)) {
-        toast({ title: "Punti Insufficienti", description: "Non hai abbastanza punti per questo premio.", variant: 'destructive' });
-        return;
-      }
-
-      startTransition(async () => {
-        const formData = new FormData();
-        formData.append('userId', user.uid);
-        formData.append('itemId', item.slug);
-        formData.append('itemTitle', item.title);
-        formData.append('itemPoints', (item.points || 0).toString());
-        formData.append('activityType', 'redemption');
-
-        const result = await registerUserForActivity(formData);
-        if (result.success) {
-          toast({ title: 'Successo!', description: result.message });
-        } else {
-          toast({ title: 'Errore', description: result.message, variant: 'destructive' });
-        }
-      });
-    }
-
-  const backLink = item.type === 'earn' ? '/marketplace' : `/${item.category.toLowerCase()}`;
+  const backLink = item.type === 'spend' ? '/marketplace' : `/${item.category.toLowerCase()}`;
+  if (item.category === 'Laboratorio' || item.category === 'Workshop') {
+    backLink === '/formazione'
+  }
 
   const pointClass = item.type === 'earn' ? 'text-green-500' : 'text-red-500';
   const pointPrefix = item.type === 'earn' ? '+' : '-';
@@ -105,9 +89,15 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
                     {item.date && <div className="flex items-center gap-2"><Calendar className="w-4 h-4"/><span>{item.date}</span></div>}
                     {item.time && <div className="flex items-center gap-2"><Clock className="w-4 h-4"/><span>{item.time}</span></div>}
                     {item.points && item.points > 0 && (
-                        <div className={`flex items-center gap-2 font-semibold ${pointClass}`}>
-                            <Award className="w-4 h-4"/>
-                            <span>{pointText} {pointPrefix}{item.points} punti</span>
+                        <div className={cn("flex items-center gap-2 font-semibold", pointClass)}>
+                            <Gem className="w-4 h-4"/>
+                            <span>{pointText} {pointPrefix}{item.points} Punti</span>
+                        </div>
+                    )}
+                     {item.xp && item.xp > 0 && (
+                        <div className="flex items-center gap-2 font-semibold text-blue-500">
+                            <Star className="w-4 h-4"/>
+                            <span>+{item.xp} XP</span>
                         </div>
                     )}
                 </div>
@@ -130,7 +120,7 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
             </div>
 
             <footer className="mt-12">
-                <Button size="lg" onClick={item.type === 'earn' ? handleRegistration : handleRedemption} disabled={isPending || !user}>
+                <Button size="lg" onClick={handleAction} disabled={isPending || !user}>
                   {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {item.cta}
                 </Button>

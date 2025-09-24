@@ -36,14 +36,16 @@ export async function addPoints(formData: FormData): Promise<{ success: boolean;
 
   try {
     const userDocRef = doc(db, 'users', userId);
-    const userDoc = await getDoc(userDocRef);
-
-    if (!userDoc.exists()) {
-      return { success: false, message: 'User not found in database.' };
-    }
-    const currentPoints = userDoc.data().points || 0;
-    const newPoints = currentPoints + Number(points);
-    await updateDoc(userDocRef, { points: newPoints });
+    
+    await runTransaction(db, async (transaction) => {
+      const userDoc = await transaction.get(userDocRef);
+      if (!userDoc.exists()) {
+        throw new Error('User not found in database.');
+      }
+      const currentPoints = userDoc.data().points || 0;
+      const newPoints = currentPoints + Number(points);
+      transaction.update(userDocRef, { points: newPoints });
+    });
 
     console.log(`Successfully added ${points} points to user ${userId}.`);
 
@@ -54,7 +56,8 @@ export async function addPoints(formData: FormData): Promise<{ success: boolean;
 
   } catch (error) {
     console.error("Error adding points: ", error);
-    return { success: false, message: 'An error occurred while adding points.' };
+    const errorMessage = error instanceof Error ? error.message : 'An error occurred while adding points.';
+    return { success: false, message: errorMessage };
   }
 }
 
@@ -83,7 +86,7 @@ export async function createMembershipCard(formData: FormData): Promise<{ succes
     // In a real application, you would save this data to a database.
     console.log('Membership card data saved successfully (simulated).');
 
-    revalidatePath('/tessera');
+    revalidatePath('/tessere');
 
     return { success: true, message: 'Tessera creata con successo! Benvenuto nella community.' };
 }
@@ -115,66 +118,131 @@ export async function registerUserForActivity(formData: FormData): Promise<{ suc
   const itemId = formData.get('itemId') as string;
   const itemTitle = formData.get('itemTitle') as string;
   const itemPoints = Number(formData.get('itemPoints'));
+  const itemXp = Number(formData.get('itemXp'));
   const activityType = formData.get('activityType') as 'event' | 'redemption';
 
-  if (!userId || !itemId || !itemTitle || isNaN(itemPoints) || !activityType) {
+  if (!userId || !itemId || !itemTitle || isNaN(itemPoints) || !activityType || isNaN(itemXp)) {
     return { success: false, message: 'Dati per la registrazione incompleti.' };
   }
 
   try {
+    const userDocRef = doc(db, 'users', userId);
+
+    if (activityType === 'redemption') {
+      // Handle redemptions immediately, as they don't need confirmation
+      await runTransaction(db, async (transaction) => {
+        const userDoc = await transaction.get(userDocRef);
+        if (!userDoc.exists()) throw new Error("Utente non trovato.");
+        
+        const currentPoints = userDoc.data().points || 0;
+        if (currentPoints < itemPoints) {
+          throw new Error("Punti insufficienti per riscattare questo premio.");
+        }
+        
+        transaction.update(userDocRef, { points: currentPoints - itemPoints });
+        
+        const activityLogRef = collection(db, 'activityLog');
+        transaction.set(doc(activityLogRef), {
+          userId,
+          userEmail: userDoc.data().email,
+          userDisplayName: userDoc.data().displayName,
+          activityType,
+          itemId,
+          itemTitle,
+          points: itemPoints,
+          xp: 0,
+          timestamp: serverTimestamp(),
+          status: 'completed',
+        });
+      });
+
+      revalidatePath('/admin');
+      revalidatePath(`/profile/${userId}`);
+      revalidatePath('/marketplace');
+      
+      return { success: true, message: `Premio "${itemTitle}" riscattato con successo!` };
+
+    } else { // Handle event registrations by creating a pending log
+      const userDoc = await getDoc(userDocRef);
+      if (!userDoc.exists()) throw new Error("Utente non trovato.");
+
+      const activityLogRef = collection(db, 'activityLog');
+      await addDoc(activityLogRef, {
+        userId,
+        userEmail: userDoc.data().email,
+        userDisplayName: userDoc.data().displayName,
+        activityType: 'event',
+        itemId,
+        itemTitle,
+        points: itemPoints,
+        xp: itemXp,
+        timestamp: serverTimestamp(),
+        status: 'pending', // Awaiting admin confirmation
+      });
+
+      revalidatePath('/admin');
+      revalidatePath(`/news/${itemId}`);
+
+      return { success: true, message: `Registrazione per "${itemTitle}" avvenuta! I punti verranno accreditati dopo la conferma della partecipazione.` };
+    }
+
+  } catch (error: any) {
+    console.error("Error in registerUserForActivity: ", error);
+    return { success: false, message: error.message || "Si è verificato un errore durante l'operazione." };
+  }
+}
+
+export async function confirmActivityParticipation(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const logId = formData.get('logId') as string;
+  
+  if (!logId) {
+    return { success: false, message: 'ID del log non fornito.' };
+  }
+
+  try {
+    const logDocRef = doc(db, 'activityLog', logId);
+    
     await runTransaction(db, async (transaction) => {
+      const logDoc = await transaction.get(logDocRef);
+      if (!logDoc.exists() || logDoc.data().status !== 'pending') {
+        throw new Error("Registrazione non trovata o già elaborata.");
+      }
+
+      const logData = logDoc.data();
+      const userId = logData.userId;
+      const pointsToAdd = logData.points || 0;
+      const xpToAdd = logData.xp || 0;
+
       const userDocRef = doc(db, 'users', userId);
       const userDoc = await transaction.get(userDocRef);
 
       if (!userDoc.exists()) {
-        throw new Error("Utente non trovato.");
+        throw new Error("Utente associato non trovato.");
       }
 
-      const userData = userDoc.data();
-      const currentPoints = userData.points || 0;
-      let newPoints = currentPoints;
+      const currentPoints = userDoc.data().points || 0;
+      const currentXp = userDoc.data().xp || 0;
       
-      if (activityType === 'redemption') {
-        if (currentPoints < itemPoints) {
-          throw new Error("Punti insufficienti per riscattare questo premio.");
-        }
-        newPoints -= itemPoints;
-      } else { // 'event' or other point-earning activities
-        newPoints += itemPoints;
-      }
-
-      // Update user's points
-      transaction.update(userDocRef, { points: newPoints });
-
-      // Log the activity
-      const activityLogRef = collection(db, 'activityLog');
-      await addDoc(activityLogRef, {
-        userId,
-        userEmail: userData.email,
-        userDisplayName: userData.displayName,
-        activityType,
-        itemId,
-        itemTitle,
-        points: itemPoints,
-        timestamp: serverTimestamp(),
+      transaction.update(userDocRef, {
+        points: currentPoints + pointsToAdd,
+        xp: currentXp + xpToAdd
       });
+
+      transaction.update(logDocRef, { status: 'completed' });
     });
-
+    
     revalidatePath('/admin');
-    revalidatePath(`/profile/${userId}`);
-    revalidatePath('/marketplace');
-    revalidatePath(`/news/${itemId}`);
+    // Consider revalidating user profile pages if needed
+    // revalidatePath(`/profile/${userId}`);
 
-    if (activityType === 'redemption') {
-      return { success: true, message: `Premio "${itemTitle}" riscattato con successo!` };
-    }
-    return { success: true, message: `Registrazione per "${itemTitle}" avvenuta con successo!` };
+    return { success: true, message: 'Partecipazione confermata e punti accreditati!' };
 
   } catch (error: any) {
-    console.error("Error registering user for activity: ", error);
-    return { success: false, message: error.message || "Si è verificato un errore durante l'operazione." };
+    console.error("Error confirming participation: ", error);
+    return { success: false, message: error.message || "Si è verificato un errore durante la conferma." };
   }
 }
+
 
 export async function submitCollaborationProposal(formData: FormData): Promise<{ success: boolean; message: string }> {
   const data = Object.fromEntries(formData.entries());
