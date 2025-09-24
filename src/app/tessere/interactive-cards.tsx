@@ -1,131 +1,91 @@
 'use client';
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { wrap } from 'popmotion';
-import { membershipTiers, UserTierLevel } from '@/lib/membership-tiers';
+import React, { useState, useEffect, useCallback } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { MembershipCard } from './membership-card';
+import type { MembershipTier, UserTierLevel } from '@/lib/membership-tiers';
 import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const variants = {
-  enter: (direction: number) => {
-    return {
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
-    };
-  },
-  center: {
-    zIndex: 1,
-    x: 0,
-    opacity: 1,
-  },
-  exit: (direction: number) => {
-    return {
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0,
-    };
-  },
-};
+const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], onSelectTier: (tier: MembershipTier) => void }) => {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'center' });
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-const swipeConfidenceThreshold = 10000;
-const swipePower = (offset: number, velocity: number) => {
-  return Math.abs(offset) * velocity;
-};
+  const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+  const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
 
-function VerticalCardStack({ levels }: { levels: UserTierLevel[] }) {
-  const [cardIndex, setCardIndex] = useState(0);
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
 
-  const handleDragEnd = (event: any, info: any) => {
-    const { offset, velocity } = info;
-    if (offset.y < -50 && cardIndex < levels.length - 1) {
-      setCardIndex(cardIndex + 1);
-    } else if (offset.y > 50 && cardIndex > 0) {
-      setCardIndex(cardIndex - 1);
-    }
-  };
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on('select', onSelect);
+  }, [emblaApi, onSelect]);
 
   return (
-    <div className="w-full h-full relative flex items-center justify-center">
-      <AnimatePresence>
-        {levels.slice(cardIndex).map((level, i) => (
-          <motion.div
-            key={level.name}
-            className="absolute w-full h-full"
-            style={{
-              width: 'clamp(280px, 80vw, 450px)',
-              height: 'clamp(176px, 50.4vw, 283px)',
-            }}
-            initial={{ scale: 1 - i * 0.05, y: -i * 15, zIndex: levels.length - i }}
-            animate={{ scale: 1 - i * 0.05, y: -i * 15, zIndex: levels.length - i }}
-            exit={{ y: 300, opacity: 0 }}
-            transition={{ duration: 0.3 }}
-            drag="y"
-            dragConstraints={{ top: 0, bottom: 0 }}
-            onDragEnd={handleDragEnd}
-          >
-            <MembershipCard level={level} userXP={level.xpThreshold} />
-          </motion.div>
-        ))}
-      </AnimatePresence>
-      <div className="absolute right-[-30px] top-1/2 -translate-y-1/2 flex flex-col gap-2">
-         {levels.map((_, i) => (
-             <div key={i} className={cn('w-2 h-2 rounded-full transition-colors', i === cardIndex ? 'bg-primary' : 'bg-muted')}/>
-         ))}
+    <div className="w-full relative">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex -ml-4">
+          {tiers.map((tier, index) => (
+            <div key={tier.type} className="pl-4 min-w-0 flex-[0_0_90%] md:flex-[0_0_50%] lg:flex-[0_0_40%]">
+              <div
+                className={cn(
+                  'transition-opacity duration-300',
+                  index === selectedIndex ? 'opacity-100' : 'opacity-40'
+                )}
+                onClick={() => index === selectedIndex && onSelectTier(tier)}
+              >
+                <MembershipCard
+                  level={tier.levels[0]}
+                  userName={tier.title}
+                  className={cn(index === selectedIndex && 'cursor-pointer')}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+       <div className="absolute top-1/2 -translate-y-1/2 flex justify-between w-full px-2">
+        <button onClick={scrollPrev} className="text-foreground hover:text-primary transition-colors disabled:opacity-30" disabled={selectedIndex === 0}>
+          <ChevronLeft className="w-10 h-10" />
+        </button>
+        <button onClick={scrollNext} className="text-foreground hover:text-primary transition-colors disabled:opacity-30" disabled={selectedIndex === tiers.length - 1}>
+          <ChevronRight className="w-10 h-10" />
+        </button>
       </div>
     </div>
   );
-}
+};
 
-
-export function InteractiveCards() {
-  const [[page, direction], setPage] = useState([0, 0]);
-
-  const tierIndex = wrap(0, membershipTiers.length, page);
-  const currentTier = membershipTiers[tierIndex];
-
-  const paginate = (newDirection: number) => {
-    setPage([page + newDirection, newDirection]);
-  };
+const VerticalCarousel = ({ levels }: { levels: UserTierLevel[] }) => {
+  const [emblaRef] = useEmblaCarousel({ axis: 'y', loop: false, align: 'center' });
 
   return (
-    <div className="w-full flex-grow flex flex-col items-center justify-center relative">
-        <AnimatePresence initial={false} custom={direction}>
-            <motion.div
-                key={page}
-                custom={direction}
-                variants={variants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={{
-                    x: { type: 'spring', stiffness: 300, damping: 30 },
-                    opacity: { duration: 0.2 },
-                }}
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                dragElastic={1}
-                onDragEnd={(e, { offset, velocity }) => {
-                    const swipe = swipePower(offset.x, velocity.x);
-                    if (swipe < -swipeConfidenceThreshold) {
-                    paginate(1);
-                    } else if (swipe > swipeConfidenceThreshold) {
-                    paginate(-1);
-                    }
-                }}
-                className="w-full h-full flex items-center justify-center"
-            >
-                <VerticalCardStack levels={currentTier.levels} />
-            </motion.div>
-        </AnimatePresence>
-       
-        <div className="absolute bottom-[-40px] flex justify-center gap-2">
-            {membershipTiers.map((_, i) => (
-                <div key={i} className={cn('w-2.5 h-2.5 rounded-full transition-colors', i === tierIndex ? 'bg-primary' : 'bg-muted')}
-                    onClick={() => setPage([i, i > tierIndex ? 1 : -1])}
-                />
+    <div className="h-[400px] w-full max-w-[500px] overflow-hidden" ref={emblaRef}>
+        <div className="flex flex-col -mt-4 h-full">
+            {levels.map((level) => (
+                <div key={level.name} className="pt-4 min-h-0 flex-[0_0_70%]">
+                     <MembershipCard level={level} userXP={level.xpThreshold} />
+                </div>
             ))}
         </div>
     </div>
-  );
+  )
+}
+
+interface InteractiveCardsProps {
+  tiers: MembershipTier[];
+  selectedTier: MembershipTier | null;
+  onSelectTier: (tier: MembershipTier) => void;
+}
+
+export function InteractiveCards({ tiers, selectedTier, onSelectTier }: InteractiveCardsProps) {
+  if (selectedTier) {
+    return <VerticalCarousel levels={selectedTier.levels} />;
+  }
+
+  return <HorizontalCarousel tiers={tiers} onSelectTier={onSelectTier} />;
 }
