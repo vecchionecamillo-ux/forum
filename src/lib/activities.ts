@@ -3,7 +3,7 @@ import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-imag
 export type Activity = {
   title: string;
   slug: string;
-  category: 'Laboratorio' | 'Workshop' | 'Eventi' | 'Opportunità' | 'Arte' | 'Community';
+  category: 'Laboratorio' | 'Workshop' | 'Arte' | 'Community';
   description: string;
   image?: ImagePlaceholder;
   cta: string;
@@ -50,11 +50,11 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     points: 80,
     duration: 'Permanente'
   },
-   // EVENTI
+   // EVENTI & COMMUNITY
   {
     title: 'Plastic Free: Pulizia del Parco',
     slug: 'plastic-free-parco',
-    category: 'Opportunità',
+    category: 'Community',
     description: 'Unisciti a noi per un\'attività di volontariato ambientale. Raccoglieremo la plastica e puliremo il parco cittadino. Un piccolo gesto per un grande impatto.',
     image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
     cta: 'Partecipa',
@@ -64,7 +64,6 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     time: '09:00 - 13:00',
     duration: '4 ore'
   },
-  // COMMUNITY
   {
     title: 'Incontro con la Psicologa: "Stare Insieme"',
     slug: 'incontro-psicologa-stare-insieme',
@@ -91,11 +90,10 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     time: '20:00',
     duration: '3 ore'
   },
-  // VECCHI EVENTI
   {
     title: 'Nuova Call per Volontari',
     slug: 'call-volontari',
-    category: 'Opportunità',
+    category: 'Community',
     description: 'Stiamo cercando persone appassionate che vogliano contribuire alla crescita del Cantiere Culturale. Unisciti a noi e fai la differenza!',
     image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
     cta: 'Partecipa',
@@ -127,7 +125,7 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       description: 'Assicurati il tuo posto per la serata inaugurale della nostra nuova mostra. Posti limitati.',
       image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
       cta: 'Usa i tuoi Punti',
-      category: 'Eventi',
+      category: 'Arte',
       points: 250,
       link: '/news/opening-visioni-digitali',
       date: '2024-11-10',
