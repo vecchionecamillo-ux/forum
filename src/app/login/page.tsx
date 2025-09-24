@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getFirebaseInstances } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -55,6 +55,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     try {
+      const { auth } = getFirebaseInstances();
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {
@@ -87,6 +88,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     try {
+      const { auth } = getFirebaseInstances();
       await sendPasswordResetEmail(auth, email);
       setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
       setIsResetMode(false);
@@ -108,6 +110,7 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
+    const { auth } = getFirebaseInstances();
     const provider = new GoogleAuthProvider();
     await signInWithRedirect(auth, provider);
   };
@@ -238,3 +241,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+    

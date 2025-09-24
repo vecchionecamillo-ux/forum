@@ -1,7 +1,7 @@
-import { initializeApp, getApp, getApps, type FirebaseOptions } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
-import { getDatabase } from 'firebase/database';
+import { initializeApp, getApp, getApps, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
+import { getAuth, type Auth } from 'firebase/auth';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getDatabase, type Database } from 'firebase/database';
 
 const firebaseConfig: FirebaseOptions = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,10 +12,34 @@ const firebaseConfig: FirebaseOptions = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-const auth = getAuth(app);
-const database = getDatabase(app);
+type FirebaseInstances = {
+    app: FirebaseApp;
+    auth: Auth;
+    db: Firestore;
+    database: Database;
+};
 
-export { app, db, auth, database };
+let instances: FirebaseInstances | null = null;
+
+function getFirebaseInstances(): FirebaseInstances {
+    if (typeof window !== 'undefined') {
+        if (!instances) {
+            const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+            const database = getDatabase(app);
+            instances = { app, auth, db, database };
+        }
+        return instances;
+    }
+    // This should ideally not be reached in a client-side context.
+    // If running in SSR, this will throw an error when used, which is intended
+    // to signal that Firebase should only be used on the client.
+    // As a temporary fallback for server components that might import it:
+    return {} as FirebaseInstances;
+}
+
+// We will export a function to get instances instead of instances directly
+export { getFirebaseInstances };
+
+    

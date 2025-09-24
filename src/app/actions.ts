@@ -1,14 +1,24 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { db } from '@/lib/firebase';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 
-// This is a mock server action. In a real application, you would:
-// 1. Authenticate the user to ensure they are a moderator.
-// 2. Validate the input (userId, points).
-// 3. Update the user's points in your database.
-// 4. Handle potential errors.
+
+// This is a temporary solution to initialize Firebase Admin on the server.
+// In a real application, you would use the Firebase Admin SDK with a service account.
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+};
+
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const db = getFirestore(app);
+
 
 export async function addPoints(formData: FormData): Promise<{ success: boolean; message: string }> {
   const userId = formData.get('userId') as string;
@@ -98,3 +108,5 @@ export async function updateUserRank(formData: FormData): Promise<{ success: boo
     return { success: false, message: "Impossibile aggiornare il grado." };
   }
 }
+
+    

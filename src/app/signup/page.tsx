@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { getFirebaseInstances } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,6 +52,7 @@ export default function SignupPage() {
     setLoading(true);
     setError(null);
     try {
+      const { auth } = getFirebaseInstances();
       await createUserWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {
@@ -71,6 +72,7 @@ export default function SignupPage() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError(null);
+    const { auth } = getFirebaseInstances();
     const provider = new GoogleAuthProvider();
     await signInWithRedirect(auth, provider);
   };
@@ -149,3 +151,5 @@ export default function SignupPage() {
     </div>
   );
 }
+
+    

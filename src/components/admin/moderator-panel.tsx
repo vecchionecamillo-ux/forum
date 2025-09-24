@@ -25,8 +25,8 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { UserProfile } from '@/hooks/use-auth';
-import { db } from '@/lib/firebase';
 import { collection, onSnapshot } from 'firebase/firestore';
+import { getFirebaseInstances } from '@/lib/firebase';
 
 
 const ranks = [
@@ -140,6 +140,7 @@ export function ModeratorPanel() {
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
+    const { db } = getFirebaseInstances();
     const usersColRef = collection(db, 'users');
     const unsubscribe = onSnapshot(usersColRef, (snapshot) => {
         const usersList = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
@@ -208,3 +209,5 @@ export function ModeratorPanel() {
     </Card>
   );
 }
+
+    
