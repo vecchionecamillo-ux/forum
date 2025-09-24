@@ -1,6 +1,6 @@
 'use client';
 
-import { newsItems } from '@/app/page-sections/news-section';
+import { allActivities } from '@/lib/activities';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
@@ -14,7 +14,7 @@ import { useTransition } from 'react';
 import { registerUserForActivity } from '@/app/actions';
 
 export default function NewsDetailPage({ params }: { params: { slug: string } }) {
-  const item = newsItems.find((p) => p.slug === params.slug);
+  const item = allActivities.find((p) => p.slug === params.slug);
   const { user } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
@@ -51,14 +51,43 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
     });
   }
 
+  const handleRedemption = () => {
+      if (!user) {
+        toast({ title: "Accesso Richiesto", description: "Devi effettuare l'accesso per riscattare i premi.", variant: 'destructive' });
+        return;
+      }
+      if ((user.uid || 0) < (item.points || 0)) {
+        toast({ title: "Punti Insufficienti", description: "Non hai abbastanza punti per questo premio.", variant: 'destructive' });
+        return;
+      }
+
+      startTransition(async () => {
+        const formData = new FormData();
+        formData.append('userId', user.uid);
+        formData.append('itemId', item.slug);
+        formData.append('itemTitle', item.title);
+        formData.append('itemPoints', (item.points || 0).toString());
+        formData.append('activityType', 'redemption');
+
+        const result = await registerUserForActivity(formData);
+        if (result.success) {
+          toast({ title: 'Successo!', description: result.message });
+        } else {
+          toast({ title: 'Errore', description: result.message, variant: 'destructive' });
+        }
+      });
+    }
+
+  const backLink = item.type === 'earn' ? '/marketplace' : `/${item.category.toLowerCase()}`;
+
   return (
     <main className="pt-24 pb-12">
       <div className="container mx-auto px-4">
         <div className="mb-8">
             <Button asChild variant="link" className="text-primary pl-0">
-                <Link href="/marketplace">
+                <Link href={backLink}>
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Torna al Marketplace
+                Torna Indietro
                 </Link>
             </Button>
         </div>
@@ -70,7 +99,7 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-muted-foreground text-sm">
                     {item.date && <div className="flex items-center gap-2"><Calendar className="w-4 h-4"/><span>{item.date}</span></div>}
                     {item.time && <div className="flex items-center gap-2"><Clock className="w-4 h-4"/><span>{item.time}</span></div>}
-                    {item.points && <div className="flex items-center gap-2"><Award className="w-4 h-4 text-primary"/><span>Guadagna {item.points} punti</span></div>}
+                    {item.points && <div className="flex items-center gap-2"><Award className="w-4 h-4 text-primary"/><span>{item.type === 'earn' ? 'Guadagna' : 'Costo:'} {item.points} punti</span></div>}
                 </div>
             </header>
 
@@ -91,7 +120,7 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
             </div>
 
             <footer className="mt-12">
-                <Button size="lg" onClick={handleRegistration} disabled={isPending}>
+                <Button size="lg" onClick={item.type === 'earn' ? handleRegistration : handleRedemption} disabled={isPending || !user}>
                   {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {item.cta}
                 </Button>
