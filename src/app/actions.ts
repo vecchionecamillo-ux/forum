@@ -16,6 +16,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+// Ensure Firebase is initialized for server-side operations
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
 
@@ -108,5 +109,3 @@ export async function updateUserRank(formData: FormData): Promise<{ success: boo
     return { success: false, message: "Impossibile aggiornare il grado." };
   }
 }
-
-    

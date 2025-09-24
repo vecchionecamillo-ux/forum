@@ -32,14 +32,18 @@ function getFirebaseInstances(): FirebaseInstances {
         }
         return instances;
     }
-    // This should ideally not be reached in a client-side context.
-    // If running in SSR, this will throw an error when used, which is intended
-    // to signal that Firebase should only be used on the client.
-    // As a temporary fallback for server components that might import it:
-    return {} as FirebaseInstances;
+    // This function should not be called on the server.
+    // Server-side initialization is handled in `actions.ts`.
+    // We return a proxy that will throw an error if accessed on the server.
+    return new Proxy({}, {
+        get(target, prop) {
+            if (typeof window === 'undefined') {
+                throw new Error(`Firebase client SDK (${String(prop)}) cannot be accessed on the server.`);
+            }
+            return Reflect.get(target, prop);
+        }
+    }) as FirebaseInstances;
 }
 
 // We will export a function to get instances instead of instances directly
 export { getFirebaseInstances };
-
-    

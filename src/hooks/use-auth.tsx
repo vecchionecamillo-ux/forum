@@ -95,8 +95,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(null);
         setUserProfile(null);
         setIsModerator(false);
+        setLoading(false); // Set loading to false if no user
       }
-      setLoading(false);
     });
 
     // Handle redirect result from Google SignIn
@@ -118,6 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!user) {
       setUserProfile(null);
+      // No user, so we are done loading.
+      if (loading) setLoading(false); 
       return;
     }
 
@@ -135,13 +137,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log("No profile document in Firestore for user:", user.uid);
         setUserProfile(null);
       }
+      setLoading(false); // Profile loaded (or not found), so loading is done
     }, (error) => {
       console.error("Error fetching user profile:", error);
       setUserProfile(null);
+      setLoading(false); // Error occurred, so loading is done
     });
 
     return () => unsubscribeProfile();
-  }, [user]);
+  }, [user, loading]);
 
 
   const logout = async () => {
@@ -153,7 +157,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error signing out:', error);
     } finally {
-        setLoading(false);
+        // State change from onAuthStateChanged will handle setting user to null and loading to false
     }
   };
 

@@ -25,7 +25,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { UserProfile } from '@/hooks/use-auth';
-import { collection, onSnapshot } from 'firebase/firestore';
+import { collection, onSnapshot, type Firestore } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
 
 
@@ -133,6 +133,7 @@ function UserTable({ users, onAction, isPending }: { users: UserProfile[], onAct
 }
 
 export function ModeratorPanel() {
+  const [db, setDb] = useState<Firestore | null>(null);
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
   const [filter, setFilter] = useState('');
@@ -140,7 +141,14 @@ export function ModeratorPanel() {
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    const { db } = getFirebaseInstances();
+    // getFirebaseInstances() must be called in useEffect to ensure it runs on the client
+    const { db: firestoreDb } = getFirebaseInstances();
+    setDb(firestoreDb);
+  }, []);
+
+  useEffect(() => {
+    if (!db) return; // Wait until db is initialized
+
     const usersColRef = collection(db, 'users');
     const unsubscribe = onSnapshot(usersColRef, (snapshot) => {
         const usersList = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() } as UserProfile));
@@ -151,7 +159,7 @@ export function ModeratorPanel() {
     });
 
     return () => unsubscribe();
-  }, [toast]);
+  }, [db, toast]);
 
   useEffect(() => {
     const lowercasedFilter = filter.toLowerCase();
@@ -209,5 +217,3 @@ export function ModeratorPanel() {
     </Card>
   );
 }
-
-    
