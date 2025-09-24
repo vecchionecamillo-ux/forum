@@ -5,7 +5,7 @@ import useEmblaCarousel from 'embla-carousel-react';
 import { MembershipCard } from './membership-card';
 import type { MembershipTier, UserTierLevel } from '@/lib/membership-tiers';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronUp, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface HorizontalCarouselProps {
@@ -85,10 +85,18 @@ interface VerticalLevelListProps {
 
 const VerticalLevelList = ({ levels, onScroll }: VerticalLevelListProps) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ axis: 'y', loop: false });
+    const [canScrollPrev, setCanScrollPrev] = useState(false);
+    const [canScrollNext, setCanScrollNext] = useState(false);
+
+    const scrollPrev = useCallback(() => emblaApi && emblaApi.scrollPrev(), [emblaApi]);
+    const scrollNext = useCallback(() => emblaApi && emblaApi.scrollNext(), [emblaApi]);
+
 
     const onSelect = useCallback(() => {
         if (!emblaApi) return;
         onScroll(emblaApi.selectedScrollSnap());
+        setCanScrollPrev(emblaApi.canScrollPrev());
+        setCanScrollNext(emblaApi.canScrollNext());
     }, [emblaApi, onScroll]);
 
     useEffect(() => {
@@ -99,14 +107,22 @@ const VerticalLevelList = ({ levels, onScroll }: VerticalLevelListProps) => {
     }, [emblaApi, onSelect]);
 
     return (
-        <div className="w-full max-w-lg h-[400px] overflow-hidden" ref={emblaRef}>
-            <div className="flex flex-col h-full">
-                {levels.map((level) => (
-                    <div key={level.name} className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-4">
-                        <MembershipCard level={level} userXP={level.xpThreshold} />
-                    </div>
-                ))}
+        <div className="w-full max-w-lg relative">
+            <Button onClick={scrollPrev} className="absolute -top-12 left-1/2 -translate-x-1/2 text-foreground hover:text-primary transition-colors disabled:opacity-30 z-10" variant="ghost" size="icon" disabled={!canScrollPrev}>
+              <ChevronUp className="w-8 h-8" />
+            </Button>
+            <div className="h-[400px] overflow-hidden" ref={emblaRef}>
+                <div className="flex flex-col h-full">
+                    {levels.map((level) => (
+                        <div key={level.name} className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-4">
+                            <MembershipCard level={level} userXP={level.xpThreshold} />
+                        </div>
+                    ))}
+                </div>
             </div>
+             <Button onClick={scrollNext} className="absolute -bottom-12 left-1/2 -translate-x-1/2 text-foreground hover:text-primary transition-colors disabled:opacity-30 z-10" variant="ghost" size="icon" disabled={!canScrollNext}>
+              <ChevronDown className="w-8 h-8" />
+            </Button>
         </div>
     );
 };
