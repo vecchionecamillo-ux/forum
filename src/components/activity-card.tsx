@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Loader2, Star } from 'lucide-react';
+import { ArrowRight, Loader2, Star, Gem } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useTransition } from 'react';
@@ -67,8 +67,8 @@ export function ActivityCard({ item }: { item: Activity }) {
 
   const pointBadgeClass =
     item.type === 'earn'
-      ? 'bg-green-500 text-white'
-      : 'bg-destructive text-destructive-foreground';
+      ? 'bg-green-500 hover:bg-green-600 text-white'
+      : 'bg-destructive hover:bg-destructive/90 text-destructive-foreground';
 
   return (
     <Card
@@ -90,21 +90,25 @@ export function ActivityCard({ item }: { item: Activity }) {
             {item.points && item.points > 0 && (
               <Badge
                 className={cn(
-                  'text-md shadow-lg',
+                  'text-md shadow-lg flex items-center gap-1',
                   pointBadgeClass
                 )}
               >
-                {item.type === 'earn' ? '+' : '-'}
-                {item.points} Punti
+                <Gem className="w-3 h-3"/>
+                <span>
+                  {item.type === 'earn' ? '+' : '-'}
+                  {item.points} Punti
+                </span>
               </Badge>
             )}
              {item.xp && item.xp > 0 && (
               <Badge
                 className={cn(
-                  'text-md shadow-lg bg-blue-500 text-white'
+                  'text-md shadow-lg bg-blue-500 hover:bg-blue-600 text-white flex items-center gap-1'
                 )}
               >
-               <Star className="w-3 h-3 mr-1"/> +{item.xp} XP
+               <Star className="w-3 h-3"/>
+               <span>+{item.xp} XP</span>
               </Badge>
             )}
         </div>
