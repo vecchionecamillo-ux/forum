@@ -49,6 +49,7 @@ export const membershipTiers: MembershipTier[] = [
         badgeColor: 'bg-sky-400',
         benefits: [
           'Tutti i vantaggi precedenti',
+          'Moltiplicatore XP +10% su tutte le attività',
           'Sconto del 5% su tutti gli articoli del Marketplace',
           'Accesso al giornalino digitale mensile "Cantiere News"',
         ],
@@ -62,6 +63,7 @@ export const membershipTiers: MembershipTier[] = [
         badgeColor: 'bg-purple-400',
         benefits: [
           'Tutti i vantaggi precedenti',
+          'Moltiplicatore XP +25% su tutte le attività',
           'Sconto del 10% sul Marketplace',
           'Accesso anticipato alle iscrizioni per workshop e laboratori',
           'Possibilità di proporre un\'attività per la community',
@@ -76,6 +78,7 @@ export const membershipTiers: MembershipTier[] = [
         badgeColor: 'bg-slate-400',
         benefits: [
           'Tutti i vantaggi precedenti',
+          'Moltiplicatore XP +50% su tutte le attività',
           'Sconto del 15% sul Marketplace',
           'Accesso a canali esclusivi e contenuti premium',
           'Inviti a eventi speciali riservati ai Pionieri',
