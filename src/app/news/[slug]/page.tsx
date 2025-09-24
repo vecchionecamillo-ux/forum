@@ -7,10 +7,10 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ArrowLeft, Calendar, Clock, Gem, Loader2, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { notFound, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { useTransition } from 'react';
+import { useEffect, useTransition } from 'react';
 import { registerUserForActivity } from '@/app/actions';
 import { cn } from '@/lib/utils';
 
@@ -21,8 +21,15 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
+  useEffect(() => {
+    if (!item) {
+      router.push('/');
+    }
+  }, [item, router]);
+
   if (!item) {
-    notFound();
+    // Render a loading state or null while redirecting
+    return null;
   }
 
   const image = item.image || PlaceHolderImages.find(img => img.id === 'art-placeholder');
