@@ -6,6 +6,7 @@ import { MembershipCard } from './membership-card';
 import type { MembershipTier, UserTierLevel } from '@/lib/membership-tiers';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], onSelectTier: (tier: MembershipTier) => void }) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'center' });
