@@ -4,7 +4,7 @@ import { useAuth, type UserProfile } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { db } from '@/lib/firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Award, Shield, AtSign } from 'lucide-react';
@@ -31,18 +31,27 @@ export default function ProfilePage() {
   }, [user, loading, router]);
 
   useEffect(() => {
-    if (user) {
+    let unsubscribe: Unsubscribe | undefined;
+
+    if (user && !loading) {
       const userDocRef = doc(db, 'users', user.uid);
-      const unsubscribe = onSnapshot(userDocRef, (doc) => {
+      unsubscribe = onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
-          setUserProfile(doc.data() as UserProfile);
+          setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
         } else {
-          console.log("No such document!");
+          console.log("No such document in Firestore for user:", user.uid);
         }
+      }, (error) => {
+          console.error("Error fetching user profile:", error);
       });
-      return () => unsubscribe();
     }
-  }, [user]);
+    
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
+  }, [user, loading]);
 
   if (loading || !user || !userProfile) {
     return (
@@ -52,7 +61,7 @@ export default function ProfilePage() {
     );
   }
 
-  const userInitial = user.email ? user.email.charAt(0).toUpperCase() : '?';
+  const userInitial = userProfile.displayName ? userProfile.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : '?');
   const userRank = ranks.find(r => r.level === userProfile.rankLevel) || ranks[0];
 
   return (
