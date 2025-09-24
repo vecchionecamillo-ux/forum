@@ -193,6 +193,7 @@ export default function TesserePage() {
                                                 <MembershipCard
                                                     tierType={option.id}
                                                     level={option.tier.levels[0]}
+                                                    userName={option.tier.title}
                                                 />
                                             </CardSpotlight>
                                         </div>

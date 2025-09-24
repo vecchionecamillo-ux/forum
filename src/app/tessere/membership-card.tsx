@@ -49,7 +49,7 @@ export function MembershipCard({
   tierType,
   level,
   className,
-  userName = 'Nome Membro',
+  userName,
   userXP,
 }: MembershipCardProps) {
   const isSpecial = tierType !== 'user';
