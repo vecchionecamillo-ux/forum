@@ -8,7 +8,12 @@ import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], onSelectTier: (tier: MembershipTier) => void }) => {
+interface HorizontalCarouselProps {
+  tiers: MembershipTier[];
+  onSelectTier: (tier: MembershipTier) => void;
+}
+
+const HorizontalCarousel = ({ tiers, onSelectTier }: HorizontalCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'center' });
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [canScrollPrev, setCanScrollPrev] = useState(false);
@@ -73,27 +78,51 @@ const HorizontalCarousel = ({ tiers, onSelectTier }: { tiers: MembershipTier[], 
   );
 };
 
-const VerticalLevelList = ({ levels }: { levels: UserTierLevel[] }) => {
-  return (
-    <div className="w-full max-w-lg space-y-8">
-        {levels.map((level) => (
-            <div key={level.name}>
-                 <MembershipCard level={level} userXP={level.xpThreshold} />
-            </div>
-        ))}
-    </div>
-  )
+interface VerticalLevelListProps {
+    levels: UserTierLevel[];
+    onScroll: (index: number) => void;
 }
+
+const VerticalLevelList = ({ levels, onScroll }: VerticalLevelListProps) => {
+    const [emblaRef, emblaApi] = useEmblaCarousel({ axis: 'y', loop: false });
+
+    const onSelect = useCallback(() => {
+        if (!emblaApi) return;
+        onScroll(emblaApi.selectedScrollSnap());
+    }, [emblaApi, onScroll]);
+
+    useEffect(() => {
+        if (!emblaApi) return;
+        onSelect();
+        emblaApi.on('select', onSelect);
+        emblaApi.on('reInit', onSelect);
+    }, [emblaApi, onSelect]);
+
+    return (
+        <div className="w-full max-w-lg h-[400px] overflow-hidden" ref={emblaRef}>
+            <div className="flex flex-col h-full">
+                {levels.map((level) => (
+                    <div key={level.name} className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-4">
+                        <MembershipCard level={level} userXP={level.xpThreshold} />
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
 
 interface InteractiveCardsProps {
   tiers: MembershipTier[];
   selectedTier: MembershipTier | null;
   onSelectTier?: (tier: MembershipTier) => void;
+  onLevelScroll?: (index: number) => void;
 }
 
-export function InteractiveCards({ tiers, selectedTier, onSelectTier }: InteractiveCardsProps) {
+export function InteractiveCards({ tiers, selectedTier, onSelectTier, onLevelScroll }: InteractiveCardsProps) {
   if (selectedTier) {
-    return <VerticalLevelList levels={selectedTier.levels} />;
+    if(!onLevelScroll) return null;
+    return <VerticalLevelList levels={selectedTier.levels} onScroll={onLevelScroll} />;
   }
 
   if(!onSelectTier) return null;

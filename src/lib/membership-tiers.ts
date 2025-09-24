@@ -12,7 +12,6 @@ export interface MembershipTier {
   type: 'user' | 'partner' | 'sponsor' | 'ambassador';
   title: string;
   description: string;
-  benefits: string[];
   levels: UserTierLevel[];
 }
 
@@ -27,7 +26,6 @@ export const membershipTiers: MembershipTier[] = [
     type: 'user', // ESTATE: Delicatezza e Raffinatezza (palette fredda, pastello)
     title: 'Membro',
     description: 'Il punto di partenza per ogni membro della community. Accumula XP per salire di grado.',
-    benefits: [],
     levels: [
       {
         name: 'Membro',
@@ -37,8 +35,9 @@ export const membershipTiers: MembershipTier[] = [
         accentColor: 'text-gray-500/50',
         badgeColor: 'bg-gray-400',
         benefits: [
-          'Accesso base alla piattaforma e agli eventi gratuiti',
-          'Possibilità di guadagnare e spendere Punti Community',
+          'Accesso base alla piattaforma',
+          'Partecipazione agli eventi gratuiti della community',
+          'Guadagna e spendi Punti Community nel Marketplace',
         ],
       },
       {
@@ -51,7 +50,7 @@ export const membershipTiers: MembershipTier[] = [
         benefits: [
           'Tutti i vantaggi precedenti',
           'Sconto del 5% su tutti gli articoli del Marketplace',
-          'Accesso al giornalino digitale "Cantiere News"',
+          'Accesso al giornalino digitale mensile "Cantiere News"',
         ],
       },
       {
@@ -65,6 +64,7 @@ export const membershipTiers: MembershipTier[] = [
           'Tutti i vantaggi precedenti',
           'Sconto del 10% sul Marketplace',
           'Accesso anticipato alle iscrizioni per workshop e laboratori',
+          'Possibilità di proporre un\'attività per la community',
         ],
       },
       {
@@ -77,8 +77,8 @@ export const membershipTiers: MembershipTier[] = [
         benefits: [
           'Tutti i vantaggi precedenti',
           'Sconto del 15% sul Marketplace',
-          'Accesso a contenuti e canali esclusivi della community',
-          'Inviti a eventi speciali riservati',
+          'Accesso a canali esclusivi e contenuti premium',
+          'Inviti a eventi speciali riservati ai Pionieri',
         ],
       },
     ],
@@ -87,12 +87,6 @@ export const membershipTiers: MembershipTier[] = [
     type: 'partner', // INVERNO: Profondità e Contrasto (palette fredda, intensa)
     title: 'Partner',
     description: 'Riservata a istituzioni e aziende che co-progettano attivamente con noi.',
-    benefits: [
-        'Visibilità e co-branding su tutti i materiali del progetto condiviso',
-        'Accesso prioritario ai talenti della community per collaborazioni',
-        'Spazio dedicato sulla piattaforma per presentare la propria realtà',
-        'Partecipazione a tavoli di lavoro strategici sul futuro del Cantiere',
-    ],
     levels: [
       {
         name: 'Partner',
@@ -101,7 +95,10 @@ export const membershipTiers: MembershipTier[] = [
         textColor: 'text-[#FDFBF7]',
         accentColor: 'text-gray-400/70',
         badgeColor: 'bg-blue-600',
-        benefits: ['Visibilità standard nei progetti condivisi'],
+        benefits: [
+            'Visibilità e co-branding su tutti i materiali del progetto condiviso',
+            'Accesso prioritario ai talenti della community per collaborazioni',
+        ],
       },
       {
         name: 'Partner Premium',
@@ -110,7 +107,11 @@ export const membershipTiers: MembershipTier[] = [
         textColor: 'text-[#FDFBF7]',
         accentColor: 'text-blue-400/80',
         badgeColor: 'bg-blue-500',
-        benefits: ['Visibilità elevata', 'Co-progettazione di un evento annuale'],
+        benefits: [
+          'Tutti i vantaggi precedenti',
+          'Spazio dedicato sulla piattaforma per presentare la propria realtà',
+          'Co-progettazione di un evento annuale esclusivo',
+        ],
       },
        {
         name: 'Partner Master',
@@ -119,7 +120,11 @@ export const membershipTiers: MembershipTier[] = [
         textColor: 'text-[#FDFBF7]',
         accentColor: 'text-[#FF00FF]/80', // Dettaglio Magenta
         badgeColor: 'bg-fuchsia-500',
-        benefits: ['Massima visibilità', 'Partecipazione a tavoli strategici', 'Accesso a report di settore'],
+        benefits: [
+            'Tutti i vantaggi precedenti',
+            'Partecipazione a tavoli di lavoro strategici sul futuro del Cantiere',
+            'Accesso a report di settore e analisi dei trend creativi',
+        ],
       },
     ],
   },
@@ -127,12 +132,6 @@ export const membershipTiers: MembershipTier[] = [
     type: 'sponsor', // PALETTE BLU ZAFFIRO
     title: 'Sponsor',
     description: 'Per le aziende che sostengono la nostra missione culturale.',
-    benefits: [
-        'Massima visibilità del brand durante gli eventi principali',
-        'Pacchetti personalizzati di marketing e comunicazione',
-        'Report periodici sull\'impatto sociale e culturale generato',
-        'Accesso VIP a tutti gli eventi del Cantiere Culturale',
-    ],
     levels: [
       {
         name: 'Sponsor',
@@ -141,7 +140,10 @@ export const membershipTiers: MembershipTier[] = [
         textColor: 'text-[#FDFBF7]',
         accentColor: 'text-cyan-400/60',
         badgeColor: 'bg-blue-700',
-        benefits: ['Visibilità del brand negli eventi supportati'],
+        benefits: [
+            'Visibilità del brand durante gli eventi e le attività supportate',
+            'Posti riservati a tutti gli eventi pubblici',
+        ],
       },
       {
         name: 'Sponsor Premium',
@@ -150,7 +152,11 @@ export const membershipTiers: MembershipTier[] = [
         textColor: 'text-[#FDFBF7]',
         accentColor: 'text-cyan-300/80',
         badgeColor: 'bg-blue-600',
-        benefits: ['Pacchetto di comunicazione dedicato', 'Posti riservati agli eventi'],
+        benefits: [
+          'Tutti i vantaggi precedenti',
+          'Pacchetto di comunicazione dedicato sui nostri canali social',
+          'Report periodici sull\'impatto generato dal supporto',
+        ],
       },
        {
         name: 'Sponsor Master',
@@ -159,7 +165,11 @@ export const membershipTiers: MembershipTier[] = [
         textColor: 'text-[#FDFBF7]',
         accentColor: 'text-white/80',
         badgeColor: 'bg-cyan-500',
-        benefits: ['Main sponsor di un evento a scelta', 'Accesso VIP a tutte le attività'],
+        benefits: [
+            'Tutti i vantaggi precedenti',
+            'Main Sponsor di un format di eventi a scelta',
+            'Accesso VIP a tutte le attività e workshop del Cantiere Culturale',
+        ],
       },
     ],
   },
@@ -167,12 +177,6 @@ export const membershipTiers: MembershipTier[] = [
     type: 'ambassador', // PRIMAVERA: Luminosità e Vivacità (palette calda, brillante)
     title: 'Ambassador',
     description: 'La tessera più prestigiosa, per chi incarna e promuove i valori del Cantiere.',
-    benefits: [
-        'Status permanente, non richiede rinnovo annuale',
-        'Accesso illimitato a tutte le attività, workshop ed eventi',
-        'Crediti gratuiti per il Marketplace ogni anno',
-        'Ruolo di mentore e rappresentante ufficiale della community',
-    ],
     levels: [
       {
         name: 'Ambassador',
@@ -181,7 +185,13 @@ export const membershipTiers: MembershipTier[] = [
         textColor: 'text-[#36454F]',
         accentColor: 'text-green-500',
         badgeColor: 'bg-lime-400',
-        benefits: [],
+        benefits: [
+            'Status permanente, non richiede rinnovo annuale',
+            'Accesso illimitato e gratuito a tutte le attività, workshop ed eventi',
+            'Budget annuale di Punti Community da spendere liberamente',
+            'Ruolo di mentore ufficiale all\'interno della community',
+            'Posto d\'onore in tutti gli eventi del Cantiere Culturale',
+        ],
       },
     ],
   },
@@ -197,10 +207,4 @@ export function getUserTier(xp: number): UserTierLevel {
     }
   }
   return userTier.levels[0]; // Ritorna il livello base se nessuna soglia è raggiunta
-}
-
-// Funzione per ottenere il livello di un partner/sponsor
-export function getSpecialTierLevel(type: 'partner' | 'sponsor', level: number): UserTierLevel {
-    const tier = membershipTiers.find((t) => t.type === type) as SpecialTier;
-    return tier.levels[level] || tier.levels[0]; // Ritorna il livello richiesto o il base
 }

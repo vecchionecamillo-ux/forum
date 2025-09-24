@@ -1,23 +1,31 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { InteractiveCards } from './interactive-cards';
 import { membershipTiers, MembershipTier } from '@/lib/membership-tiers';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, CheckCircle2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { MembershipCard } from './membership-card';
+import { AnimatePresence, motion } from 'framer-motion';
 
 export default function TesserePage() {
   const [selectedTier, setSelectedTier] = useState<MembershipTier | null>(null);
+  const [currentLevelIndex, setCurrentLevelIndex] = useState(0);
 
   const handleSelectTier = (tier: MembershipTier) => {
     setSelectedTier(tier);
+    setCurrentLevelIndex(0); // Reset index when tier changes
   };
 
   const handleGoBack = () => {
     setSelectedTier(null);
   };
+  
+  const currentBenefits = useMemo(() => {
+      if (!selectedTier) return [];
+      return selectedTier.levels[currentLevelIndex]?.benefits || [];
+  }, [selectedTier, currentLevelIndex])
 
   const title = useMemo(() => {
     if (selectedTier) {
@@ -40,26 +48,36 @@ export default function TesserePage() {
     if (!selectedTier) return null;
 
     const benefitsView = (
-        <Card className="p-6 md:p-8 bg-card/80 flex-shrink-0">
-          <h3 className="text-2xl font-bold mb-4">Vantaggi Principali</h3>
-          <ul className="space-y-3">
-            {selectedTier.benefits.map(benefit => (
-              <li key={benefit} className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
-                <span className="text-foreground/90">{benefit}</span>
-              </li>
-            ))}
-          </ul>
+        <Card className="p-6 md:p-8 bg-card/80 flex-shrink-0 relative min-h-[200px] overflow-hidden">
+          <h3 className="text-2xl font-bold mb-4">Vantaggi del Grado</h3>
+           <AnimatePresence mode="wait">
+            <motion.ul
+                key={currentLevelIndex}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-3"
+            >
+                {currentBenefits.map(benefit => (
+                  <li key={benefit} className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <span className="text-foreground/90">{benefit}</span>
+                  </li>
+                ))}
+            </motion.ul>
+           </AnimatePresence>
         </Card>
     );
 
     // Any tier with more than one level gets the vertical scroll view.
     if (selectedTier.levels.length > 1) {
       return (
-         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in-50 duration-500 items-start">
+         <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in-50 duration-500 items-center">
             <InteractiveCards 
                 tiers={membershipTiers}
                 selectedTier={selectedTier}
+                onLevelScroll={setCurrentLevelIndex}
             />
             {benefitsView}
         </div>
@@ -70,11 +88,19 @@ export default function TesserePage() {
     return (
        <div className="w-full max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 animate-in fade-in-50 duration-500 items-start">
         <div className="space-y-4">
-           {selectedTier.levels.map(level => (
-            <MembershipCard key={level.name} level={level} userName={level.name} />
-          ))}
+           <MembershipCard level={selectedTier.levels[0]} userName={selectedTier.title} />
         </div>
-        {benefitsView}
+        <Card className="p-6 md:p-8 bg-card/80 flex-shrink-0">
+          <h3 className="text-2xl font-bold mb-4">Vantaggi Esclusivi</h3>
+          <ul className="space-y-3">
+            {selectedTier.levels[0].benefits.map(benefit => (
+              <li key={benefit} className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                <span className="text-foreground/90">{benefit}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
       </div>
     );
   }
