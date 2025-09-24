@@ -6,6 +6,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 
@@ -17,63 +18,60 @@ import {
   type SpecialTier,
   getUserTier
 } from '@/lib/membership-tiers';
-import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Users, Building, Handshake, Crown, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
-type Selection = 'user' | 'partner' | 'sponsor' | 'ambassador';
-
-const userTierData = membershipTiers.find(
-  (tier) => tier.type === 'user'
-) as UserTier;
-
-const specialTiersData = membershipTiers.filter(
-  (tier) => tier.type !== 'user'
-) as SpecialTier[];
+import { cn } from '@/lib/utils';
 
 
 const selectionOptions: {
-  id: Selection;
+  id: 'user' | 'partner' | 'sponsor' | 'ambassador';
   icon: React.ReactNode;
   title: string;
   description: string;
-}[] = [
-  {
-    id: 'user',
-    icon: <Users className="w-10 h-10 text-primary" />,
-    title: 'Tessera Membro',
-    description: 'Il tuo passaporto per la community. Accumula XP, sali di livello e sblocca vantaggi esclusivi.',
-  },
-  {
-    id: 'partner',
-    icon: <Handshake className="w-10 h-10 text-primary" />,
-    title: 'Tessera Partner',
-    description: 'Per le istituzioni che co-progettano attivamente con noi, creando valore condiviso.',
-  },
-  {
-    id: 'sponsor',
-    icon: <Building className="w-10 h-10 text-primary" />,
-    title: 'Tessera Sponsor',
-    description: 'Per le aziende visionarie che sostengono la nostra missione culturale e innovativa.',
-  },
-   {
-    id: 'ambassador',
-    icon: <Crown className="w-10 h-10 text-primary" />,
-    title: 'Tessera Ambassador',
-    description: 'Lo status più prestigioso, riservato a chi incarna e promuove i valori del Cantiere.',
-  },
-];
+  tier: MembershipTier;
+}[] = membershipTiers.map(tier => {
+  let icon;
+  switch (tier.type) {
+    case 'user': icon = <Users className="w-10 h-10 text-primary" />; break;
+    case 'partner': icon = <Handshake className="w-10 h-10 text-primary" />; break;
+    case 'sponsor': icon = <Building className="w-10 h-10 text-primary" />; break;
+    case 'ambassador': icon = <Crown className="w-10 h-10 text-primary" />; break;
+  }
+  return {
+    id: tier.type,
+    icon: icon,
+    title: tier.title,
+    description: tier.description,
+    tier: tier,
+  };
+});
 
 
 export default function TesserePage() {
-    const [selection, setSelection] = useState<Selection | null>(null);
+    const [selection, setSelection] = useState<MembershipTier | null>(null);
+    const [api, setApi] = useState<CarouselApi>()
+    const [current, setCurrent] = useState(0)
+    const [count, setCount] = useState(0)
+
+    useEffect(() => {
+        if (!api) return;
+        setCount(api.scrollSnapList().length);
+        setCurrent(api.selectedScrollSnap());
+        api.on("select", () => {
+            setCurrent(api.selectedScrollSnap());
+        });
+    }, [api]);
+
+    const handleSelect = (tier: MembershipTier) => {
+        setSelection(tier);
+    }
 
     const renderSelectionContent = () => {
         if (!selection) return null;
 
-        if (selection === 'user') {
+        if (selection.type === 'user') {
+            const userTier = selection as UserTier;
             return (
                 <div className="w-full">
                     <div className="text-center mb-16">
@@ -98,7 +96,7 @@ export default function TesserePage() {
                         className="w-full max-w-5xl mx-auto"
                     >
                         <CarouselContent className="-ml-4">
-                        {userTierData.levels.map((level, index) => (
+                        {userTier.levels.map((level, index) => (
                             <CarouselItem
                             key={index}
                             className="md:basis-1/2 lg:basis-1/3 pl-8"
@@ -123,9 +121,7 @@ export default function TesserePage() {
             )
         }
 
-        const selectedTier = specialTiersData.find(t => t.type === selection);
-        if (!selectedTier) return null;
-
+        const selectedTier = selection as SpecialTier;
         return (
              <div className="w-full max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 <CardSpotlight>
@@ -161,17 +157,17 @@ export default function TesserePage() {
     }
 
   return (
-    <div className="min-h-screen bg-background text-foreground pt-32 pb-24 px-4">
+    <div className="min-h-screen bg-background text-foreground pt-32 pb-24 px-4 overflow-x-hidden">
         <main className="container mx-auto">
-            <div className="text-center mb-12">
-            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-foreground">
-                Il Tuo Status nel Cantiere
-            </h1>
-            <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80">
-                {selection
-                ? `Scopri i dettagli della Tessera ${selection.charAt(0).toUpperCase() + selection.slice(1)}.`
-                : 'Ogni contributo, ogni partecipazione, ogni interazione ti fa crescere all\'interno della nostra community. Scegli il tuo percorso.'}
-            </p>
+            <div className="text-center mb-12 animate-in fade-in-50 duration-500">
+                <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-foreground">
+                    Il Tuo Status nel Cantiere
+                </h1>
+                <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80">
+                    {selection
+                    ? `Scopri i dettagli della Tessera ${selection.title}.`
+                    : 'Ogni contributo, ogni partecipazione, ogni interazione ti fa crescere all\'interno della nostra community. Scegli il tuo percorso.'}
+                </p>
             </div>
 
             <div className="max-w-6xl mx-auto">
@@ -184,20 +180,44 @@ export default function TesserePage() {
                         {renderSelectionContent()}
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate-in fade-in-50 duration-500">
-                        {selectionOptions.map((option) => (
-                            <Card 
-                            key={option.id}
-                            onClick={() => setSelection(option.id)}
-                            className="cursor-pointer hover:shadow-lg hover:-translate-y-2 transition-all duration-300 text-center flex flex-col items-center p-6 bg-card/50"
-                            >
-                            <div className="p-4 bg-primary/10 rounded-full mb-4">
-                                {option.icon}
-                            </div>
-                            <h3 className="text-2xl font-bold">{option.title}</h3>
-                            <p className="text-foreground/70 mt-2 flex-grow">{option.description}</p>
-                            </Card>
-                        ))}
+                    <div className="animate-in fade-in-50 duration-500">
+                        <Carousel setApi={setApi} className="w-full">
+                            <CarouselContent>
+                                {selectionOptions.map((option, index) => (
+                                    <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 flex justify-center">
+                                         <div 
+                                            className="w-[300px] cursor-pointer"
+                                            onClick={() => handleSelect(option.tier)}
+                                         >
+                                            <CardSpotlight className="w-full">
+                                                <MembershipCard
+                                                    tierType={option.id}
+                                                    level={option.tier.levels[0]}
+                                                />
+                                            </CardSpotlight>
+                                        </div>
+                                    </CarouselItem>
+                                ))}
+                            </CarouselContent>
+                            <CarouselPrevious />
+                            <CarouselNext />
+                        </Carousel>
+                        
+                        <div className="mt-12 text-center max-w-2xl mx-auto">
+                            {api && selectionOptions[current] && (
+                                <div className="animate-in fade-in-20 duration-300">
+                                    <h2 className="text-3xl md:text-4xl font-bold tracking-tight">
+                                        {selectionOptions[current].title}
+                                    </h2>
+                                    <p className="mt-4 text-lg text-foreground/80">
+                                        {selectionOptions[current].description}
+                                    </p>
+                                    <Button onClick={() => handleSelect(selectionOptions[current].tier)} className="mt-6">
+                                        Scopri di più
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 )}
             </div>
