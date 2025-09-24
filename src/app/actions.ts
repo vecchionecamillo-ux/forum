@@ -135,11 +135,16 @@ export async function registerUserForActivity(formData: FormData): Promise<{ suc
         if (!userDoc.exists()) throw new Error("Utente non trovato.");
         
         const currentPoints = userDoc.data().points || 0;
+        const currentXp = userDoc.data().xp || 0;
+
         if (currentPoints < itemPoints) {
           throw new Error("Punti insufficienti per riscattare questo premio.");
         }
         
-        transaction.update(userDocRef, { points: currentPoints - itemPoints });
+        transaction.update(userDocRef, { 
+            points: currentPoints - itemPoints,
+            xp: currentXp + itemXp
+        });
         
         const activityLogRef = collection(db, 'activityLog');
         transaction.set(doc(activityLogRef), {
@@ -150,7 +155,7 @@ export async function registerUserForActivity(formData: FormData): Promise<{ suc
           itemId,
           itemTitle,
           points: itemPoints,
-          xp: 0,
+          xp: itemXp,
           timestamp: serverTimestamp(),
           status: 'completed',
         });
@@ -160,7 +165,7 @@ export async function registerUserForActivity(formData: FormData): Promise<{ suc
       revalidatePath(`/profile/${userId}`);
       revalidatePath('/marketplace');
       
-      return { success: true, message: `Premio "${itemTitle}" riscattato con successo!` };
+      return { success: true, message: `Premio "${itemTitle}" riscattato con successo! Hai guadagnato ${itemXp} XP.` };
 
     } else { // Handle event registrations by creating a pending log
       const userDoc = await getDoc(userDocRef);

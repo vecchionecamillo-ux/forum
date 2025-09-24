@@ -185,6 +185,7 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       cta: 'Usa i tuoi Punti',
       category: 'Arte',
       points: 250,
+      xp: 300,
       link: '/news/opening-visioni-digitali',
       date: '2024-11-10',
     },
@@ -196,6 +197,7 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       cta: 'Riscatta Ora',
       category: 'Arte',
       points: 500,
+      xp: 400,
       link: '/news/stampa-riflessi-urbani',
     },
     {
@@ -206,6 +208,7 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       cta: 'Usa i tuoi Punti',
       category: 'Workshop',
       points: 800,
+      xp: 600,
       link: '/news/workshop-scultura-3d',
       date: '2024-11-20',
       durationDetail: 'Workshop Intensivo',
