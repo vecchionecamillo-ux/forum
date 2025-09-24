@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { wrap } from 'popmotion';
 import { membershipTiers, UserTierLevel } from '@/lib/membership-tiers';
 import { MembershipCard } from './membership-card';
+import { cn } from '@/lib/utils';
 
 const variants = {
   enter: (direction: number) => {
