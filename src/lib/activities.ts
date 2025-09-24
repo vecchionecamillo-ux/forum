@@ -78,6 +78,19 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     time: '18:00',
     duration: '1.5 ore'
   },
+   {
+    title: 'Plastic Free: Pulizia del Parco',
+    slug: 'plastic-free-parco',
+    category: 'Opportunità',
+    description: 'Unisciti a noi per un\'attività di volontariato ambientale. Raccoglieremo la plastica e puliremo il parco cittadino. Un piccolo gesto per un grande impatto.',
+    image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
+    cta: 'Partecipa',
+    link: '/news/plastic-free-parco',
+    points: 120,
+    date: '2024-10-02',
+    time: '09:00 - 13:00',
+    duration: '4 ore'
+  },
   // VECCHI EVENTI
   {
     title: 'Nuova Call per Volontari',

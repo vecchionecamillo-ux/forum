@@ -1,3 +1,5 @@
+'use client';
+
 import { allActivities } from '@/lib/activities';
 import { ActivityCard } from '@/components/activity-card';
 import { EventCalendar } from '@/components/event-calendar';

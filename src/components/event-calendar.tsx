@@ -5,7 +5,6 @@ import { addMonths, subMonths, format, startOfMonth, endOfMonth, startOfWeek, en
 import { it } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { Activity } from '@/lib/activities';
@@ -90,9 +89,9 @@ export function EventCalendar({ events }: EventCalendarProps) {
                       {format(day, 'd')}
                     </time>
                     {dayEvents && (
-                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1">
+                      <div className="absolute bottom-1 left-1.5 right-1.5 flex flex-col gap-1">
                         {dayEvents.slice(0, 3).map((event, i) => (
-                           <div key={i} className="w-2 h-2 rounded-full bg-primary"></div>
+                           <div key={i} className="w-full h-1.5 rounded-full bg-primary/80"></div>
                         ))}
                       </div>
                     )}
