@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2, Star } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 import { useTransition } from 'react';
@@ -49,6 +49,7 @@ export function ActivityCard({ item }: { item: Activity }) {
       formData.append('itemId', item.slug);
       formData.append('itemTitle', item.title);
       formData.append('itemPoints', (item.points || 0).toString());
+      formData.append('itemXp', (item.xp || 0).toString());
       formData.append('activityType', 'redemption');
 
       const result = await registerUserForActivity(formData);
@@ -85,17 +86,28 @@ export function ActivityCard({ item }: { item: Activity }) {
             data-ai-hint={item.image.imageHint}
           />
         )}
-        {item.points && item.points > 0 && (
-          <Badge
-            className={cn(
-              'absolute top-2 right-2 text-lg shadow-lg',
-              pointBadgeClass
+        <div className="absolute top-2 right-2 flex flex-col gap-2 items-end">
+            {item.points && item.points > 0 && (
+              <Badge
+                className={cn(
+                  'text-md shadow-lg',
+                  pointBadgeClass
+                )}
+              >
+                {item.type === 'earn' ? '+' : '-'}
+                {item.points} Punti
+              </Badge>
             )}
-          >
-            {item.type === 'earn' ? '+' : '-'}
-            {item.points} Punti
-          </Badge>
-        )}
+             {item.xp && item.xp > 0 && (
+              <Badge
+                className={cn(
+                  'text-md shadow-lg bg-blue-500 text-white'
+                )}
+              >
+               <Star className="w-3 h-3 mr-1"/> +{item.xp} XP
+              </Badge>
+            )}
+        </div>
       </div>
       <CardHeader>
         <Badge variant="secondary" className="w-fit mb-2">

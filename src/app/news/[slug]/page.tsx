@@ -16,7 +16,7 @@ import { cn } from '@/lib/utils';
 
 export default function NewsDetailPage({ params }: { params: { slug: string } }) {
   const item = allActivities.find((p) => p.slug === params.slug);
-  const { user } = useAuth();
+  const { user, userProfile } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -34,8 +34,7 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
       return;
     }
     
-    // For redemption, check points on client side to provide immediate feedback
-    if (item.type === 'spend' && (user.uid || 0) < (item.points || 0)) {
+    if (item.type === 'spend' && userProfile && userProfile.points < (item.points || 0)) {
         toast({ title: "Punti Insufficienti", description: "Non hai abbastanza punti per questo premio.", variant: 'destructive' });
         return;
     }
@@ -47,7 +46,8 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
       formData.append('itemTitle', item.title);
       formData.append('itemPoints', (item.points || 0).toString());
       formData.append('itemXp', (item.xp || 0).toString());
-      formData.append('activityType', item.type);
+      formData.append('activityType', item.type === 'spend' ? 'redemption' : 'event');
+
 
       const result = await registerUserForActivity(formData);
 
@@ -59,10 +59,15 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
     });
   }
 
-  const backLink = item.type === 'spend' ? '/marketplace' : `/${item.category.toLowerCase()}`;
-  if (item.category === 'Laboratorio' || item.category === 'Workshop') {
-    backLink === '/formazione'
+  let backLink = '/';
+  if (item.type === 'spend') {
+      backLink = '/marketplace';
+  } else if (item.category === 'Laboratorio' || item.category === 'Workshop') {
+      backLink = '/formazione';
+  } else {
+      backLink = '/eventi';
   }
+
 
   const pointClass = item.type === 'earn' ? 'text-green-500' : 'text-red-500';
   const pointPrefix = item.type === 'earn' ? '+' : '-';
@@ -124,6 +129,7 @@ export default function NewsDetailPage({ params }: { params: { slug: string } })
                   {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {item.cta}
                 </Button>
+                {!user && <p className="text-sm text-muted-foreground mt-2">Devi essere loggato per partecipare.</p>}
             </footer>
 
         </article>
