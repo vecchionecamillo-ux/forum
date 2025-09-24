@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Award, Shield, AtSign, Star, Gem } from 'lucide-react';
+import { Award, Shield, AtSign, Star, Gem, Infinity } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { getUserTier } from '@/lib/membership-tiers';
@@ -75,7 +75,9 @@ export default function ProfilePage() {
             <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
                     <p className="text-sm uppercase text-muted-foreground tracking-wider flex items-center justify-center gap-2"><Gem className="w-4 h-4" /> Punti Community</p>
-                    <p className="text-5xl font-black text-primary drop-shadow-lg">{userProfile.points}</p>
+                    <p className="text-5xl font-black text-primary drop-shadow-lg">
+                      {userTier.name === 'Ambassador' ? <Infinity className="inline-block h-12 w-12" /> : userProfile.points}
+                    </p>
                 </div>
                  <div>
                     <p className="text-sm uppercase text-muted-foreground tracking-wider flex items-center justify-center gap-2"><Star className="w-4 h-4" /> Punti Esperienza</p>

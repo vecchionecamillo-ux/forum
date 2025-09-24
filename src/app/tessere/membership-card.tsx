@@ -1,7 +1,7 @@
 'use client';
 import { cn } from '@/lib/utils';
 import { UserTierLevel } from '@/lib/membership-tiers';
-import { Layers } from 'lucide-react';
+import { Layers, Infinity } from 'lucide-react';
 import React from 'react';
 import { Progress } from '@/components/ui/progress';
 
@@ -30,7 +30,11 @@ export const MembershipCard = React.forwardRef<HTMLDivElement, MembershipCardPro
     const isSpecial =
       level.name === 'Partner' ||
       level.name === 'Sponsor' ||
-      level.name === 'Ambassador';
+      level.name === 'Ambassador' ||
+      level.name === 'Partner Premium' ||
+      level.name === 'Partner Master' ||
+      level.name === 'Sponsor Premium' ||
+      level.name === 'Sponsor Master';
       
     const progressPercentage = !isSpecial && nextLevelXP 
       ? Math.min(((userXP - level.xpThreshold) / (nextLevelXP - level.xpThreshold)) * 100, 100)
@@ -68,9 +72,15 @@ export const MembershipCard = React.forwardRef<HTMLDivElement, MembershipCardPro
 
         {/* Main Content */}
         <div className="z-10">
-          <div className={'font-bold text-lg tracking-wider uppercase opacity-70'}>
-            {level.name}
-          </div>
+           {level.name === 'Ambassador' ? (
+                <div className="font-bold text-5xl tracking-wider uppercase">
+                    <Infinity className="h-12 w-12" />
+                </div>
+            ) : (
+                 <div className={'font-bold text-lg tracking-wider uppercase opacity-70'}>
+                   {level.name}
+                 </div>
+            )}
            <div className={'text-2xl font-black tracking-tight'}>
             {userName || level.name}
           </div>
