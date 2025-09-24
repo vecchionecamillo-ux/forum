@@ -52,17 +52,17 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
   },
    // EVENTI
   {
-    title: 'Cineforum + Lab Pittura',
-    slug: 'cineforum-lab-pittura',
-    category: 'Eventi',
-    description: 'Una serata speciale in collaborazione con l\'associazione Cinemateque. Proiezione di un film d\'autore seguita da un laboratorio di pittura a tema.',
-    image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
-    cta: 'Prenota il tuo posto',
-    link: '/news/cineforum-lab-pittura',
-    points: 100,
-    date: '2024-10-05',
-    time: '20:00',
-    duration: '3 ore'
+    title: 'Plastic Free: Pulizia del Parco',
+    slug: 'plastic-free-parco',
+    category: 'Opportunità',
+    description: 'Unisciti a noi per un\'attività di volontariato ambientale. Raccoglieremo la plastica e puliremo il parco cittadino. Un piccolo gesto per un grande impatto.',
+    image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
+    cta: 'Partecipa',
+    link: '/news/plastic-free-parco',
+    points: 120,
+    date: '2024-10-02',
+    time: '09:00 - 13:00',
+    duration: '4 ore'
   },
   // COMMUNITY
   {
@@ -78,18 +78,18 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     time: '18:00',
     duration: '1.5 ore'
   },
-   {
-    title: 'Plastic Free: Pulizia del Parco',
-    slug: 'plastic-free-parco',
-    category: 'Opportunità',
-    description: 'Unisciti a noi per un\'attività di volontariato ambientale. Raccoglieremo la plastica e puliremo il parco cittadino. Un piccolo gesto per un grande impatto.',
-    image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
-    cta: 'Partecipa',
-    link: '/news/plastic-free-parco',
-    points: 120,
-    date: '2024-10-02',
-    time: '09:00 - 13:00',
-    duration: '4 ore'
+  {
+    title: 'Cineforum & Lab Pittura',
+    slug: 'cineforum-lab-pittura',
+    category: 'Community',
+    description: 'Una serata che unisce cinema e arte. In collaborazione con Cinemateque, un film d\'autore ispira un laboratorio di pittura a tema. Un evento per la community.',
+    image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
+    cta: 'Prenota il tuo posto',
+    link: '/news/cineforum-lab-pittura',
+    points: 100,
+    date: '2024-10-05',
+    time: '20:00',
+    duration: '3 ore'
   },
   // VECCHI EVENTI
   {
