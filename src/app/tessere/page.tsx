@@ -14,142 +14,194 @@ import {
   membershipTiers,
   type MembershipTier,
   type UserTier,
+  type SpecialTier,
+  getUserTier
 } from '@/lib/membership-tiers';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle, Users, Building, Handshake, Crown } from 'lucide-react';
+import { CheckCircle, Users, Building, Handshake, Crown, ArrowLeft } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-const specialTiers = membershipTiers.filter(
-  (tier) => tier.type !== 'user'
-) as MembershipTier[];
+type Selection = 'user' | 'partner' | 'sponsor' | 'ambassador';
 
-const userTiers = membershipTiers.find(
+const userTierData = membershipTiers.find(
   (tier) => tier.type === 'user'
 ) as UserTier;
 
-const tierIcons = {
-  user: <Users className="w-8 h-8 text-primary" />,
-  partner: <Handshake className="w-8 h-8 text-blue-500" />,
-  sponsor: <Building className="w-8 h-8 text-purple-500" />,
-  ambassador: <Crown className="w-8 h-8 text-amber-500" />,
-};
+const specialTiersData = membershipTiers.filter(
+  (tier) => tier.type !== 'user'
+) as SpecialTier[];
+
+
+const selectionOptions: {
+  id: Selection;
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}[] = [
+  {
+    id: 'user',
+    icon: <Users className="w-10 h-10 text-primary" />,
+    title: 'Tessera Membro',
+    description: 'Il tuo passaporto per la community. Accumula XP, sali di livello e sblocca vantaggi esclusivi.',
+  },
+  {
+    id: 'partner',
+    icon: <Handshake className="w-10 h-10 text-primary" />,
+    title: 'Tessera Partner',
+    description: 'Per le istituzioni che co-progettano attivamente con noi, creando valore condiviso.',
+  },
+  {
+    id: 'sponsor',
+    icon: <Building className="w-10 h-10 text-primary" />,
+    title: 'Tessera Sponsor',
+    description: 'Per le aziende visionarie che sostengono la nostra missione culturale e innovativa.',
+  },
+   {
+    id: 'ambassador',
+    icon: <Crown className="w-10 h-10 text-primary" />,
+    title: 'Tessera Ambassador',
+    description: 'Lo status più prestigioso, riservato a chi incarna e promuove i valori del Cantiere.',
+  },
+];
+
 
 export default function TesserePage() {
+    const [selection, setSelection] = useState<Selection | null>(null);
+
+    const renderSelectionContent = () => {
+        if (!selection) return null;
+
+        if (selection === 'user') {
+            return (
+                <div className="w-full">
+                    <div className="text-center mb-16">
+                        <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+                            Evolvi nella Community
+                        </h2>
+                        <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
+                            Accumula Punti Esperienza (XP) e sblocca nuovi gradi. Ogni livello ti dà accesso a ricompense, sconti e opportunità esclusive.
+                        </p>
+                    </div>
+                     <Carousel
+                        opts={{
+                        align: 'start',
+                        loop: true,
+                        }}
+                        plugins={[
+                        Autoplay({
+                            delay: 5000,
+                            stopOnInteraction: true,
+                        }),
+                        ]}
+                        className="w-full max-w-5xl mx-auto"
+                    >
+                        <CarouselContent className="-ml-4">
+                        {userTierData.levels.map((level, index) => (
+                            <CarouselItem
+                            key={index}
+                            className="md:basis-1/2 lg:basis-1/3 pl-8"
+                            >
+                            <div className="p-1 h-full">
+                                <CardSpotlight>
+                                <MembershipCard
+                                    tierType="user"
+                                    level={level}
+                                    className="h-full"
+                                    userXP={level.xpThreshold}
+                                />
+                                </CardSpotlight>
+                            </div>
+                            </CarouselItem>
+                        ))}
+                        </CarouselContent>
+                        <CarouselPrevious className="hidden xl:flex" />
+                        <CarouselNext className="hidden xl:flex" />
+                    </Carousel>
+                </div>
+            )
+        }
+
+        const selectedTier = specialTiersData.find(t => t.type === selection);
+        if (!selectedTier) return null;
+
+        return (
+             <div className="w-full max-w-4xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <CardSpotlight>
+                    <MembershipCard
+                        tierType={selectedTier.type}
+                        level={selectedTier.levels[0]}
+                        userName={selectedTier.title}
+                    />
+                </CardSpotlight>
+                <div>
+                     <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+                        {selectedTier.title}
+                    </h2>
+                    <p className="mt-4 text-lg text-foreground/80">
+                        {selectedTier.description}
+                    </p>
+                    <div className="mt-8">
+                        <h4 className="font-semibold mb-4 text-xl">
+                            Vantaggi Esclusivi
+                        </h4>
+                        <ul className="space-y-3">
+                            {selectedTier.benefits.map((benefit, i) => (
+                            <li key={i} className="flex items-start gap-3">
+                                <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
+                                <span className="text-foreground/90">{benefit}</span>
+                            </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
   return (
-    <div className="min-h-screen bg-background text-foreground overflow-hidden">
-      {/* Hero Section */}
-      <section className="relative text-center py-32 md:py-48 px-4 flex flex-col items-center justify-center">
-        <div className="absolute inset-0 bg-gradient-to-b from-background to-transparent z-0"></div>
-        <div className="relative z-10">
-          <Badge
-            variant="outline"
-            className="text-sm sm:text-base py-1 px-4 rounded-full border-primary/50 bg-primary/10 text-primary mb-6"
-          >
-            Il Tuo Status nel Cantiere
-          </Badge>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter leading-tight text-foreground">
-            La Tua Tessera. <br />
-            Il Tuo Viaggio.
-          </h1>
-          <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80">
-            Ogni contributo, ogni partecipazione, ogni interazione ti fa crescere
-            all'interno della nostra community. Scopri un ecosistema di
-            vantaggi pensato per premiare la tua passione.
-          </p>
-        </div>
-      </section>
-
-      {/* User Tiers Carousel Section */}
-      <section className="py-24 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Evolvi nella Community
-            </h2>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-              Accumula Punti Esperienza (XP) e sblocca nuovi gradi. Ogni
-              livello ti dà accesso a ricompense, sconti e opportunità
-              esclusive.
+    <div className="min-h-screen bg-background text-foreground pt-32 pb-24 px-4">
+        <main className="container mx-auto">
+            <div className="text-center mb-12">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-tight text-foreground">
+                Il Tuo Status nel Cantiere
+            </h1>
+            <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80">
+                {selection
+                ? `Scopri i dettagli della Tessera ${selection.charAt(0).toUpperCase() + selection.slice(1)}.`
+                : 'Ogni contributo, ogni partecipazione, ogni interazione ti fa crescere all\'interno della nostra community. Scegli il tuo percorso.'}
             </p>
-          </div>
-          <Carousel
-            opts={{
-              align: 'start',
-              loop: true,
-            }}
-            plugins={[
-              Autoplay({
-                delay: 5000,
-                stopOnInteraction: true,
-              }),
-            ]}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-4">
-              {userTiers.levels.map((level, index) => (
-                <CarouselItem
-                  key={index}
-                  className="md:basis-1/2 lg:basis-1/3 pl-4"
-                >
-                  <div className="p-1 h-full">
-                    <CardSpotlight>
-                      <MembershipCard
-                        tierType="user"
-                        level={level}
-                        className="h-full"
-                      />
-                    </CardSpotlight>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="hidden lg:flex" />
-            <CarouselNext className="hidden lg:flex" />
-          </Carousel>
-        </div>
-      </section>
+            </div>
 
-      {/* Special Tiers Section */}
-      <section className="py-24">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
-              Un Ruolo da Protagonista
-            </h2>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-foreground/80">
-              Il Cantiere Culturale cresce grazie ai suoi alleati strategici.
-              Scopri le tessere dedicate a chi contribuisce in modo speciale
-              alla nostra missione.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            {specialTiers.map((tier) => (
-              <div key={tier.type} className="flex flex-col">
-                <div className="p-4 bg-muted rounded-t-lg flex flex-col items-center text-center">
-                  <div className="mb-4">{tierIcons[tier.type]}</div>
-                  <h3 className="text-2xl font-bold">{tier.title}</h3>
-                  <p className="text-muted-foreground mt-1">
-                    {tier.description}
-                  </p>
-                </div>
-                <div className="bg-muted/40 rounded-b-lg p-6 flex-grow">
-                  <h4 className="font-semibold mb-4 text-center">
-                    Vantaggi Principali
-                  </h4>
-                  <ul className="space-y-3">
-                    {tier.benefits.map((benefit, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 shrink-0" />
-                        <span className="text-foreground/90">{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            <div className="max-w-6xl mx-auto">
+                {selection ? (
+                    <div className="animate-in fade-in-50 duration-500">
+                        <Button variant="ghost" onClick={() => setSelection(null)} className="mb-8">
+                            <ArrowLeft className="mr-2 h-4 w-4" />
+                            Torna alla selezione
+                        </Button>
+                        {renderSelectionContent()}
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 animate-in fade-in-50 duration-500">
+                        {selectionOptions.map((option) => (
+                            <Card 
+                            key={option.id}
+                            onClick={() => setSelection(option.id)}
+                            className="cursor-pointer hover:shadow-lg hover:-translate-y-2 transition-all duration-300 text-center flex flex-col items-center p-6 bg-card/50"
+                            >
+                            <div className="p-4 bg-primary/10 rounded-full mb-4">
+                                {option.icon}
+                            </div>
+                            <h3 className="text-2xl font-bold">{option.title}</h3>
+                            <p className="text-foreground/70 mt-2 flex-grow">{option.description}</p>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </main>
     </div>
   );
 }
