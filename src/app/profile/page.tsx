@@ -2,9 +2,7 @@
 
 import { useAuth, type UserProfile } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { db } from '@/lib/firebase';
-import { doc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Award, Shield, AtSign } from 'lucide-react';
@@ -20,9 +18,8 @@ const ranks = [
 ];
 
 export default function ProfilePage() {
-  const { user, isModerator, loading } = useAuth();
+  const { user, userProfile, isModerator, loading } = useAuth();
   const router = useRouter();
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -30,28 +27,6 @@ export default function ProfilePage() {
     }
   }, [user, loading, router]);
 
-  useEffect(() => {
-    let unsubscribe: Unsubscribe | undefined;
-
-    if (user && !loading) {
-      const userDocRef = doc(db, 'users', user.uid);
-      unsubscribe = onSnapshot(userDocRef, (doc) => {
-        if (doc.exists()) {
-          setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
-        } else {
-          console.log("No such document in Firestore for user:", user.uid);
-        }
-      }, (error) => {
-          console.error("Error fetching user profile:", error);
-      });
-    }
-    
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, [user, loading]);
 
   if (loading || !user || !userProfile) {
     return (

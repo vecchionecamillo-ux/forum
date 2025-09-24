@@ -12,10 +12,9 @@ import {
   signOut,
   type User,
   getRedirectResult,
-  type UserCredential
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, Unsubscribe } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com', 'vecchionecamillo1@gmail.com'];
@@ -36,6 +35,7 @@ export type UserProfile = {
 
 type AuthContextType = {
   user: User | null;
+  userProfile: UserProfile | null;
   loading: boolean;
   isModerator: boolean;
   logout: () => void;
@@ -43,6 +43,7 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
+  userProfile: null,
   loading: true,
   isModerator: false,
   logout: () => {},
@@ -72,11 +73,12 @@ const createOrUpdateUserInDb = async (user: User) => {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isModerator, setIsModerator] = useState(false);
   const router = useRouter();
   
-  useEffect(() => {
+ useEffect(() => {
     const processUser = async (user: User | null) => {
       if (user) {
         await createOrUpdateUserInDb(user);
@@ -86,31 +88,57 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setUser(null);
         setIsModerator(false);
+        setUserProfile(null); // Clear profile on logout
+        setLoading(false);
       }
-      setLoading(false);
     };
 
-    const unsubscribe = onAuthStateChanged(auth, processUser);
+    const unsubscribeAuth = onAuthStateChanged(auth, processUser);
 
-    // Also handle redirect result
     getRedirectResult(auth)
       .then((result) => {
         if (result) {
-           processUser(result.user);
-           router.push('/profile');
+          processUser(result.user);
+          router.push('/profile');
         }
       })
       .catch((error) => {
         console.error("Error getting redirect result: ", error);
       })
       .finally(() => {
-        // This ensures loading is false after either redirect check or auth state change.
-        // It might be redundant if onAuthStateChanged already set it, but it's safe.
         setLoading(false);
       });
-      
-    return () => unsubscribe();
+
+    return () => unsubscribeAuth();
   }, [router]);
+
+  useEffect(() => {
+    let unsubscribeProfile: Unsubscribe | undefined;
+
+    if (user && !loading) {
+      const userDocRef = doc(db, 'users', user.uid);
+      unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
+        if (doc.exists()) {
+          setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
+        } else {
+          console.log("No such document in Firestore for user:", user.uid);
+          setUserProfile(null);
+        }
+      }, (error) => {
+        console.error("Error fetching user profile:", error);
+        setUserProfile(null);
+      });
+    } else if (!user) {
+        setUserProfile(null);
+    }
+
+    return () => {
+      if (unsubscribeProfile) {
+        unsubscribeProfile();
+      }
+    };
+  }, [user, loading]);
+
 
   const logout = async () => {
     setLoading(true);
@@ -119,13 +147,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
-    } finally {
-      // onAuthStateChanged will handle setting user to null and loading to false
     }
+    // onAuthStateChanged will handle the state cleanup
   };
 
   const value = {
     user,
+    userProfile,
     loading,
     isModerator,
     logout,
