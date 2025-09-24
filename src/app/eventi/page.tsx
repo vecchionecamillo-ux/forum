@@ -11,7 +11,13 @@ import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, par
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 
-const allCategories = [...new Set(allActivities.map(item => item.category))];
+// Definiamo le categorie formative da escludere
+const formazioneCategories = ['Laboratorio', 'Workshop'];
+// Filtriamo una sola volta le attività pertinenti per questa pagina
+const eventItems = allActivities.filter(item => !formazioneCategories.includes(item.category));
+// Estraiamo dinamicamente le categorie disponibili dai soli eventi
+const allCategories = [...new Set(eventItems.map(item => item.category))];
+
 
 type Timeframe = 'all' | 'week' | 'month';
 type PointFilter = 'all' | 'earn' | 'spend' | 'free';
@@ -31,7 +37,7 @@ export default function EventiPage() {
       interval = { start: startOfMonth(now), end: endOfMonth(now) };
     }
 
-    return allActivities.filter(item => {
+    return eventItems.filter(item => {
       // Category Filter
       const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
       if (!matchesCategory) return false;
