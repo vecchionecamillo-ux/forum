@@ -9,30 +9,42 @@ import { Badge } from '@/components/ui/badge';
 export const newsItems = [
   {
     title: 'Nuova Call per Volontari',
+    slug: 'call-volontari',
     category: 'Opportunità',
     description: 'Stiamo cercando persone appassionate che vogliano contribuire alla crescita del Cantiere Culturale. Unisciti a noi e fai la differenza!',
     image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
     cta: 'Partecipa',
-    link: '#',
+    link: '/news/call-volontari',
     points: 150,
+    date: '30 Settembre 2024',
+    time: 'Tutto il giorno',
+    duration: 'Continuativo'
   },
   {
     title: 'Annuncio Workshop: "Creative Coding"',
+    slug: 'workshop-creative-coding',
     category: 'Formazione',
     description: 'Impara a creare arte con il codice nel nostro prossimo workshop intensivo. Prenota il tuo slot, i posti sono limitati!',
     image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
     cta: 'Prenota Ora',
-    link: '#',
+    link: '/news/workshop-creative-coding',
     points: 75,
+    date: '15 Ottobre 2024',
+    time: '18:00 - 20:00',
+    duration: '2 ore'
   },
   {
     title: 'Articolo: Il Futuro dell\'Arte è Digitale?',
+    slug: 'articolo-futuro-arte',
     category: 'Approfondimento',
     description: 'Un approfondimento del nostro curatore sul ruolo crescente della tecnologia nel mondo dell\'arte contemporanea. Leggi l\'articolo completo.',
     image: PlaceHolderImages.find(img => img.id === 'nft-placeholder'),
     cta: 'Leggi di più',
-    link: '#',
+    link: '/news/articolo-futuro-arte',
     points: 10,
+    date: '20 Settembre 2024',
+    time: 'N/A',
+    duration: '5 min di lettura'
   },
 ];
 

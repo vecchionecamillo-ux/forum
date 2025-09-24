@@ -11,6 +11,7 @@ import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { newsItems as allNewsItems } from '../page-sections/news-section';
+import Link from 'next/link';
 
 const earnPointsItems = allNewsItems.filter(item => item.points && item.points > 0);
 
@@ -22,6 +23,7 @@ const spendPointsItems = [
       cta: 'Usa i tuoi Punti',
       category: 'Eventi',
       points: 250,
+      link: '#'
     },
     {
       title: 'Stampa Fine Art in Edizione Limitata',
@@ -30,6 +32,7 @@ const spendPointsItems = [
       cta: 'Riscatta Ora',
       category: 'Arte',
       points: 500,
+      link: '#'
     },
     {
       title: 'Workshop di Scultura 3D con Artista Digitale',
@@ -38,6 +41,7 @@ const spendPointsItems = [
       cta: 'Usa i tuoi Punti',
       category: 'Formazione',
       points: 800,
+      link: '#'
     },
 ];
 
@@ -47,7 +51,7 @@ const allCategories = [...new Set(allItems.map(item => item.category))];
 const maxPoints = Math.max(...allItems.map(item => item.points || 0));
 
 export default function MarketplacePage() {
-    const [activeTab, setActiveTab] = useState<'earn' | 'spend'>('spend');
+    const [activeTab, setActiveTab] = useState<'spend' | 'earn'>('spend');
     const [pointRange, setPointRange] = useState<[number]>([maxPoints]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     
@@ -67,7 +71,7 @@ export default function MarketplacePage() {
         );
     };
 
-    const tabButtonStyle = (tabName: 'earn' | 'spend') => 
+    const tabButtonStyle = (tabName: 'spend' | 'earn') => 
         `flex-1 py-3 px-4 text-lg font-bold transition-all duration-300 rounded-t-lg focus:outline-none ${
             activeTab === tabName 
             ? 'bg-primary text-primary-foreground shadow-inner' 
@@ -156,10 +160,10 @@ export default function MarketplacePage() {
                                 </CardContent>
                                 <CardFooter>
                                     <Button asChild variant={item.type === 'earn' ? 'link' : 'default'} className={item.type === 'earn' ? 'text-primary p-0' : 'w-full'}>
-                                        <a href={(item as any).link || '#'}>
+                                        <Link href={item.link || '#'}>
                                             {item.cta}
                                             {item.type === 'earn' && <ArrowRight className="ml-2 h-4 w-4" />}
-                                        </a>
+                                        </Link>
 
                                     </Button>
                                 </CardFooter>
