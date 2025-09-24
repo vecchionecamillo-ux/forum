@@ -46,7 +46,7 @@ const HorizontalCarousel = ({ tiers, onSelectTier }: HorizontalCarouselProps) =>
   return (
     <div className="w-full relative">
       <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex -ml-4">
+        <div className="flex -ml-4 py-4">
           {tiers.map((tier, index) => (
             <div key={tier.type} className="pl-4 min-w-0 flex-[0_0_90%] md:flex-[0_0_50%] lg:flex-[0_0_40%]">
               <div
@@ -79,11 +79,11 @@ const HorizontalCarousel = ({ tiers, onSelectTier }: HorizontalCarouselProps) =>
 };
 
 interface VerticalLevelListProps {
-    levels: UserTierLevel[];
+    tier: MembershipTier;
     onScroll: (index: number) => void;
 }
 
-const VerticalLevelList = ({ levels, onScroll }: VerticalLevelListProps) => {
+const VerticalLevelList = ({ tier, onScroll }: VerticalLevelListProps) => {
     const [emblaRef, emblaApi] = useEmblaCarousel({ axis: 'y', loop: false });
     const [canScrollPrev, setCanScrollPrev] = useState(false);
     const [canScrollNext, setCanScrollNext] = useState(false);
@@ -113,9 +113,13 @@ const VerticalLevelList = ({ levels, onScroll }: VerticalLevelListProps) => {
             </Button>
             <div className="h-[400px] overflow-hidden" ref={emblaRef}>
                 <div className="flex flex-col h-full">
-                    {levels.map((level) => (
+                    {tier.levels.map((level, index) => (
                         <div key={level.name} className="flex-[0_0_100%] min-h-0 flex items-center justify-center p-4">
-                            <MembershipCard level={level} userXP={level.xpThreshold} />
+                            <MembershipCard 
+                                level={level} 
+                                userXP={level.xpThreshold} 
+                                nextLevelXP={tier.levels[index + 1]?.xpThreshold}
+                            />
                         </div>
                     ))}
                 </div>
@@ -138,7 +142,7 @@ interface InteractiveCardsProps {
 export function InteractiveCards({ tiers, selectedTier, onSelectTier, onLevelScroll }: InteractiveCardsProps) {
   if (selectedTier) {
     if(!onLevelScroll) return null;
-    return <VerticalLevelList levels={selectedTier.levels} onScroll={onLevelScroll} />;
+    return <VerticalLevelList tier={selectedTier} onScroll={onLevelScroll} />;
   }
 
   if(!onSelectTier) return null;
