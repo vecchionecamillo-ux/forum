@@ -69,6 +69,9 @@ export default function LoginPage() {
         case 'auth/invalid-credential':
              setError('Credenziali non valide. Controlla email e password.');
              break;
+        case 'auth/internal-error':
+            setError('Errore interno del server di autenticazione. Riprova più tardi.');
+            break;
         default:
           setError('Si è verificato un errore durante l\'accesso. Riprova.');
           break;
@@ -241,5 +244,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-    

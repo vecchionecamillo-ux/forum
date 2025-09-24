@@ -49,6 +49,31 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
+// Helper function to create user in Firestore
+const createOrUpdateUserInDb = async (user: User) => {
+  const { db } = getFirebaseInstances();
+  if (!user.email) {
+    console.warn("User object is missing email, skipping DB creation.");
+    return;
+  }
+  const userDocRef = doc(db, 'users', user.uid);
+  const userDoc = await getDoc(userDocRef);
+
+  if (!userDoc.exists()) {
+      const newUserProfile: Omit<UserProfile, 'uid'> = {
+          email: user.email!,
+          displayName: user.displayName || user.email!.split('@')[0],
+          photoURL: user.photoURL,
+          points: 0,
+          rankLevel: 1,
+          createdAt: serverTimestamp(),
+          history: [],
+      };
+      await setDoc(userDocRef, newUserProfile);
+  }
+};
+
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
@@ -56,50 +81,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isModerator, setIsModerator] = useState(false);
   const router = useRouter();
   
- useEffect(() => {
-    const { auth, db } = getFirebaseInstances();
+  useEffect(() => {
+    const { auth } = getFirebaseInstances();
 
-    const createOrUpdateUserInDb = async (user: User) => {
-      if (!user.email) {
-        console.warn("User object is missing email, skipping DB creation.");
-        return;
-      }
-      const userDocRef = doc(db, 'users', user.uid);
-      const userDoc = await getDoc(userDocRef);
-
-      if (!userDoc.exists()) {
-          const newUserProfile: Omit<UserProfile, 'uid'> = {
-              email: user.email!,
-              displayName: user.displayName || user.email!.split('@')[0],
-              photoURL: user.photoURL,
-              points: 0,
-              rankLevel: 1,
-              createdAt: serverTimestamp(),
-              history: [],
-          };
-          await setDoc(userDocRef, newUserProfile);
-      }
-    };
-
-    const processUser = async (user: User | null) => {
+    // Handle user state changes
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      setLoading(true);
       if (user) {
-        await createOrUpdateUserInDb(user);
         setUser(user);
-        const isDevModerator = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
-        setIsModerator(isDevModerator);
+        const isMod = user.email ? MODERATOR_EMAILS.includes(user.email) : false;
+        setIsModerator(isMod);
       } else {
         setUser(null);
-        setIsModerator(false);
         setUserProfile(null);
+        setIsModerator(false);
       }
       setLoading(false);
-    };
+    });
 
-    const unsubscribeAuth = onAuthStateChanged(auth, processUser);
-
+    // Handle redirect result from Google SignIn
     getRedirectResult(auth)
-      .then((result) => {
-        if (result) {
+      .then(async (result) => {
+        if (result && result.user) {
+          await createOrUpdateUserInDb(result.user);
           router.push('/profile');
         }
       })
@@ -110,18 +114,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribeAuth();
   }, [router]);
 
+
   useEffect(() => {
     if (!user) {
       setUserProfile(null);
       return;
     }
+
     const { db } = getFirebaseInstances();
     const userDocRef = doc(db, 'users', user.uid);
+
+    // Create user in DB if they don't exist (e.g., first email/password login)
+    createOrUpdateUserInDb(user);
+    
+    // Subscribe to user profile updates
     const unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
         setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
       } else {
-        console.log("No such document in Firestore for user:", user.uid);
+        console.log("No profile document in Firestore for user:", user.uid);
         setUserProfile(null);
       }
     }, (error) => {
@@ -141,6 +152,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -158,5 +171,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
-
-    
