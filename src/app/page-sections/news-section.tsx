@@ -6,7 +6,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ArrowRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
-const newsItems = [
+export const newsItems = [
   {
     title: 'Nuova Call per Volontari',
     category: 'Opportunità',
@@ -14,6 +14,7 @@ const newsItems = [
     image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
     cta: 'Partecipa',
     link: '#',
+    points: 150,
   },
   {
     title: 'Annuncio Workshop: "Creative Coding"',
@@ -22,6 +23,7 @@ const newsItems = [
     image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
     cta: 'Prenota Ora',
     link: '#',
+    points: 75,
   },
   {
     title: 'Articolo: Il Futuro dell\'Arte è Digitale?',
@@ -30,6 +32,7 @@ const newsItems = [
     image: PlaceHolderImages.find(img => img.id === 'nft-placeholder'),
     cta: 'Leggi di più',
     link: '#',
+    points: 10,
   },
 ];
 
@@ -52,6 +55,9 @@ export function NewsSection() {
                     {item.image && (
                     <Image src={item.image.imageUrl} alt={item.description} width={600} height={400} className="w-full h-full object-cover" data-ai-hint={item.image.imageHint} />
                     )}
+                     {item.points && item.points > 0 && (
+                        <Badge className="absolute top-2 right-2 text-md bg-primary text-primary-foreground shadow-lg">+{item.points} Punti</Badge>
+                     )}
                 </div>
                 <CardHeader>
                     <Badge variant="secondary" className="w-fit mb-2">{item.category}</Badge>
