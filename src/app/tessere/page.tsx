@@ -186,7 +186,7 @@ export default function TesserePage() {
                                 {selectionOptions.map((option, index) => (
                                     <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 xl:basis-1/4 flex justify-center">
                                          <div 
-                                            className="w-[300px] cursor-pointer"
+                                            className="w-[300px]"
                                             onClick={() => handleSelect(option.tier)}
                                          >
                                             <CardSpotlight className="w-full">
