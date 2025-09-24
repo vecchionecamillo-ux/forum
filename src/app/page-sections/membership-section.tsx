@@ -54,8 +54,8 @@ export function MembershipSection() {
         </div>
         <div className="mt-20 text-center">
              <Button asChild size="lg">
-                <Link href="/tessera">
-                    Scopri di più e Richiedi la Tessera <ArrowRight className="ml-2 h-4 w-4" />
+                <Link href="/tessere">
+                    Scopri tutte le Tessere <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
              </Button>
         </div>

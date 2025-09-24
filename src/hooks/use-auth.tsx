@@ -25,6 +25,7 @@ export type UserProfile = {
   displayName: string | null;
   photoURL: string | null;
   points: number;
+  xp: number; // Experience Points
   rankLevel: number;
   createdAt: any;
   country?: string;
@@ -64,7 +65,8 @@ const createOrUpdateUserInDb = async (db: Firestore, user: User) => {
           displayName: user.displayName || user.email!.split('@')[0],
           photoURL: user.photoURL,
           points: 0,
-          rankLevel: 1,
+          xp: 0,
+          rankLevel: 1, // Obsoleto, ma lo teniamo per compatibilità iniziale
           createdAt: serverTimestamp(),
           history: [],
       };

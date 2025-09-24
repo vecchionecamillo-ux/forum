@@ -5,17 +5,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Award, Shield, AtSign } from 'lucide-react';
+import { Award, Shield, AtSign, Star, Gem } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-
-const ranks = [
-  { level: 1, name: 'Visitatore', color: 'bg-gray-400' },
-  { level: 2, name: 'Membro', color: 'bg-blue-500' },
-  { level: 3, name: 'Partecipante Attivo', color: 'bg-green-500' },
-  { level: 4, name: 'Creatore', color: 'bg-purple-500' },
-  { level: 5, name: 'Ambasciatore', color: 'bg-yellow-500 text-black' },
-];
+import { membershipTiers, getUserTier } from '@/lib/membership-tiers';
 
 export default function ProfilePage() {
   const { user, userProfile, isModerator, loading } = useAuth();
@@ -46,7 +39,7 @@ export default function ProfilePage() {
 
 
   const userInitial = userProfile.displayName ? userProfile.displayName.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : '?');
-  const userRank = ranks.find(r => r.level === userProfile.rankLevel) || ranks[0];
+  const userTier = getUserTier(userProfile.xp || 0);
 
   return (
     <div className="min-h-screen p-4 pt-24 sm:p-6 lg:p-8">
@@ -68,7 +61,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
                 <div className="flex flex-row sm:flex-col items-start sm:items-end gap-2">
-                     <Badge variant="secondary" className={`${userRank.color} text-white shadow-lg`}>{userRank.name}</Badge>
+                     <Badge variant="secondary" className={`${userTier.color} ${userTier.textColor || 'text-white'} shadow-lg`}>{userTier.name}</Badge>
                       {isModerator && (
                         <Badge variant="destructive" className="flex items-center gap-1 shadow-lg">
                             <Shield className="h-3 w-3" />
@@ -79,9 +72,15 @@ export default function ProfilePage() {
             </div>
           </CardHeader>
           <CardContent className="p-6 space-y-8">
-            <div className="text-center">
-                <p className="text-sm uppercase text-muted-foreground tracking-wider">Punti Community</p>
-                <p className="text-6xl font-black text-primary drop-shadow-lg">{userProfile.points}</p>
+            <div className="grid grid-cols-2 gap-4 text-center">
+                <div>
+                    <p className="text-sm uppercase text-muted-foreground tracking-wider flex items-center justify-center gap-2"><Gem className="w-4 h-4" /> Punti Community</p>
+                    <p className="text-5xl font-black text-primary drop-shadow-lg">{userProfile.points}</p>
+                </div>
+                 <div>
+                    <p className="text-sm uppercase text-muted-foreground tracking-wider flex items-center justify-center gap-2"><Star className="w-4 h-4" /> Punti Esperienza</p>
+                    <p className="text-5xl font-black text-foreground/80 drop-shadow-lg">{userProfile.xp || 0}</p>
+                </div>
             </div>
             
             <div>
