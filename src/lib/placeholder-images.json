@@ -1,4 +1,3 @@
-
 {
   "placeholderImages": [
     {
@@ -9,9 +8,15 @@
     },
     {
       "id": "art-placeholder",
-      "description": "Giovani che ammirano opere d'arte in una galleria moderna e luminosa.",
-      "imageUrl": "https://images.unsplash.com/photo-1531988042231-f39a6cc12a3b?q=80&w=600&h=400&auto=format&fit=crop",
-      "imageHint": "art gallery"
+      "description": "Una persona che scatta una foto con una macchina fotografica vintage.",
+      "imageUrl": "https://images.unsplash.com/photo-1495745966610-2a647d415658?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "vintage camera"
+    },
+    {
+      "id": "art-gallery-placeholder",
+      "description": "Una persona che dipinge su una tela in uno studio luminoso.",
+      "imageUrl": "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "person painting"
     },
     {
       "id": "training-placeholder",

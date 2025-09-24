@@ -3,19 +3,82 @@ import { PlaceHolderImages, type ImagePlaceholder } from '@/lib/placeholder-imag
 export type Activity = {
   title: string;
   slug: string;
-  category: string;
+  category: 'Formazione' | 'Eventi' | 'Community' | 'Approfondimento' | 'Opportunità' | 'Arte';
   description: string;
   image?: ImagePlaceholder;
   cta: string;
   link?: string;
   points?: number;
-  date?: string;
+  date?: string; // Formato YYYY-MM-DD per facilitare l'ordinamento e il parsing
   time?: string;
   duration?: string;
   type: 'earn' | 'spend';
 };
 
 const earnPointsItems: Omit<Activity, 'type'>[] = [
+  // FORMAZIONE
+  {
+    title: 'Laboratorio di Fotografia',
+    slug: 'lab-fotografia',
+    category: 'Formazione',
+    description: 'Un laboratorio permanente per imparare le basi della fotografia, dalla composizione alla post-produzione. Adatto a tutti i livelli.',
+    image: PlaceHolderImages.find(img => img.id === 'art-placeholder'),
+    cta: 'Scopri di più',
+    link: '/news/lab-fotografia',
+    points: 80,
+    duration: 'Permanente'
+  },
+  {
+    title: 'Laboratorio Giovani Idee',
+    slug: 'lab-giovani-idee',
+    category: 'Formazione',
+    description: 'Uno spazio creativo per giovani menti. Trasforma le tue idee in progetti concreti con il supporto di mentor esperti.',
+    image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
+    cta: 'Partecipa',
+    link: '/news/lab-giovani-idee',
+    points: 80,
+    duration: 'Permanente'
+  },
+  {
+    title: 'Laboratorio di Pittura',
+    slug: 'lab-pittura',
+    category: 'Formazione',
+    description: 'Esplora la tua creatività con tele e pennelli. Un corso continuo per affinare la tua tecnica pittorica.',
+    image: PlaceHolderImages.find(img => img.id === 'art-gallery-placeholder'),
+    cta: 'Iscriviti',
+    link: '/news/lab-pittura',
+    points: 80,
+    duration: 'Permanente'
+  },
+   // EVENTI
+  {
+    title: 'Cineforum + Lab Pittura',
+    slug: 'cineforum-lab-pittura',
+    category: 'Eventi',
+    description: 'Una serata speciale in collaborazione con l\'associazione Cinemateque. Proiezione di un film d\'autore seguita da un laboratorio di pittura a tema.',
+    image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
+    cta: 'Prenota il tuo posto',
+    link: '/news/cineforum-lab-pittura',
+    points: 100,
+    date: '2024-10-05',
+    time: '20:00',
+    duration: '3 ore'
+  },
+  // COMMUNITY
+  {
+    title: 'Incontro con la Psicologa: "Stare Insieme"',
+    slug: 'incontro-psicologa-stare-insieme',
+    category: 'Community',
+    description: 'Un incontro di gruppo per esplorare le dinamiche relazionali e il benessere psicologico in un ambiente sicuro e accogliente.',
+    image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
+    cta: 'Partecipa all\'incontro',
+    link: '/news/incontro-psicologa-stare-insieme',
+    points: 50,
+    date: '2024-10-12',
+    time: '18:00',
+    duration: '1.5 ore'
+  },
+  // VECCHI EVENTI
   {
     title: 'Nuova Call per Volontari',
     slug: 'call-volontari',
@@ -25,7 +88,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Partecipa',
     link: '/news/call-volontari',
     points: 150,
-    date: '30 Settembre 2024',
+    date: '2024-09-30',
     time: 'Tutto il giorno',
     duration: 'Continuativo'
   },
@@ -38,7 +101,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Prenota Ora',
     link: '/news/workshop-creative-coding',
     points: 75,
-    date: '15 Ottobre 2024',
+    date: '2024-10-15',
     time: '18:00 - 20:00',
     duration: '2 ore'
   },
@@ -51,7 +114,7 @@ const earnPointsItems: Omit<Activity, 'type'>[] = [
     cta: 'Leggi di più',
     link: '/news/articolo-futuro-arte',
     points: 10,
-    date: '20 Settembre 2024',
+    date: '2024-09-20',
     time: 'N/A',
     duration: '5 min di lettura'
   },
@@ -66,7 +129,8 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       cta: 'Usa i tuoi Punti',
       category: 'Eventi',
       points: 250,
-      link: '#'
+      link: '/news/opening-visioni-digitali',
+      date: '2024-11-10',
     },
     {
       title: 'Stampa Fine Art in Edizione Limitata',
@@ -76,7 +140,7 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       cta: 'Riscatta Ora',
       category: 'Arte',
       points: 500,
-      link: '#'
+      link: '/news/stampa-riflessi-urbani',
     },
     {
       title: 'Workshop di Scultura 3D con Artista Digitale',
@@ -86,7 +150,8 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
       cta: 'Usa i tuoi Punti',
       category: 'Formazione',
       points: 800,
-      link: '#'
+      link: '/news/workshop-scultura-3d',
+      date: '2024-11-20',
     },
 ];
 
@@ -94,4 +159,11 @@ const spendPointsItems: Omit<Activity, 'type'>[] = [
 export const allActivities: Activity[] = [
     ...earnPointsItems.map(item => ({...item, type: 'earn' as const})), 
     ...spendPointsItems.map(item => ({...item, type: 'spend' as const}))
-];
+].sort((a, b) => {
+    if (a.date && b.date) {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+    }
+    if (a.date) return -1;
+    if (b.date) return 1;
+    return 0;
+});
