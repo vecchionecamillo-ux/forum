@@ -15,7 +15,7 @@ import {
   type UserCredential
 } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, serverTimestamp, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
 const MODERATOR_EMAILS = ['moderator@example.com', 'admin@example.com', 'vecchionecamillo1@gmail.com'];
@@ -92,22 +92,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const unsubscribe = onAuthStateChanged(auth, processUser);
 
+    // Also handle redirect result
     getRedirectResult(auth)
-      .then((result: UserCredential | null) => {
+      .then((result) => {
         if (result) {
-          // The user has just signed in via redirect.
-          // onAuthStateChanged will handle the user object.
-          // We can add any redirect-specific logic here if needed.
-          router.push('/profile'); 
+           processUser(result.user);
+           router.push('/profile');
         }
-        // If result is null, it means we are not coming from a redirect.
-        // onAuthStateChanged will still do its job for persisted sessions.
       })
       .catch((error) => {
         console.error("Error getting redirect result: ", error);
       })
       .finally(() => {
         // This ensures loading is false after either redirect check or auth state change.
+        // It might be redundant if onAuthStateChanged already set it, but it's safe.
         setLoading(false);
       });
       
