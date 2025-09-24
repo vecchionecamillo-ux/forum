@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, PenSquare, LogOut, User, Shield } from 'lucide-react';
+import { Menu, Bot, LogOut, User, Shield } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
@@ -54,9 +54,9 @@ export function Header() {
   const authButtonsDesktop = (
     <div className="hidden md:flex items-center gap-2">
       <Button asChild variant="outline" size="sm">
-        <Link href="/style-guide">
-            <PenSquare className="mr-2 h-4 w-4" />
-            Style Guide AI
+        <Link href="/ai-assistant">
+            <Bot className="mr-2 h-4 w-4" />
+            Assistente AI
         </Link>
       </Button>
       {user ? (
@@ -85,9 +85,9 @@ export function Header() {
   const authButtonsMobile = (
      <div className="mt-4 pt-4 border-t flex flex-col gap-4">
         <Button asChild variant="default" className="w-full">
-            <Link href="/style-guide" onClick={handleLinkClick}>
-            <PenSquare className="mr-2 h-4 w-4" />
-            Style Guide AI
+            <Link href="/ai-assistant" onClick={handleLinkClick}>
+            <Bot className="mr-2 h-4 w-4" />
+            Assistente AI
             </Link>
         </Button>
         {user ? (
