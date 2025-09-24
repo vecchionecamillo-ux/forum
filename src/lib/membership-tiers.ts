@@ -20,15 +20,15 @@ export type UserTier = MembershipTier & { type: 'user' };
 export const membershipTiers: MembershipTier[] = [
   {
     type: 'user',
-    title: 'Tessera Utente',
-    description: 'La tessera per ogni membro della community.',
+    title: 'Tessera Membro',
+    description: 'Il punto di partenza per ogni membro della community. Accumula XP per salire di grado.',
     benefits: [],
     levels: [
       {
         name: 'Membro',
         xpThreshold: 0,
-        gradient: 'from-gray-500 to-gray-700',
-        color: 'bg-gray-500',
+        gradient: 'from-orange-800/70 to-amber-900/70', // Bronze
+        color: 'bg-amber-700',
         benefits: [
           'Accesso base alla piattaforma e agli eventi gratuiti',
           'Possibilità di guadagnare e spendere Punti Community',
@@ -37,8 +37,8 @@ export const membershipTiers: MembershipTier[] = [
       {
         name: 'Partecipante Attivo',
         xpThreshold: 500,
-        gradient: 'from-blue-500 to-blue-700',
-        color: 'bg-blue-500',
+        gradient: 'from-sky-600 to-indigo-700', // Sapphire/Silver
+        color: 'bg-sky-500',
         benefits: [
           'Tutti i vantaggi precedenti',
           'Sconto del 5% su tutti gli articoli del Marketplace',
@@ -48,7 +48,7 @@ export const membershipTiers: MembershipTier[] = [
       {
         name: 'Creatore',
         xpThreshold: 1500,
-        gradient: 'from-purple-500 to-purple-700',
+        gradient: 'from-purple-600 to-violet-700', // Amethyst
         color: 'bg-purple-500',
         benefits: [
           'Tutti i vantaggi precedenti',
@@ -59,9 +59,9 @@ export const membershipTiers: MembershipTier[] = [
       {
         name: 'Pioniere',
         xpThreshold: 4000,
-        gradient: 'from-amber-400 to-orange-500',
-        color: 'bg-amber-500',
+        gradient: 'from-yellow-400 to-amber-500', // Gold
         textColor: 'text-black',
+        color: 'bg-yellow-500',
         benefits: [
           'Tutti i vantaggi precedenti',
           'Sconto del 15% sul Marketplace',
@@ -86,8 +86,8 @@ export const membershipTiers: MembershipTier[] = [
       {
         name: 'Partner',
         xpThreshold: 0,
-        gradient: 'from-sky-500 to-indigo-500',
-        color: 'bg-sky-500',
+        gradient: 'from-cyan-500 to-blue-600',
+        color: 'bg-cyan-500',
         benefits: [],
       },
     ],
@@ -106,8 +106,8 @@ export const membershipTiers: MembershipTier[] = [
       {
         name: 'Sponsor',
         xpThreshold: 0,
-        gradient: 'from-slate-800 to-gray-900',
-        color: 'bg-slate-800',
+        gradient: 'from-slate-400 to-slate-900', // Platinum
+        color: 'bg-slate-700',
         benefits: [],
       },
     ],
@@ -127,9 +127,9 @@ export const membershipTiers: MembershipTier[] = [
       {
         name: 'Ambassador',
         xpThreshold: 0,
-        gradient: 'from-yellow-400 via-red-500 to-pink-500',
-        textColor: 'text-black',
-        color: 'bg-yellow-400',
+        gradient: 'from-pink-500 via-red-500 to-yellow-500', // Aurora/Iridescent
+        textColor: 'text-white',
+        color: 'bg-pink-500',
         benefits: [],
       },
     ],
