@@ -25,7 +25,7 @@ export type SpecialTier = MembershipTier & { type: 'partner' | 'sponsor' | 'amba
 export const membershipTiers: MembershipTier[] = [
   {
     type: 'user', // ESTATE: Delicatezza e Raffinatezza (palette fredda, pastello)
-    title: 'Tessera Membro',
+    title: 'Membro',
     description: 'Il punto di partenza per ogni membro della community. Accumula XP per salire di grado.',
     benefits: [],
     levels: [
@@ -85,7 +85,7 @@ export const membershipTiers: MembershipTier[] = [
   },
   {
     type: 'partner', // INVERNO: Profondità e Contrasto (palette fredda, intensa)
-    title: 'Tessera Partner',
+    title: 'Partner',
     description: 'Riservata a istituzioni e aziende che co-progettano attivamente con noi.',
     benefits: [
         'Visibilità e co-branding su tutti i materiali del progetto condiviso',
@@ -99,33 +99,33 @@ export const membershipTiers: MembershipTier[] = [
         xpThreshold: 0,
         backgroundColor: 'bg-[#000033]', // Blu Notte
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-blue-400/70',
+        accentColor: 'text-gray-400/70',
         badgeColor: 'bg-blue-600',
-        benefits: [],
+        benefits: ['Visibilità standard nei progetti condivisi'],
       },
       {
         name: 'Partner Premium',
         xpThreshold: 1,
         backgroundColor: 'bg-[#000033]',
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-blue-300',
+        accentColor: 'text-blue-400/80',
         badgeColor: 'bg-blue-500',
-        benefits: [],
+        benefits: ['Visibilità elevata', 'Co-progettazione di un evento annuale'],
       },
        {
         name: 'Partner Master',
         xpThreshold: 2,
         backgroundColor: 'bg-[#000033]',
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-magenta-400', // Dettaglio Magenta
-        badgeColor: 'bg-magenta-500',
-        benefits: [],
+        accentColor: 'text-[#FF00FF]/80', // Dettaglio Magenta
+        badgeColor: 'bg-fuchsia-500',
+        benefits: ['Massima visibilità', 'Partecipazione a tavoli strategici', 'Accesso a report di settore'],
       },
     ],
   },
   {
-    type: 'sponsor', // NUOVA PALETTE BLU
-    title: 'Tessera Sponsor',
+    type: 'sponsor', // PALETTE BLU ZAFFIRO
+    title: 'Sponsor',
     description: 'Per le aziende che sostengono la nostra missione culturale.',
     benefits: [
         'Massima visibilità del brand durante gli eventi principali',
@@ -139,33 +139,33 @@ export const membershipTiers: MembershipTier[] = [
         xpThreshold: 0,
         backgroundColor: 'bg-[#0F5298]', // Blu Zaffiro
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-cyan-400/80',
+        accentColor: 'text-cyan-400/60',
         badgeColor: 'bg-blue-700',
-        benefits: [],
+        benefits: ['Visibilità del brand negli eventi supportati'],
       },
       {
         name: 'Sponsor Premium',
         xpThreshold: 1,
         backgroundColor: 'bg-[#0F5298]',
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-cyan-300',
+        accentColor: 'text-cyan-300/80',
         badgeColor: 'bg-blue-600',
-        benefits: [],
+        benefits: ['Pacchetto di comunicazione dedicato', 'Posti riservati agli eventi'],
       },
        {
         name: 'Sponsor Master',
         xpThreshold: 2,
         backgroundColor: 'bg-[#0F5298]',
         textColor: 'text-[#FDFBF7]',
-        accentColor: 'text-white',
+        accentColor: 'text-white/80',
         badgeColor: 'bg-cyan-500',
-        benefits: [],
+        benefits: ['Main sponsor di un evento a scelta', 'Accesso VIP a tutte le attività'],
       },
     ],
   },
   {
     type: 'ambassador', // PRIMAVERA: Luminosità e Vivacità (palette calda, brillante)
-    title: 'Tessera Ambassador',
+    title: 'Ambassador',
     description: 'La tessera più prestigiosa, per chi incarna e promuove i valori del Cantiere.',
     benefits: [
         'Status permanente, non richiede rinnovo annuale',
