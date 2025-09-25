@@ -33,18 +33,6 @@ function getFirebaseInstances(): FirebaseInstances {
           localCache: persistentLocalCache(/* settings */),
         });
         
-        enableIndexedDbPersistence(db).catch((err) => {
-            if (err.code == 'failed-precondition') {
-                console.warn(
-                    'Firestore: Multiple tabs open, persistence can only be enabled in one tab at a time.'
-                );
-            } else if (err.code == 'unimplemented') {
-                console.warn(
-                    'Firestore: The current browser does not support all of the features required to enable persistence.'
-                );
-            }
-        });
-
         const database = getDatabase(app);
         instances = { app, auth, db, database };
     }
