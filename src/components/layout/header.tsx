@@ -14,6 +14,7 @@ const navLinks = [
   { href: '/tessere', label: 'Tessere' },
   { href: '/eventi', label: 'Eventi & Community' },
   { href: '/formazione', label: 'Formazione' },
+  { href: '/elearning', label: 'E-learning' },
   { href: '/marketplace', label: 'Marketplace' },
   { href: '/collabora', label: 'Collabora' },
 ];
