@@ -19,30 +19,19 @@ type FirebaseInstances = {
     database: Database;
 };
 
+// This variable will hold the single initialized instance.
 let instances: FirebaseInstances | null = null;
 
 function getFirebaseInstances(): FirebaseInstances {
-    if (typeof window !== 'undefined') {
-        if (!instances) {
-            const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-            const database = getDatabase(app);
-            instances = { app, auth, db, database };
-        }
-        return instances;
+    if (!instances) {
+        // Initialize the app only if it hasn't been initialized yet.
+        const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const database = getDatabase(app);
+        instances = { app, auth, db, database };
     }
-    // This function should not be called on the server.
-    // Server-side initialization is handled in `actions.ts`.
-    // We return a proxy that will throw an error if accessed on the server.
-    return new Proxy({}, {
-        get(target, prop) {
-            if (typeof window === 'undefined') {
-                throw new Error(`Firebase client SDK (${String(prop)}) cannot be accessed on the server.`);
-            }
-            return Reflect.get(target, prop);
-        }
-    }) as FirebaseInstances;
+    return instances;
 }
 
 // We will export a function to get instances instead of instances directly

@@ -2,29 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction, type Firestore } from 'firebase/firestore';
-import { initializeApp, getApps, getApp } from 'firebase/app';
+import { getFirebaseInstances } from '@/lib/firebase';
 
 
 // This is a temporary solution to initialize Firebase Admin on the server.
 // In a real application, you would use the Firebase Admin SDK with a service account.
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-function getDb(): Firestore {
-    if (getApps().length === 0) {
-        initializeApp(firebaseConfig);
-    }
-    return getFirestore(getApp());
-}
-
-const db = getDb();
-// Do not export 'db' directly from a 'use server' file.
+const { db } = getFirebaseInstances();
 
 
 export async function addPoints(formData: FormData): Promise<{ success: boolean; message: string }> {
