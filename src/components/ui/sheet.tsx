@@ -57,23 +57,18 @@ const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
   SheetContentProps
 >(({ side = "right", className, children, ...props }, ref) => {
-  const titleId = React.useId();
-  const descriptionId = React.useId();
-  
   return (
   <SheetPortal>
     <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ side }), className)}
-      aria-labelledby={titleId}
-      aria-describedby={descriptionId}
       {...props}
     >
-      <SheetPrimitive.Title id={titleId} className="sr-only">
+      <SheetPrimitive.Title className="sr-only">
         Menu
       </SheetPrimitive.Title>
-      <SheetPrimitive.Description id={descriptionId} className="sr-only">
+      <SheetPrimitive.Description className="sr-only">
         A panel with navigation links and user actions.
       </SheetPrimitive.Description>
       {children}
