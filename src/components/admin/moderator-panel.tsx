@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
-import { MoreHorizontal, Search } from 'lucide-react';
+import { MoreHorizontal, Search, Loader2, AlertCircle } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -24,9 +24,95 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { UserProfile } from '@/hooks/use-auth';
-import { collection, onSnapshot, type Firestore } from 'firebase/firestore';
+import { collection, onSnapshot, type Firestore, doc, getDoc } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
 import { getUserTier } from '@/lib/membership-tiers';
+import { Label } from '../ui/label';
+import { Alert, AlertDescription } from '../ui/alert';
+
+
+function UserTokenChecker() {
+    const [userId, setUserId] = useState('');
+    const [tokens, setTokens] = useState<number | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleLoadData = async () => {
+        if (!userId) {
+        setError('Per favore, inserisci un ID utente.');
+        return;
+        }
+        setLoading(true);
+        setError(null);
+        setTokens(null);
+
+        try {
+        const { db } = getFirebaseInstances();
+        const userDocRef = doc(db, 'users', userId);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setTokens(userData.points || 0);
+        } else {
+            setError('Nessun utente trovato con questo ID.');
+        }
+        } catch (e) {
+        console.error('Error fetching user data:', e);
+        setError("Si è verificato un errore durante il caricamento dei dati. Controlla l'ID e riprova.");
+        } finally {
+        setLoading(false);
+        }
+    };
+    
+    return (
+        <Card className="mb-6">
+            <CardHeader>
+                <CardTitle>Controlla Punti Utente</CardTitle>
+                 <CardDescription>
+                    Inserisci l'ID di un utente per visualizzare il suo saldo di punti.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                 <div className="space-y-2">
+                    <Label htmlFor="userId">ID Utente</Label>
+                    <Input
+                    id="userId"
+                    type="text"
+                    placeholder="Inserisci l'ID utente qui..."
+                    value={userId}
+                    onChange={(e) => setUserId(e.target.value)}
+                    disabled={loading}
+                    />
+                </div>
+                <Button onClick={handleLoadData} className="w-full sm:w-auto" disabled={loading}>
+                    {loading ? (
+                    <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Caricamento...
+                    </>
+                    ) : (
+                    'Carica Punti'
+                    )}
+                </Button>
+
+                {error && (
+                    <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                )}
+
+                {tokens !== null && (
+                    <div className="pt-4">
+                    <Label className="text-md text-muted-foreground">Punti dell'utente:</Label>
+                    <p className="text-3xl font-bold text-primary">{tokens}</p>
+                    </div>
+                )}
+            </CardContent>
+        </Card>
+    )
+}
 
 
 function UserTableRow({ user, onAction, isPending }: { user: UserProfile, onAction: (formData: FormData, actionType: 'addPoints') => void, isPending: boolean }) {
@@ -166,30 +252,33 @@ export function ModeratorPanel() {
   };
 
   return (
-    <Card>
-        <CardHeader>
-            <CardTitle>Dashboard Tessere Utente</CardTitle>
-            <CardDescription>Visualizza, filtra e gestisci i membri della community.</CardDescription>
-            <div className="relative mt-4">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Filtra per nome o email..."
-                className="w-full pl-8"
-                value={filter}
-                onChange={(e) => setFilter(e.target.value)}
-              />
-            </div>
-        </CardHeader>
-      <CardContent>
-        {isPending ? (
-            <div className="text-center text-muted-foreground py-8">Aggiornamento in corso...</div>
-        ) : filteredUsers.length > 0 ? (
-          <UserTable users={filteredUsers} onAction={handleAction} isPending={isPending} />
-        ) : (
-          <div className="text-center text-muted-foreground py-8">Nessun utente trovato.</div>
-        )}
-      </CardContent>
-    </Card>
+    <div className="space-y-8">
+        <UserTokenChecker />
+        <Card>
+            <CardHeader>
+                <CardTitle>Dashboard Tessere Utente</CardTitle>
+                <CardDescription>Visualizza, filtra e gestisci i membri della community.</CardDescription>
+                <div className="relative mt-4">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                    type="search"
+                    placeholder="Filtra per nome o email..."
+                    className="w-full pl-8"
+                    value={filter}
+                    onChange={(e) => setFilter(e.target.value)}
+                />
+                </div>
+            </CardHeader>
+        <CardContent>
+            {isPending ? (
+                <div className="text-center text-muted-foreground py-8">Aggiornamento in corso...</div>
+            ) : filteredUsers.length > 0 ? (
+            <UserTable users={filteredUsers} onAction={handleAction} isPending={isPending} />
+            ) : (
+            <div className="text-center text-muted-foreground py-8">Nessun utente trovato.</div>
+            )}
+        </CardContent>
+        </Card>
+    </div>
   );
 }
