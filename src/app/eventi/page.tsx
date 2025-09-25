@@ -3,9 +3,8 @@
 import { ActivityCard } from '@/components/activity-card';
 import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, Calendar, Layers, Palette, Users } from 'lucide-react';
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
@@ -13,9 +12,21 @@ import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FilterCard } from '@/components/filter-card';
+import { cn } from '@/lib/utils';
 
 type Timeframe = 'all' | 'week' | 'month';
 type PointFilter = 'all' | 'earn' | 'spend' | 'free';
+
+const categoryIcons: Record<string, React.ElementType> = {
+  'Mostra': Palette,
+  'Talk': Users,
+  'Community': Users,
+  'Evento': Calendar,
+  'Arte': Palette,
+  // Aggiungi altre icone per categoria qui
+  default: Layers,
+};
 
 export default function EventiPage() {
   const [eventItems, setEventItems] = useState<Activity[]>([]);
@@ -23,23 +34,24 @@ export default function EventiPage() {
   const [allCategories, setAllCategories] = useState<string[]>([]);
 
   const [timeframe, setTimeframe] = useState<Timeframe>('all');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [pointFilter, setPointFilter] = useState<PointFilter>('all');
+  
+  const formationCategories = ['Laboratorio', 'Workshop', 'Formazione'];
+
 
   useEffect(() => {
     const { db } = getFirebaseInstances();
-    // Query for all activities
     const q = query(collection(db, 'activities'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const allItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
       
-      // Filter for event items on the client
-      const items = allItems.filter(item => !['Laboratorio', 'Workshop'].includes(item.category));
+      const items = allItems.filter(item => !formationCategories.includes(item.category));
       setEventItems(items);
 
-      // Dynamically generate categories from fetched data
-      setAllCategories([...new Set(items.map(item => item.category))]);
+      const uniqueCategories = [...new Set(items.map(item => item.category))];
+      setAllCategories(uniqueCategories);
       setLoading(false);
     }, (error) => {
       console.error("Error fetching event items:", error);
@@ -60,11 +72,9 @@ export default function EventiPage() {
     }
 
     return eventItems.filter(item => {
-      // Category Filter
-      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
+      const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
       if (!matchesCategory) return false;
 
-      // Timeframe Filter
       const matchesTimeframe = () => {
         if (timeframe === 'all' || !item.date) return true;
         if (interval) {
@@ -76,7 +86,6 @@ export default function EventiPage() {
       }
       if (!matchesTimeframe()) return false;
 
-      // Points Filter
       const matchesPoints = () => {
         switch (pointFilter) {
           case 'earn':
@@ -94,23 +103,16 @@ export default function EventiPage() {
 
       return true;
     });
-  }, [timeframe, selectedCategories, pointFilter, eventItems]);
+  }, [timeframe, selectedCategory, pointFilter, eventItems]);
 
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories(prev => 
-        prev.includes(category) 
-            ? prev.filter(c => c !== category)
-            : [...prev, category]
-    );
-  };
 
   const timeframeButtonStyle = (frame: Timeframe) =>
-    `transition-colors duration-200 ${
+    cn(
+      "transition-colors duration-200",
       timeframe === frame
         ? 'bg-primary text-primary-foreground'
         : 'bg-muted hover:bg-muted/80'
-    }`;
-
+    );
 
   return (
     <div className="min-h-screen bg-background pt-24 pb-12">
@@ -122,12 +124,40 @@ export default function EventiPage() {
           </p>
         </div>
 
-        {/* Interactive Filter Section */}
         <Card className="mb-12">
             <CardHeader>
                 <CardTitle className="flex items-center gap-2"><SlidersHorizontal /> Filtra Eventi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+                 <div>
+                    <h4 className="font-semibold text-lg mb-4 text-center md:text-left">Categorie</h4>
+                    {loading ? (
+                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                           {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 w-full" />)}
+                        </div>
+                    ) : (
+                    <RadioGroup value={selectedCategory} onValueChange={setSelectedCategory} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
+                       <FilterCard 
+                          value="all" 
+                          label="Tutti" 
+                          icon={Layers} 
+                          selectedValue={selectedCategory} 
+                          onSelect={setSelectedCategory} 
+                        />
+                        {allCategories.map(cat => {
+                           const Icon = categoryIcons[cat] || categoryIcons.default;
+                           return <FilterCard 
+                                    key={cat} 
+                                    value={cat} 
+                                    label={cat} 
+                                    icon={Icon} 
+                                    selectedValue={selectedCategory} 
+                                    onSelect={setSelectedCategory} 
+                                  />
+                        })}
+                    </RadioGroup>
+                    )}
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <h4 className="font-semibold mb-3">Quando?</h4>
@@ -158,29 +188,6 @@ export default function EventiPage() {
                             </div>
                         </RadioGroup>
                     </div>
-                </div>
-                 <div>
-                    <h4 className="font-semibold mb-3">Cosa ti interessa?</h4>
-                    {loading ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                           {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                            {allCategories.map(category => (
-                                <div key={category} className="flex items-center space-x-2 p-2 rounded-md bg-muted/50">
-                                    <Checkbox 
-                                        id={`cat-${category}`}
-                                        onCheckedChange={() => handleCategoryChange(category)}
-                                        checked={selectedCategories.includes(category)}
-                                    />
-                                    <label htmlFor={`cat-${category}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1">
-                                        {category}
-                                    </label>
-                                </div>
-                            ))}
-                        </div>
-                    )}
                 </div>
             </CardContent>
         </Card>

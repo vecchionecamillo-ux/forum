@@ -3,23 +3,45 @@
 import { ActivityCard } from '@/components/activity-card';
 import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
-import { SlidersHorizontal, Layers, FlaskConical, Zap, Clock } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { SlidersHorizontal, Layers, FlaskConical, Zap, Clock, Code, Paintbrush, Landmark, BrainCircuit, Lightbulb, Library } from 'lucide-react';
 import { collection, onSnapshot, query } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FilterCard } from '@/components/filter-card';
+
 
 type DurationFilter = 'all' | 'intensive' | 'long-term';
+
+const mainCategoryIcons: Record<string, React.ElementType> = {
+    'Informatica e Programmazione': Code,
+    'Arte e Design': Paintbrush,
+    'Economia e Finanza': Landmark,
+    'Scienze Umane': BrainCircuit,
+    'Scienza e Matematica': FlaskConical,
+    'Sviluppo Personale e Professionale': Lightbulb,
+    'Piattaforme Trasversali': Library,
+    default: Layers,
+};
+
+const courseTypeIcons: Record<string, React.ElementType> = {
+    'Laboratorio': FlaskConical,
+    'Workshop': Zap,
+    'Formazione': Layers,
+    default: Layers,
+}
+
 
 export function CourseCatalogue() {
   const [allActivities, setAllActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
-  const [allCategories, setAllCategories] = useState<string[]>([]);
   
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [courseTypes, setCourseTypes] = useState<string[]>([]);
+  const [mainCategories, setMainCategories] = useState<string[]>([]);
+
+  const [courseTypeFilter, setCourseTypeFilter] = useState<string>('all');
+  const [mainCategoryFilter, setMainCategoryFilter] = useState<string>('all');
   const [durationFilter, setDurationFilter] = useState<DurationFilter>('all');
 
   const formationCategories = ['Laboratorio', 'Workshop', 'Formazione'];
@@ -29,12 +51,15 @@ export function CourseCatalogue() {
     const q = query(collection(db, 'activities'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
-      setAllActivities(items);
+      const allItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+      const formationItems = allItems.filter(item => formationCategories.includes(item.category as any));
+      setAllActivities(formationItems);
+      
+      const uniqueCourseTypes = [...new Set(formationItems.map(item => item.category))];
+      setCourseTypes(uniqueCourseTypes);
 
-      // Dynamically generate categories only from formation-related items
-      const formationItems = items.filter(item => formationCategories.includes(item.category as any));
-      setAllCategories([...new Set(formationItems.map(item => item.category))]);
+      const uniqueMainCategories = [...new Set(formationItems.map(item => item.mainCategory).filter(Boolean) as string[])];
+      setMainCategories(uniqueMainCategories);
       
       setLoading(false);
     }, (error) => {
@@ -46,58 +71,30 @@ export function CourseCatalogue() {
   }, []);
 
   const filteredItems = useMemo(() => {
-    return allActivities
-    .filter(item => formationCategories.includes(item.category as any)) // First, get only formation items
-    .filter(item => {
-      // Category Filter
-      const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
-      if (!matchesCategory) return false;
-
-      // Duration Filter
+    return allActivities.filter(item => {
+      const matchesCourseType = courseTypeFilter === 'all' || item.category === courseTypeFilter;
+      const matchesMainCategory = mainCategoryFilter === 'all' || item.mainCategory === mainCategoryFilter;
+      
       const matchesDuration = () => {
         if (durationFilter === 'all') return true;
         if (durationFilter === 'intensive') return item.durationDetail === 'Workshop Intensivo';
         if (durationFilter === 'long-term') return item.durationDetail === 'Lungo Termine';
         return true;
       };
-      if (!matchesDuration()) return false;
-      
-      return true;
-    });
-  }, [categoryFilter, durationFilter, allActivities]);
-  
-  const getIconForCategory = (category: string) => {
-    switch(category) {
-        case 'Laboratorio': return FlaskConical;
-        case 'Workshop': return Zap;
-        case 'Formazione': return Layers;
-        default: return Layers;
-    }
-  }
 
-  const FilterCard = ({ value, label, icon: Icon, group, selectedValue, onSelect }: { value: string, label:string, icon:React.ElementType, group:string, selectedValue: string, onSelect: (value: any) => void }) => {
-    const isSelected = selectedValue === value;
-    return (
-        <Label htmlFor={`${group}-${value}`} className={cn(
-            "flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200",
-            isSelected ? "border-primary bg-primary/5 text-primary" : "border-border bg-card hover:bg-accent/50 hover:border-accent"
-        )}>
-            <RadioGroupItem value={value} id={`${group}-${value}`} className="sr-only" />
-            <Icon className={cn("w-8 h-8 mb-2", isSelected ? "text-primary" : "text-muted-foreground")} />
-            <span className="text-sm font-semibold text-center">{label}</span>
-        </Label>
-    );
-  };
+      return matchesCourseType && matchesMainCategory && matchesDuration();
+    });
+  }, [courseTypeFilter, mainCategoryFilter, durationFilter, allActivities]);
 
 
   return (
     <div className="space-y-12">
-        {/* Filter Section */}
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2"><SlidersHorizontal /> Filtra Corsi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
+                {/* Filter by Course Type */}
                 <div>
                     <h4 className="font-semibold text-lg mb-4 text-center md:text-left">Tipo di Corso</h4>
                     {loading ? (
@@ -105,27 +102,58 @@ export function CourseCatalogue() {
                            {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 w-full" />)}
                         </div>
                     ) : (
-                    <RadioGroup value={categoryFilter} onValueChange={(value: string) => setCategoryFilter(value)} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <FilterCard value="all" label="Tutti" icon={Layers} group="category" selectedValue={categoryFilter} onSelect={setCategoryFilter} />
-                        {allCategories.map(cat => {
-                           const Icon = getIconForCategory(cat);
-                           return <FilterCard key={cat} value={cat} label={cat} icon={Icon} group="category" selectedValue={categoryFilter} onSelect={setCategoryFilter} />
-                        })}
+                    <RadioGroup value={courseTypeFilter} onValueChange={setCourseTypeFilter} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <FilterCard value="all" label="Tutti" icon={Layers} selectedValue={courseTypeFilter} onSelect={setCourseTypeFilter} />
+                        {courseTypes.map(cat => (
+                          <FilterCard 
+                            key={cat} 
+                            value={cat} 
+                            label={cat} 
+                            icon={courseTypeIcons[cat] || courseTypeIcons.default} 
+                            selectedValue={courseTypeFilter} 
+                            onSelect={setCourseTypeFilter} 
+                          />
+                        ))}
                     </RadioGroup>
                     )}
                 </div>
+
+                {/* Filter by Main Category */}
+                <div>
+                    <h4 className="font-semibold text-lg mb-4 text-center md:text-left">Materie Principali</h4>
+                     {loading ? (
+                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                           {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 w-full" />)}
+                        </div>
+                    ) : (
+                    <RadioGroup value={mainCategoryFilter} onValueChange={setMainCategoryFilter} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        <FilterCard value="all" label="Tutte" icon={Layers} selectedValue={mainCategoryFilter} onSelect={setMainCategoryFilter} />
+                        {mainCategories.map(cat => (
+                          <FilterCard 
+                            key={cat} 
+                            value={cat} 
+                            label={cat} 
+                            icon={mainCategoryIcons[cat] || mainCategoryIcons.default} 
+                            selectedValue={mainCategoryFilter} 
+                            onSelect={setMainCategoryFilter} 
+                          />
+                        ))}
+                    </RadioGroup>
+                    )}
+                </div>
+
+                {/* Filter by Duration */}
                 <div>
                     <h4 className="font-semibold text-lg mb-4 text-center md:text-left">Durata</h4>
                      <RadioGroup value={durationFilter} onValueChange={(value: DurationFilter) => setDurationFilter(value)} className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <FilterCard value="all" label="Tutte" icon={Clock} group="duration" selectedValue={durationFilter} onSelect={setDurationFilter} />
-                        <FilterCard value="intensive" label="Intensivi (1 giorno)" icon={Clock} group="duration" selectedValue={durationFilter} onSelect={setDurationFilter} />
-                        <FilterCard value="long-term" label="Lungo Termine (+ giorni)" icon={Clock} group="duration" selectedValue={durationFilter} onSelect={setDurationFilter} />
+                        <FilterCard value="all" label="Tutte" icon={Clock} selectedValue={durationFilter} onSelect={setDurationFilter} />
+                        <FilterCard value="intensive" label="Intensivi" icon={Zap} selectedValue={durationFilter} onSelect={setDurationFilter} />
+                        <FilterCard value="long-term" label="Lungo Termine" icon={Layers} selectedValue={durationFilter} onSelect={setDurationFilter} />
                     </RadioGroup>
                 </div>
             </CardContent>
         </Card>
 
-        {/* Results Section */}
         <div>
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">

@@ -8,7 +8,8 @@ export type Activity = {
   id?: string; // ID del documento Firestore
   title: string;
   slug: string;
-  category: 'Laboratorio' | 'Workshop' | 'Arte' | 'Community' | 'Mostra' | 'Talk' | 'Premio' | 'Formazione';
+  category: 'Laboratorio' | 'Workshop' | 'Arte' | 'Community' | 'Mostra' | 'Talk' | 'Premio' | 'Formazione' | 'Evento';
+  mainCategory?: 'Informatica e Programmazione' | 'Arte e Design' | 'Economia e Finanza' | 'Scienze Umane' | 'Scienza e Matematica' | 'Sviluppo Personale e Professionale' | 'Piattaforme Trasversali';
   description: string;
   image?: ImagePlaceholder;
   cta: string;
@@ -18,7 +19,7 @@ export type Activity = {
   date?: string; // Formato YYYY-MM-DD per facilitare l'ordinamento e il parsing
   time?: string;
   duration?: string;
-  durationDetail?: 'Permanente' | 'Workshop Intensivo' | '4 settimane, 2h/sett';
+  durationDetail?: 'Permanente' | 'Workshop Intensivo' | '4 settimane, 2h/sett' | 'Lungo Termine';
   type: 'earn' | 'spend';
 };
 
