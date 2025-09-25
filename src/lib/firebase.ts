@@ -1,6 +1,6 @@
 import { initializeApp, getApp, getApps, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getFirestore, type Firestore, memoryLocalCache, initializeFirestore } from 'firebase/firestore';
 import { getDatabase, type Database } from 'firebase/database';
 
 const firebaseConfig: FirebaseOptions = {
@@ -27,7 +27,10 @@ function getFirebaseInstances(): FirebaseInstances {
         // Initialize the app only if it hasn't been initialized yet.
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
-        const db = getFirestore(app);
+        // Use memory persistence to avoid IndexedDB errors in some browser environments
+        const db = initializeFirestore(app, {
+          localCache: memoryLocalCache(),
+        });
         const database = getDatabase(app);
         instances = { app, auth, db, database };
     }
