@@ -7,6 +7,16 @@ import { getFirebaseInstances } from './firebase';
 import { PlaceHolderImages } from './placeholder-images';
 import { Activity } from './activities';
 
+const partnerLogos = [
+  { id: '1', name: 'Partner 1', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner1', websiteUrl: '#' },
+  { id: '2', name: 'Partner 2', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner2', websiteUrl: '#' },
+  { id: '3', name: 'Partner 3', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner3', websiteUrl: '#' },
+  { id: '4', name: 'Partner 4', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner4', websiteUrl: '#' },
+  { id: '5', name: 'Partner 5', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner5', websiteUrl: '#' },
+  { id: '6', name: 'Partner 6', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner6', websiteUrl: '#' },
+  { id: '7', name: 'Partner 7', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner7', websiteUrl: '#' },
+  { id: '8', name: 'Partner 8', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner8', websiteUrl: '#' },
+];
 
 const allActivities: Activity[] = [
     // --- FEATURED ITEMS FOR HOMEPAGE ---
@@ -342,7 +352,7 @@ const allActivities: Activity[] = [
         description: 'Piattaforma in partnership con università di prestigio e giganti del settore come Google e IBM. Molti corsi possono essere visionati gratuitamente, ma per ottenere un certificato professionale è spesso richiesto un pagamento.',
         examples: ['Corsi brevi (MOOC) e lauree online.', 'Certificati professionali in Data Science, AI e altro.', 'Corsi da Yale, Harvard, Università Bocconi.'],
         link: 'https://www.coursera.org',
-        durationDetail: 'Long-term',
+        durationDetail: 'Lungo Termine',
         cta: 'Visita la piattaforma',
         type: 'earn',
         image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
@@ -357,7 +367,7 @@ const allActivities: Activity[] = [
         description: 'Co-fondata da Harvard e MIT, offre un\'offerta formativa di altissima qualità accademica. Ideale per chi cerca certificazioni riconosciute a livello internazionale.',
         examples: ['Corsi in matematica, scienze umane e tecnologia.', 'Programmi MicroMasters e lauree online.'],
         link: 'https://www.edx.org',
-        durationDetail: 'Long-term',
+        durationDetail: 'Lungo Termine',
         cta: 'Visita la piattaforma',
         type: 'earn',
         image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
@@ -387,7 +397,7 @@ const allActivities: Activity[] = [
         description: 'Organizzazione no-profit con la missione di fornire un\'istruzione gratuita di primo livello. Eccellente per matematica e scienze, con percorsi personalizzati.',
         examples: ['Lezioni di matematica dall\'aritmetica di base al calcolo avanzato.', 'Corsi di scienze, economia e storia.'],
         link: 'https://www.khanacademy.org',
-        durationDetail: 'Long-term',
+        durationDetail: 'Lungo Termine',
         cta: 'Visita la piattaforma',
         type: 'earn',
         image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
@@ -417,7 +427,7 @@ const allActivities: Activity[] = [
         description: 'Un punto di riferimento per il responsive web design. Offre un curriculum completo e gratuito di oltre 300 ore che copre HTML, CSS e JavaScript con un approccio basato su progetti e certificazioni.',
         examples: ['Responsive Web Design Certification', 'JavaScript Algorithms and Data Structures'],
         link: 'https://www.freecodecamp.org',
-        durationDetail: 'Long-term',
+        durationDetail: 'Lungo Termine',
         cta: 'Visita la piattaforma',
         type: 'earn',
         image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
@@ -432,7 +442,7 @@ const allActivities: Activity[] = [
         description: 'Un progetto open-source che cura i migliori tutorial per diventare sviluppatore full-stack (Ruby on Rails o JavaScript), con una forte community di supporto.',
         examples: ['Foundations Path', 'Full Stack JavaScript Path'],
         link: 'https://www.theodinproject.com',
-        durationDetail: 'Long-term',
+        durationDetail: 'Lungo Termine',
         cta: 'Visita la piattaforma',
         type: 'earn',
         image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
@@ -477,7 +487,7 @@ const allActivities: Activity[] = [
         description: 'Offre certificati professionali con prova gratuita in settori di punta come il Google Data Analytics Professional Certificate, l\'IBM Data Science e il Generative AI Engineering.',
         examples: ['Google Data Analytics', 'IBM Data Science', 'Generative AI Engineering'],
         link: 'https://www.coursera.org',
-        durationDetail: 'Long-term',
+        durationDetail: 'Lungo Termine',
         cta: 'Visita la piattaforma',
         type: 'earn',
         image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
@@ -522,7 +532,7 @@ const allActivities: Activity[] = [
         description: 'Corsi gratuiti di Grafica Digitale e Siti Web finanziati da enti come la Regione Lombardia, spesso con stage garantito e attestato riconosciuto.',
         examples: ['Grafica Digitale Adobe e Siti Web'],
         link: '#',
-        durationDetail: 'Long-term',
+        durationDetail: 'Lungo Termine',
         cta: 'Visita la piattaforma',
         type: 'earn',
         image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
@@ -532,22 +542,40 @@ const allActivities: Activity[] = [
 export async function seedDatabase() {
     console.log('Starting database seed...');
     const { db } = getFirebaseInstances();
-    const activitiesCollection = collection(db, 'activities');
     
-    // Check if the collection is empty to prevent re-seeding
-    const snapshot = await getDocs(query(activitiesCollection));
-    if (!snapshot.empty) {
-        console.log('Database already contains data. Seeding aborted.');
-        return;
+    // Seed activities
+    const activitiesCollection = collection(db, 'activities');
+    const activitiesSnapshot = await getDocs(query(activitiesCollection));
+    if (activitiesSnapshot.empty) {
+        try {
+            for (const activity of allActivities) {
+                await addDoc(activitiesCollection, activity);
+                console.log(`Added activity: ${activity.title}`);
+            }
+            console.log('Activities seeded successfully!');
+        } catch (error) {
+            console.error('Error seeding activities:', error);
+            throw error; // Rethrow to be caught by the API route
+        }
+    } else {
+        console.log('Activities collection already contains data. Seeding aborted.');
     }
 
-    try {
-        for (const activity of allActivities) {
-            await addDoc(activitiesCollection, activity);
-            console.log(`Added: ${activity.title}`);
+    // Seed partners
+    const partnersCollection = collection(db, 'partners');
+    const partnersSnapshot = await getDocs(query(partnersCollection));
+    if (partnersSnapshot.empty) {
+        try {
+            for (const partner of partnerLogos) {
+                await addDoc(partnersCollection, partner);
+                console.log(`Added partner: ${partner.name}`);
+            }
+            console.log('Partners seeded successfully!');
+        } catch (error) {
+            console.error('Error seeding partners:', error);
+            throw error; // Rethrow to be caught by the API route
         }
-        console.log('Database seeded successfully!');
-    } catch (error) {
-        console.error('Error seeding database:', error);
+    } else {
+        console.log('Partners collection already contains data. Seeding aborted.');
     }
 }

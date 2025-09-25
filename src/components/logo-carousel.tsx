@@ -5,26 +5,12 @@ import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 
-type Logo = {
+export type Logo = {
   id: string;
   name: string;
   logoUrl: string;
   websiteUrl: string;
 };
-
-// In a real application, this would fetch from a database or CMS.
-// For now, we simulate with a static array.
-const defaultLogos: Logo[] = [
-  { id: '1', name: 'Partner 1', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner1', websiteUrl: '#' },
-  { id: '2', name: 'Partner 2', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner2', websiteUrl: '#' },
-  { id: '3', name: 'Partner 3', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner3', websiteUrl: '#' },
-  { id: '4', name: 'Partner 4', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner4', websiteUrl: '#' },
-  { id: '5', name: 'Partner 5', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner5', websiteUrl: '#' },
-  { id: '6', name: 'Partner 6', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner6', websiteUrl: '#' },
-  { id: '7', name: 'Partner 7', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner7', websiteUrl: '#' },
-  { id: '8', name: 'Partner 8', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner8', websiteUrl: '#' },
-];
-
 
 interface LogoTrackProps {
     logos: { logoUrl: string, name: string, websiteUrl?: string }[];
@@ -70,10 +56,10 @@ interface LogoCarouselProps {
     logos?: Logo[];
     logoUrl?: string; // For repeating a single logo
     logoCount?: number;
+    loading?: boolean;
 }
 
-export function LogoCarousel({ logos = defaultLogos, logoUrl, logoCount = 16 }: LogoCarouselProps) {
-  const loading = false; // Simulating loaded state
+export function LogoCarousel({ logos, logoUrl, logoCount = 16, loading = false }: LogoCarouselProps) {
 
   // If a single logoUrl is provided, create an array of logos to repeat
   const displayLogos = logoUrl
@@ -83,7 +69,7 @@ export function LogoCarousel({ logos = defaultLogos, logoUrl, logoCount = 16 }: 
         logoUrl: logoUrl,
         websiteUrl: '#',
       }))
-    : logos;
+    : logos || [];
 
   if (loading) {
       return (
@@ -102,7 +88,7 @@ export function LogoCarousel({ logos = defaultLogos, logoUrl, logoCount = 16 }: 
   return (
     <div className="relative overflow-hidden group space-y-8">
       <LogoTrack logos={firstHalf} direction="normal" />
-      <LogoTrack logos={secondHalf} direction="reverse" />
+      {secondHalf.length > 0 && <LogoTrack logos={secondHalf} direction="reverse" />}
     </div>
   );
 }

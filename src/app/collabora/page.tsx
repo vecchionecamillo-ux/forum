@@ -1,12 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { VolunteerForm } from './volunteer-form';
 import { InterestForm } from './interest-form';
 import { Handshake, Heart, Building, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { LogoCarousel } from '@/components/logo-carousel';
+import { LogoCarousel, type Logo } from '@/components/logo-carousel';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { getFirebaseInstances } from '@/lib/firebase';
 
 type Selection = 'partner' | 'sponsor' | 'volunteer';
 
@@ -38,6 +40,20 @@ const selectionOptions: {
 
 export default function CollaboraPage() {
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [partners, setPartners] = useState<Logo[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const { db } = getFirebaseInstances();
+    const q = query(collection(db, 'partners'));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const partnerList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Logo));
+      setPartners(partnerList);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
   
   const renderSelectionContent = () => {
     switch (selection) {
@@ -172,7 +188,7 @@ export default function CollaboraPage() {
             Collaboriamo con istituzioni, aziende e realtà creative che condividono la nostra visione e supportano la nostra missione.
             </p>
             <div className="relative overflow-hidden group">
-                <LogoCarousel />
+                <LogoCarousel logos={partners} loading={loading} />
                 <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-muted/40 to-transparent"></div>
                 <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-muted/40 to-transparent"></div>
             </div>
