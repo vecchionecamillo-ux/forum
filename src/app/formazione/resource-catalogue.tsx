@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, Code, Paintbrush, Landmark, BrainCircuit, FlaskConical, Lightbulb, Library, Layers, Zap, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle, Code, Paintbrush, Landmark, BrainCircuit, FlaskConical, Lightbulb, Library, Layers, Zap, Clock, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RadioGroup } from '@/components/ui/radio-group';
