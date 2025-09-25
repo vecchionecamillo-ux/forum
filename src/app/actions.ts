@@ -6,12 +6,9 @@ import { getFirebaseInstances } from '@/lib/firebase';
 import { allActivities } from '@/lib/seed-data';
 import { partnerLogos } from '@/lib/seed-data';
 
-// This is a temporary solution to initialize Firebase Admin on the server.
-// In a real application, you would use the Firebase Admin SDK with a service account.
-const { db } = getFirebaseInstances();
-
 
 export async function addPoints(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const { db } = getFirebaseInstances();
   const userId = formData.get('userId') as string;
   const points = formData.get('points');
 
@@ -82,6 +79,7 @@ export async function createMembershipCard(formData: FormData): Promise<{ succes
 }
 
 export async function updateUserRank(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const { db } = getFirebaseInstances();
   const userId = formData.get('userId') as string;
   const newRankLevel = Number(formData.get('rank'));
 
@@ -104,6 +102,7 @@ export async function updateUserRank(formData: FormData): Promise<{ success: boo
 }
 
 export async function registerUserForActivity(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const { db } = getFirebaseInstances();
   const userId = formData.get('userId') as string;
   const itemId = formData.get('itemId') as string;
   const itemTitle = formData.get('itemTitle') as string;
@@ -188,6 +187,7 @@ export async function registerUserForActivity(formData: FormData): Promise<{ suc
 }
 
 export async function confirmActivityParticipation(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const { db } = getFirebaseInstances();
   const logId = formData.get('logId') as string;
   
   if (!logId) {
@@ -240,6 +240,7 @@ export async function confirmActivityParticipation(formData: FormData): Promise<
 
 
 export async function submitCollaborationProposal(formData: FormData): Promise<{ success: boolean; message: string }> {
+  const { db } = getFirebaseInstances();
   const data = Object.fromEntries(formData.entries());
 
   // Basic validation
@@ -266,6 +267,7 @@ export async function submitCollaborationProposal(formData: FormData): Promise<{
 }
 
 export async function seedDatabaseAction(): Promise<{ success: boolean; message: string }> {
+    const { db } = getFirebaseInstances();
     console.log('Starting database seed...');
     
     // Seed activities
