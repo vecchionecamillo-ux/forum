@@ -24,7 +24,7 @@ export function CourseCatalogue() {
 
   useEffect(() => {
     const { db } = getFirebaseInstances();
-    const formationCategories = ['Laboratorio', 'Workshop'];
+    const formationCategories = ['Laboratorio', 'Workshop', 'Formazione'];
     const q = query(collection(db, 'activities'), where('category', 'in', formationCategories));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -51,7 +51,7 @@ export function CourseCatalogue() {
         if (durationFilter === 'all') return true;
         // This logic assumes specific `durationDetail` values. Adjust if your data is different.
         if (durationFilter === 'intensive') return item.durationDetail === 'Workshop Intensivo';
-        if (durationFilter === 'long-term') return item.durationDetail?.includes('settimane');
+        if (durationFilter === 'long-term') return item.durationDetail === 'Lungo Termine';
         return true;
       };
       if (!matchesDuration()) return false;
@@ -64,6 +64,7 @@ export function CourseCatalogue() {
     switch(category) {
         case 'Laboratorio': return FlaskConical;
         case 'Workshop': return Zap;
+        case 'Formazione': return Layers;
         default: return Layers;
     }
   }
