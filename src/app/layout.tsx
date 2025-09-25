@@ -5,6 +5,8 @@ import { Header } from '@/components/layout/header';
 import { AuthProvider } from '@/hooks/use-auth';
 import { WebGLBackground } from '@/components/layout/webgl-background';
 import { ThemeProvider } from '@/components/theme-provider';
+import { DatabaseSeeder } from '@/components/database-seeder';
+
 
 export const metadata: Metadata = {
   title: 'Cantiere Culturale Digitale',
@@ -32,6 +34,7 @@ export default function RootLayout({
         >
             <WebGLBackground />
             <AuthProvider>
+            <DatabaseSeeder />
             <Header />
             <div className="relative z-10">
                 {children}
