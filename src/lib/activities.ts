@@ -4,6 +4,14 @@ import type { ImagePlaceholder } from '@/lib/placeholder-images';
 // Questo file è ora obsoleto e verrà rimosso in una fase successiva.
 // L'applicazione ora recupera le attività direttamente dal database.
 
+export type Supporter = {
+  name: string;
+  bio: string;
+  avatarUrl?: string;
+  websiteUrl?: string;
+};
+
+
 export type Activity = {
   id?: string; // ID del documento Firestore
   title: string;
@@ -21,6 +29,7 @@ export type Activity = {
   duration?: string;
   durationDetail?: 'Permanente' | 'Workshop Intensivo' | '4 settimane, 2h/sett' | 'Lungo Termine';
   type: 'earn' | 'spend';
+  supporters?: Supporter[];
 };
 
 export const allActivities: Activity[] = [];

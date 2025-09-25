@@ -2,7 +2,7 @@
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, Clock, Gem, Loader2, Star } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Gem, Globe, Loader2, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useParams } from 'next/navigation';
@@ -15,6 +15,8 @@ import { doc, getDoc } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function NewsDetailPage() {
   const params = useParams();
@@ -101,7 +103,7 @@ export default function NewsDetailPage() {
   let backLink = '/';
   if (item.type === 'spend') {
       backLink = '/marketplace';
-  } else if (item.category === 'Laboratorio' || item.category === 'Workshop') {
+  } else if (item.category === 'Laboratorio' || item.category === 'Workshop' || item.category === 'Formazione') {
       backLink = '/formazione';
   } else {
       backLink = '/eventi';
@@ -155,11 +157,8 @@ export default function NewsDetailPage() {
             
             <div className="prose prose-lg dark:prose-invert max-w-none">
                 <p className="lead">{item.description}</p>
-
                 <p>Partecipando a questa attività, non solo contribuirai alla community del Cantiere Culturale, ma avrai anche l'opportunità di accumulare punti preziosi per sbloccare ricompense esclusive nel nostro marketplace. È un modo fantastico per crescere, imparare e essere premiato per la tua passione e il tuo impegno.</p>
-                
                 {item.duration && <p><strong>Durata:</strong> {item.duration}</p>}
-
                 <p>Non perdere questa occasione! Clicca sul pulsante qui sotto per unirti a noi.</p>
             </div>
 
@@ -171,6 +170,33 @@ export default function NewsDetailPage() {
                 {!user && <p className="text-sm text-muted-foreground mt-2">Devi essere loggato per partecipare.</p>}
             </footer>
 
+            {item.supporters && item.supporters.length > 0 && (
+                 <section className="mt-16 pt-8 border-t">
+                    <h2 className="text-2xl font-bold mb-6 text-center">Con il supporto di</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                       {item.supporters.map(supporter => (
+                         <Card key={supporter.name} className="flex flex-col sm:flex-row items-center gap-6 p-6">
+                            <Avatar className="w-24 h-24 text-3xl">
+                                <AvatarImage src={supporter.avatarUrl} alt={supporter.name} className="object-cover" />
+                                <AvatarFallback>{supporter.name.charAt(0)}</AvatarFallback>
+                            </Avatar>
+                            <div className="text-center sm:text-left">
+                                <h3 className="font-bold text-lg">{supporter.name}</h3>
+                                <p className="text-sm text-muted-foreground">{supporter.bio}</p>
+                                {supporter.websiteUrl && (
+                                    <Button asChild variant="link" size="sm" className="pl-0 mt-2">
+                                        <a href={supporter.websiteUrl} target="_blank" rel="noopener noreferrer">
+                                            <Globe className="w-4 h-4 mr-2" />
+                                            Scopri di più
+                                        </a>
+                                    </Button>
+                                )}
+                            </div>
+                         </Card>
+                       ))}
+                    </div>
+                </section>
+            )}
         </article>
       </div>
     </main>

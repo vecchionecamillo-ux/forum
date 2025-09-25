@@ -25,6 +25,14 @@ const allActivities: Activity[] = [
         duration: '2 ore',
         durationDetail: 'Workshop Intensivo',
         type: 'earn',
+        supporters: [
+            {
+                name: 'Mario Rossi',
+                bio: 'Esperto di Arte Generativa e Creative Coding, con 10 anni di esperienza nel settore.',
+                avatarUrl: 'https://i.pravatar.cc/150?u=mario',
+                websiteUrl: 'https://example.com'
+            }
+        ]
     },
     {
         title: 'Workshop di Scrittura Creativa',
@@ -41,6 +49,14 @@ const allActivities: Activity[] = [
         duration: '4 settimane',
         durationDetail: 'Lungo Termine',
         type: 'earn',
+        supporters: [
+            {
+                name: 'Julia Verdi',
+                bio: 'Scrittrice e editor professionista. Autrice di numerosi romanzi e racconti.',
+                avatarUrl: 'https://i.pravatar.cc/150?u=julia',
+                websiteUrl: 'https://example.com'
+            }
+        ]
     },
     {
         title: 'Lezione di Scacchi',
@@ -101,6 +117,14 @@ const allActivities: Activity[] = [
         time: '19:00',
         duration: '1 ora',
         type: 'earn',
+        supporters: [
+            {
+                name: 'Tech Solutions Inc.',
+                bio: 'Azienda leader nello sviluppo di soluzioni AI-driven per il settore creativo.',
+                avatarUrl: 'https://i.pravatar.cc/150?u=techinc',
+                websiteUrl: 'https://example.com'
+            }
+        ]
     },
     // --- MARKETPLACE ---
     {
