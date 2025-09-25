@@ -29,15 +29,25 @@ function getFirebaseInstances(): FirebaseInstances {
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
         
-        // Use memory cache to avoid IndexedDB issues in some environments
-        const db = initializeFirestore(app, {
-          localCache: memoryLocalCache(),
-        });
+        let db: Firestore;
+        try {
+            // Try to initialize with persistent cache first.
+            db = initializeFirestore(app, {
+                localCache: persistentLocalCache(/*{ tabManager: 'single-tab' }*/),
+            });
+        } catch (e) {
+            // If persistent cache fails (e.g., IndexedDB not supported or blocked),
+            // fallback to memory cache.
+            console.warn("Firestore persistent cache initialization failed, falling back to memory cache.", e);
+            db = initializeFirestore(app, {
+                localCache: memoryLocalCache(),
+            });
+        }
         
         const database = getDatabase(app);
         instances = { app, auth, db, database };
     }
-    // Fallback for server-side rendering
+    // Fallback for server-side or already initialized instances.
     if (!instances) {
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
