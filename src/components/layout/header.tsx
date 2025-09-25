@@ -45,9 +45,6 @@ export function Header() {
           {link.label}
         </Link>
       ))}
-      <Link href="/style-guide" onClick={handleLinkClick} className="text-sm font-medium transition-colors text-foreground/70 hover:text-foreground flex items-center">
-           <PenSquare className="mr-2 h-4 w-4" /> Art Style Guide
-      </Link>
       {isModerator && (
          <Link href="/admin" onClick={handleLinkClick} className="text-sm font-medium transition-colors text-foreground/70 hover:text-foreground flex items-center">
            <Shield className="mr-2 h-4 w-4" /> Admin
