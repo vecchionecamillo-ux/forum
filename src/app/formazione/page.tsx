@@ -21,7 +21,7 @@ export default function FormazionePage() {
                 </p>
             </div>
           </div>
-           <div className="absolute inset-0 z-0">
+           <div className="absolute inset-0 z-0 opacity-10">
              <LogoCarousel logoUrl="/lab039-logo.png" />
            </div>
         </section>

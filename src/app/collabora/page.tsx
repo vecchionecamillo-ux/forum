@@ -171,7 +171,7 @@ export default function CollaboraPage() {
             <p className="max-w-2xl mx-auto text-lg text-foreground/80 mb-12">
             Collaboriamo con istituzioni, aziende e realtà creative che condividono la nostra visione e supportano la nostra missione.
             </p>
-            <div className="relative overflow-hidden group space-y-8">
+            <div className="relative overflow-hidden group">
                 <LogoCarousel />
                 <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-muted/40 to-transparent"></div>
                 <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-muted/40 to-transparent"></div>
