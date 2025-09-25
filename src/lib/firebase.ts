@@ -1,6 +1,6 @@
 import { initializeApp, getApp, getApps, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-import { type Firestore, memoryLocalCache, initializeFirestore } from 'firebase/firestore';
+import { type Firestore, getFirestore, enableIndexedDbPersistence, memoryLocalCache, initializeFirestore } from 'firebase/firestore';
 import { getDatabase, type Database } from 'firebase/database';
 
 const firebaseConfig: FirebaseOptions = {
@@ -20,32 +20,29 @@ type FirebaseInstances = {
     database: Database;
 };
 
-// Singleton instance holder
-let instances: FirebaseInstances | null = null;
-
-// The single, reliable function to get Firebase instances
-function getFirebaseInstances(): FirebaseInstances {
-  if (typeof window === 'undefined') {
-    // Server-side rendering: create a new instance or get existing one for the server context
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    const auth = getAuth(app);
-    const db = initializeFirestore(app, { localCache: memoryLocalCache() });
-    const database = getDatabase(app);
-    return { app, auth, db, database };
-  }
-  
-  // Client-side rendering: ensure only one instance is created
-  if (!instances) {
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    const auth = getAuth(app);
-    const db = initializeFirestore(app, {
-      localCache: memoryLocalCache(),
-    });
-    const database = getDatabase(app);
-    instances = { app, auth, db, database };
-  }
-
-  return instances;
+let app: FirebaseApp;
+if (getApps().length === 0) {
+  app = initializeApp(firebaseConfig);
+} else {
+  app = getApp();
 }
 
-export { getFirebaseInstances };
+const auth = getAuth(app);
+const db = getFirestore(app);
+const database = getDatabase(app);
+
+if (typeof window !== 'undefined') {
+  enableIndexedDbPersistence(db).catch((err) => {
+    if (err.code == 'failed-precondition') {
+      console.warn(
+        'Firestore: La persistenza multipla non è supportata. I dati non verranno salvati offline in questa scheda.'
+      );
+    } else if (err.code == 'unimplemented') {
+      console.warn(
+        'Firestore: Il browser non supporta la persistenza offline.'
+      );
+    }
+  });
+}
+
+export { app, auth, db, database };

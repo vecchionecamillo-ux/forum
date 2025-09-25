@@ -107,7 +107,7 @@ export default function TesserePage() {
                     </div>
                     <Button onClick={handleFetchPoints} disabled={loading || !userId} className="w-full">
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {loading ? 'Caricamento...' : 'Carica Dati'}
+                    {loading ? 'Caricamento...' : 'Verifica Token'}
                     </Button>
 
                     {error && <p className="text-sm text-center text-destructive">{error}</p>}

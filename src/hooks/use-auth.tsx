@@ -13,7 +13,7 @@ import {
   type User,
   getRedirectResult,
 } from 'firebase/auth';
-import { getFirebaseInstances } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase';
 import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, type Firestore } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
@@ -40,8 +40,8 @@ type AuthContextType = {
   loading: boolean;
   isModerator: boolean;
   logout: () => void;
-  auth: ReturnType<typeof getFirebaseInstances>['auth'];
-  db: ReturnType<typeof getFirebaseInstances>['db'];
+  auth: Auth;
+  db: Firestore;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -78,7 +78,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isModerator, setIsModerator] = useState(false);
   const router = useRouter();
 
-  const { auth, db } = getFirebaseInstances();
   
   // Effect for handling redirect result from Google SignIn
   useEffect(() => {
