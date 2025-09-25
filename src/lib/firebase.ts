@@ -20,41 +20,32 @@ type FirebaseInstances = {
     database: Database;
 };
 
+// Singleton instance holder
 let instances: FirebaseInstances | null = null;
 
-function initializeFirebase(): FirebaseInstances {
-    if (typeof window === "undefined") {
-        // Fallback for server-side rendering, although we aim for client-side Firebase
-        if (instances) return instances;
-        const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = initializeFirestore(app, { localCache: memoryLocalCache() });
-        const database = getDatabase(app);
-        instances = { app, auth, db, database };
-        return instances;
-    }
-    
-    if (instances) {
-        return instances;
-    }
-
-    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+// The single, reliable function to get Firebase instances
+function getFirebaseInstances(): FirebaseInstances {
+  if (typeof window === 'undefined') {
+    // Server-side rendering: create a new instance or get existing one for the server context
+    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
     const auth = getAuth(app);
-    // Use initializeFirestore to specify cache settings. This is the modern approach.
+    const db = initializeFirestore(app, { localCache: memoryLocalCache() });
+    const database = getDatabase(app);
+    return { app, auth, db, database };
+  }
+  
+  // Client-side rendering: ensure only one instance is created
+  if (!instances) {
+    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    const auth = getAuth(app);
     const db = initializeFirestore(app, {
       localCache: memoryLocalCache(),
     });
     const database = getDatabase(app);
     instances = { app, auth, db, database };
-    return instances;
-}
+  }
 
-// This function is now the single source of truth for Firebase instances.
-function getFirebaseInstances(): FirebaseInstances {
-    if (!instances) {
-        instances = initializeFirebase();
-    }
-    return instances;
+  return instances;
 }
 
 export { getFirebaseInstances };

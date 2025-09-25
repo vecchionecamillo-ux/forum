@@ -9,7 +9,6 @@ import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimesta
 // However, the current project structure uses them as client-invoked server actions.
 // This is a placeholder for a proper server-side Firebase admin initialization.
 import { initializeApp, getApp, getApps } from 'firebase/app';
-import { getFirestore as getAdminFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -25,7 +24,7 @@ function getDb() {
     if (getApps().length === 0) {
         initializeApp(firebaseConfig);
     }
-    return getAdminFirestore(getApp());
+    return getFirestore(getApp());
 }
 
 
