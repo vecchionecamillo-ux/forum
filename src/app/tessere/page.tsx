@@ -14,7 +14,7 @@ import { Loader2 } from 'lucide-react';
 export default function TesserePage() {
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [userId, setUserId] = useState('');
-  const [userPoints, setUserPoints] = useState<number | null>(null);
+  const [userTokens, setUserTokens] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCheck, setShowCheck] = useState(false);
@@ -26,7 +26,7 @@ export default function TesserePage() {
     }
     setLoading(true);
     setError(null);
-    setUserPoints(null);
+    setUserTokens(null);
 
     try {
       const { db } = getFirebaseInstances();
@@ -35,7 +35,7 @@ export default function TesserePage() {
 
       if (docSnap.exists()) {
         const userData = docSnap.data();
-        setUserPoints(userData.points !== undefined ? userData.points : null);
+        setUserTokens(userData.token !== undefined ? userData.token : null);
       } else {
         setError('Nessun utente trovato con questo ID.');
       }
@@ -76,10 +76,10 @@ export default function TesserePage() {
         <div className="w-full mt-12 border-t pt-12">
             <div className="text-center">
                 <h2 className="text-3xl font-bold tracking-tight">Hai già una tessera?</h2>
-                <p className="mt-2 text-muted-foreground">Controlla il tuo saldo punti qui.</p>
+                <p className="mt-2 text-muted-foreground">Controlla il tuo saldo token qui.</p>
                 {!showCheck && (
                     <Button onClick={() => setShowCheck(true)} className="mt-4">
-                        Verifica Punti
+                        Verifica Token
                     </Button>
                 )}
             </div>
@@ -87,8 +87,8 @@ export default function TesserePage() {
            {showCheck && (
              <Card className="w-full mt-8 animate-in fade-in-50 duration-500">
                 <CardHeader>
-                    <CardTitle>Verifica Saldo Punti (Token)</CardTitle>
-                    <CardDescription>Inserisci il tuo ID utente per visualizzare i tuoi punti.</CardDescription>
+                    <CardTitle>Verifica Saldo Token</CardTitle>
+                    <CardDescription>Inserisci il tuo ID utente per visualizzare i tuoi token.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
@@ -108,11 +108,11 @@ export default function TesserePage() {
 
                     {error && <p className="text-sm text-center text-destructive">{error}</p>}
                     
-                    {userPoints !== null && (
+                    {userTokens !== null && (
                     <div className="text-center pt-4">
                         <p className="text-muted-foreground">L'utente ha</p>
-                        <p className="text-4xl font-black text-primary">{userPoints}</p>
-                        <p className="text-muted-foreground">punti</p>
+                        <p className="text-4xl font-black text-primary">{userTokens}</p>
+                        <p className="text-muted-foreground">token</p>
                     </div>
                     )}
                 </CardContent>
