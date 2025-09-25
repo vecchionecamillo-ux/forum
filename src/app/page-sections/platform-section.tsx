@@ -8,7 +8,7 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 const platformItems = [
   {
-    title: 'Formazione',
+    title: 'Formazione by lab039',
     description: 'Accedi a workshop, masterclass e corsi tenuti da professionisti del settore creativo e tecnologico.',
     image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
     link: '/formazione',

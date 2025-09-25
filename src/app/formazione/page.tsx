@@ -5,6 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CourseCatalogue } from './course-catalogue';
 import { ResourceCatalogue } from './resource-catalogue';
 import { BookOpenCheck, GraduationCap } from 'lucide-react';
+import Image from 'next/image';
 
 export default function FormazionePage() {
   
@@ -12,9 +13,18 @@ export default function FormazionePage() {
     <div className="min-h-screen bg-background pt-24 pb-12">
       <main className="container mx-auto px-4">
         <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Formazione & E-Learning</h1>
+            <div className="flex justify-center mb-6">
+              <Image 
+                src="/lab039-logo.png" 
+                alt="lab039 Logo"
+                width={200}
+                height={50}
+                className="object-contain"
+              />
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">Formazione a cura di lab039</h1>
             <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80">
-                Accresci le tue competenze con i nostri workshop, laboratori e serie di contenuti. Esplora le migliori risorse di formazione online gratuite, selezionate per te.
+                Accresci le tue competenze con i nostri workshop, laboratori e serie di contenuti. Esplora le migliori risorse di formazione online gratuite, selezionate e curate da lab039 per te.
             </p>
         </div>
 

@@ -13,7 +13,7 @@ const navLinks = [
   { href: '/about', label: 'Chi Siamo' },
   { href: '/tessere', label: 'Tessere' },
   { href: '/eventi', label: 'Eventi & Community' },
-  { href: '/formazione', label: 'Formazione' },
+  { href: '/formazione', label: 'lab039' },
   { href: '/marketplace', label: 'Marketplace' },
   { href: '/collabora', label: 'Collabora' },
 ];
