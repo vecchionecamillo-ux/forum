@@ -1,5 +1,24 @@
-import { ResourceCard, type Resource } from './resource-card';
-import { GraduationCap } from 'lucide-react';
+
+'use client';
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { ArrowRight, CheckCircle } from 'lucide-react';
+
+export type Resource = {
+  name: string;
+  description: string;
+  examples: string[];
+  link: string;
+};
 
 const transversePlatforms: Resource[] = [
     {
@@ -297,25 +316,40 @@ const personalDevelopmentResources: { subCategory: string; resources: Resource[]
     }
 ];
 
-
-export default function ElearningPage() {
+function ResourceCard({ resource }: { resource: Resource }) {
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12">
-      <main className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <GraduationCap className="w-8 h-8 text-primary" />
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight">
-            E-learning Gratuito
-          </h1>
-          <p className="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-foreground/80">
-            Benvenuto nel nostro portale curato per l'e-learning. Abbiamo selezionato e organizzato le migliori risorse di formazione online gratuite per aiutarti a crescere, sia professionalmente che personalmente. La conoscenza è a un clic di distanza.
-          </p>
-        </div>
+    <Card className="flex flex-col h-full bg-card/80 backdrop-blur-sm transform hover:-translate-y-1 transition-transform duration-300">
+      <CardHeader>
+        <CardTitle>{resource.name}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex-grow">
+        <CardDescription className="mb-4">{resource.description}</CardDescription>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+            {resource.examples.map((example) => (
+                <li key={example} className="flex items-start gap-2">
+                    <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span>{example}</span>
+                </li>
+            ))}
+        </ul>
+      </CardContent>
+      <CardFooter>
+        <Button asChild variant="link" className="text-primary p-0">
+          <Link href={resource.link} target="_blank" rel="noopener noreferrer">
+            Visita la piattaforma
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
 
+export function ResourceCatalogue() {
+  return (
+    <div className="space-y-16">
         {/* Piattaforme Trasversali */}
-        <section className="mb-16">
+        <section>
           <h2 className="text-3xl font-bold tracking-tight mb-8 text-center">Piattaforme E-Learning Trasversali</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {transversePlatforms.map(resource => <ResourceCard key={resource.name} resource={resource} />)}
@@ -323,7 +357,7 @@ export default function ElearningPage() {
         </section>
 
         {/* Informatica e Programmazione */}
-        <section className="mb-16">
+        <section>
           <h2 className="text-3xl font-bold tracking-tight mb-8 text-center border-t pt-12">Informatica e Programmazione</h2>
           {itAndProgrammingResources.map(category => (
             <div key={category.subCategory} className="mb-12">
@@ -336,7 +370,7 @@ export default function ElearningPage() {
         </section>
         
         {/* Arte e Design */}
-        <section className="mb-16">
+        <section>
           <h2 className="text-3xl font-bold tracking-tight mb-8 text-center border-t pt-12">Arte e Design</h2>
           {artAndDesignResources.map(category => (
             <div key={category.subCategory} className="mb-12">
@@ -349,7 +383,7 @@ export default function ElearningPage() {
         </section>
 
         {/* Economia e Finanza */}
-        <section className="mb-16">
+        <section>
           <h2 className="text-3xl font-bold tracking-tight mb-8 text-center border-t pt-12">Economia e Finanza</h2>
           {economyAndFinanceResources.map(category => (
             <div key={category.subCategory} className="mb-12">
@@ -362,7 +396,7 @@ export default function ElearningPage() {
         </section>
         
         {/* Scienze Umane */}
-        <section className="mb-16">
+        <section>
           <h2 className="text-3xl font-bold tracking-tight mb-8 text-center border-t pt-12">Scienze Umane</h2>
           {humanSciencesResources.map(category => (
             <div key={category.subCategory} className="mb-12">
@@ -375,7 +409,7 @@ export default function ElearningPage() {
         </section>
 
         {/* Scienza e Matematica */}
-        <section className="mb-16">
+        <section>
           <h2 className="text-3xl font-bold tracking-tight mb-8 text-center border-t pt-12">Scienza e Matematica</h2>
           {scienceAndMathResources.map(category => (
             <div key={category.subCategory} className="mb-12">
@@ -388,7 +422,7 @@ export default function ElearningPage() {
         </section>
         
         {/* Sviluppo Personale e Professionale */}
-        <section className="mb-16">
+        <section>
           <h2 className="text-3xl font-bold tracking-tight mb-8 text-center border-t pt-12">Sviluppo Personale e Professionale</h2>
           {personalDevelopmentResources.map(category => (
             <div key={category.subCategory} className="mb-12">
@@ -399,14 +433,7 @@ export default function ElearningPage() {
             </div>
           ))}
         </section>
-
-        <div className="text-center mt-12 border-t pt-12">
-            <p className="text-lg text-foreground/80">
-                Il nostro impegno è fornire risorse di qualità per la tua crescita. Esplora il catalogo e inizia il tuo percorso di apprendimento oggi stesso.
-            </p>
-        </div>
-
-      </main>
     </div>
   );
 }
+
