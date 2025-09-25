@@ -45,6 +45,9 @@ export function Header() {
           {link.label}
         </Link>
       ))}
+      <Link href="/style-guide" onClick={handleLinkClick} className="text-sm font-medium transition-colors text-foreground/70 hover:text-foreground flex items-center">
+           <PenSquare className="mr-2 h-4 w-4" /> Art Style Guide
+      </Link>
       {isModerator && (
          <Link href="/admin" onClick={handleLinkClick} className="text-sm font-medium transition-colors text-foreground/70 hover:text-foreground flex items-center">
            <Shield className="mr-2 h-4 w-4" /> Admin
@@ -55,12 +58,6 @@ export function Header() {
 
   const authButtonsDesktop = (
     <div className="hidden md:flex items-center gap-2">
-      <Button asChild variant="outline" size="sm">
-        <Link href="/style-guide">
-            <PenSquare className="mr-2 h-4 w-4" />
-            Art Style Guide
-        </Link>
-      </Button>
       {user ? (
         <>
           <Button asChild variant="ghost" size="sm">
@@ -86,12 +83,6 @@ export function Header() {
 
   const authButtonsMobile = (
      <div className="mt-4 pt-4 border-t flex flex-col gap-4">
-        <Button asChild variant="default" className="w-full">
-            <Link href="/style-guide" onClick={handleLinkClick}>
-            <PenSquare className="mr-2 h-4 w-4" />
-            Art Style Guide
-            </Link>
-        </Button>
         {user ? (
             <>
             <Button asChild variant="ghost" size="sm" className="justify-start">
