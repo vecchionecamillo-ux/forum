@@ -8,7 +8,7 @@ export type Activity = {
   id?: string; // ID del documento Firestore
   title: string;
   slug: string;
-  category: 'Laboratorio' | 'Workshop' | 'Arte' | 'Community';
+  category: 'Laboratorio' | 'Workshop' | 'Arte' | 'Community' | 'Mostra' | 'Talk' | 'Premio' | 'Formazione';
   description: string;
   image?: ImagePlaceholder;
   cta: string;

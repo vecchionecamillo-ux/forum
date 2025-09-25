@@ -74,7 +74,7 @@ export function ActivityCard({ item }: { item: Activity }) {
 
   return (
     <Card
-      key={item.slug}
+      key={item.id}
       className="overflow-hidden flex flex-col h-full bg-card/80 backdrop-blur-sm transform hover:-translate-y-1 transition-transform duration-300"
     >
       <div className="aspect-video overflow-hidden relative">
