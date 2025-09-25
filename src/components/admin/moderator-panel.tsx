@@ -24,9 +24,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { UserProfile } from '@/hooks/use-auth';
-import { collection, onSnapshot, type Firestore } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { getUserTier } from '@/lib/membership-tiers';
+import { useAuth } from '@/hooks/use-auth';
 
 
 function UserTableRow({ user, onAction, isPending }: { user: UserProfile, onAction: (formData: FormData, actionType: 'addPoints') => void, isPending: boolean }) {
@@ -111,18 +111,12 @@ function UserTable({ users, onAction, isPending }: { users: UserProfile[], onAct
 }
 
 export function ModeratorPanel() {
-  const [db, setDb] = useState<Firestore | null>(null);
+  const { db } = useAuth();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<UserProfile[]>([]);
   const [filter, setFilter] = useState('');
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
-
-  useEffect(() => {
-    // getFirebaseInstances() must be called in useEffect to ensure it runs on the client
-    const { db: firestoreDb } = getFirebaseInstances();
-    setDb(firestoreDb);
-  }, []);
 
   useEffect(() => {
     if (!db) return; // Wait until db is initialized

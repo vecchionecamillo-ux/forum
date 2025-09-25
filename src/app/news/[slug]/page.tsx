@@ -12,7 +12,6 @@ import { useEffect, useTransition, useState } from 'react';
 import { registerUserForActivity } from '@/app/actions';
 import { cn } from '@/lib/utils';
 import { doc, getDoc } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,14 +22,13 @@ export default function NewsDetailPage() {
   const slug = params.slug as string;
   const [item, setItem] = useState<Activity | null>(null);
   const [loading, setLoading] = useState(true);
-  const { user, userProfile } = useAuth();
+  const { user, userProfile, db } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    if (!slug) return;
-    const { db } = getFirebaseInstances();
+    if (!slug || !db) return;
     // Assuming slugs are unique and used as document IDs
     const docRef = doc(db, 'activities', slug);
     getDoc(docRef).then(docSnap => {
@@ -46,7 +44,7 @@ export default function NewsDetailPage() {
       router.push('/eventi');
       setLoading(false);
     });
-  }, [slug, router]);
+  }, [slug, router, db]);
 
 
   if (loading || !item) {

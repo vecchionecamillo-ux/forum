@@ -9,11 +9,11 @@ import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, par
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FilterCard } from '@/components/filter-card';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
 
 type Timeframe = 'all' | 'week' | 'month';
 type PointFilter = 'all' | 'earn' | 'spend' | 'free';
@@ -32,6 +32,7 @@ export default function EventiPage() {
   const [eventItems, setEventItems] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [allCategories, setAllCategories] = useState<string[]>([]);
+  const { db } = useAuth();
 
   const [timeframe, setTimeframe] = useState<Timeframe>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -41,7 +42,7 @@ export default function EventiPage() {
 
 
   useEffect(() => {
-    const { db } = getFirebaseInstances();
+    if (!db) return;
     const q = query(collection(db, 'activities'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -59,7 +60,7 @@ export default function EventiPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [db]);
 
   const filteredItems = useMemo(() => {
     const now = new Date();

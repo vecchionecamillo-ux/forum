@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
-import { getFirebaseInstances } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -46,13 +46,13 @@ export default function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { auth } = useAuth();
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      const { auth } = getFirebaseInstances();
       await createUserWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {
@@ -72,7 +72,6 @@ export default function SignupPage() {
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setError(null);
-    const { auth } = getFirebaseInstances();
     const provider = new GoogleAuthProvider();
     await signInWithRedirect(auth, provider);
   };

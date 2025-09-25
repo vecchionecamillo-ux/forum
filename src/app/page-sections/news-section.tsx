@@ -10,16 +10,17 @@ import Link from 'next/link';
 import { ActivityCard } from '@/components/activity-card';
 import { useEffect, useState } from 'react';
 import { collection, query, where, limit, onSnapshot, orderBy } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/use-auth';
 
 export function NewsSection() {
   const [newsItems, setNewsItems] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const { db } = useAuth();
 
   useEffect(() => {
-    const { db } = getFirebaseInstances();
+    if (!db) return;
     const q = query(collection(db, 'activities'), where('type', '==', 'earn'), orderBy('date', 'desc'), limit(3));
     
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -29,7 +30,7 @@ export function NewsSection() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [db]);
 
   return (
     <ScrollRevealWrapper id="news">

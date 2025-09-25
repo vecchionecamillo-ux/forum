@@ -9,22 +9,23 @@ import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
 import { ActivityCard } from '@/components/activity-card';
 import { collection, onSnapshot } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function MarketplacePage() {
     const [activities, setActivities] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
     const [allCategories, setAllCategories] = useState<string[]>([]);
     const [maxPoints, setMaxPoints] = useState(1000);
+    const { db } = useAuth();
 
     const [activeTab, setActiveTab] = useState<'spend' | 'earn'>('spend');
     const [pointRange, setPointRange] = useState<[number]>([1000]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
     useEffect(() => {
-      const { db } = getFirebaseInstances();
+      if (!db) return;
       const unsubscribe = onSnapshot(collection(db, 'activities'), (snapshot) => {
         const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
         setActivities(items);
@@ -44,7 +45,7 @@ export default function MarketplacePage() {
       });
   
       return () => unsubscribe();
-    }, []);
+    }, [db]);
 
     const filteredItems = useMemo(() => {
         return activities.filter(item => 

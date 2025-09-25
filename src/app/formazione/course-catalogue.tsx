@@ -6,10 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup } from '@/components/ui/radio-group';
 import { SlidersHorizontal, Layers, FlaskConical, Zap, Clock, Code, Paintbrush, Landmark, BrainCircuit, Lightbulb, Library } from 'lucide-react';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FilterCard } from '@/components/filter-card';
+import { useAuth } from '@/hooks/use-auth';
 
 
 type DurationFilter = 'all' | 'intensive' | 'long-term';
@@ -36,6 +36,7 @@ const courseTypeIcons: Record<string, React.ElementType> = {
 export function CourseCatalogue() {
   const [allActivities, setAllActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const { db } = useAuth();
   
   const [courseTypes, setCourseTypes] = useState<string[]>([]);
   const [mainCategories, setMainCategories] = useState<string[]>([]);
@@ -47,7 +48,7 @@ export function CourseCatalogue() {
   const formationCategories = ['Laboratorio', 'Workshop', 'Formazione'];
 
   useEffect(() => {
-    const { db } = getFirebaseInstances();
+    if (!db) return;
     const q = query(collection(db, 'activities'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -68,7 +69,7 @@ export function CourseCatalogue() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [db]);
 
   const filteredItems = useMemo(() => {
     return allActivities.filter(item => {

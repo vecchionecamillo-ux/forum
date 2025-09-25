@@ -9,17 +9,18 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/use-auth';
 
 
 export function PlatformSection() {
     const [platformItems, setPlatformItems] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
+    const { db } = useAuth();
 
     useEffect(() => {
-        const { db } = getFirebaseInstances();
+        if (!db) return;
         // This query fetches 3 activities marked as "featured" for the homepage platform section.
         const q = query(collection(db, 'activities'), where('featured', '==', true));
 
@@ -33,7 +34,7 @@ export function PlatformSection() {
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [db]);
 
 
   return (

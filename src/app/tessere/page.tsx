@@ -7,9 +7,9 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { getFirebaseInstances } from '@/lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { Loader2 } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function TesserePage() {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -18,18 +18,22 @@ export default function TesserePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCheck, setShowCheck] = useState(false);
+  const { db } = useAuth(); // Use the stable db instance from context
 
   const handleFetchPoints = async () => {
     if (!userId) {
       setError('Per favore, inserisci un ID utente.');
       return;
     }
+    if (!db) {
+        setError("Database non pronto. Riprova tra poco.");
+        return;
+    }
     setLoading(true);
     setError(null);
     setUserTokens(null);
 
     try {
-      const { db } = getFirebaseInstances();
       const userDocRef = doc(db, 'users', userId);
       const docSnap = await getDoc(userDocRef);
 

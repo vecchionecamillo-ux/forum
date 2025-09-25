@@ -3,13 +3,13 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithRedirect } from 'firebase/auth';
-import { getFirebaseInstances } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
     return (
@@ -48,6 +48,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [isResetMode, setIsResetMode] = useState(false);
   const router = useRouter();
+  const { auth } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,7 +56,6 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     try {
-      const { auth } = getFirebaseInstances();
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {
@@ -91,7 +91,6 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     try {
-      const { auth } = getFirebaseInstances();
       await sendPasswordResetEmail(auth, email);
       setMessage('Email di recupero inviata! Controlla la tua casella di posta (anche lo spam).');
       setIsResetMode(false);
@@ -113,7 +112,6 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
     setMessage(null);
-    const { auth } = getFirebaseInstances();
     const provider = new GoogleAuthProvider();
     // The redirect will be handled by the useAuth hook
     await signInWithRedirect(auth, provider);

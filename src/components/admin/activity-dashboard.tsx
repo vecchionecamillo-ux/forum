@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo, useTransition } from 'react';
 import { collection, onSnapshot, query, type Firestore, orderBy } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -18,6 +17,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from '@/components/ui/button';
 import { confirmActivityParticipation } from '@/app/actions';
+import { useAuth } from '@/hooks/use-auth';
 
 type ActivityLog = {
   id: string;
@@ -59,16 +59,11 @@ function ConfirmButton({ logId, disabled }: { logId: string; disabled: boolean }
 
 
 export function ActivityDashboard() {
-  const [db, setDb] = useState<Firestore | null>(null);
+  const { db } = useAuth();
   const { toast } = useToast();
   const [activities, setActivities] = useState<ActivityLog[]>([]);
   const [searchFilter, setSearchFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'completed'>('pending');
-
-  useEffect(() => {
-    const { db: firestoreDb } = getFirebaseInstances();
-    setDb(firestoreDb);
-  }, []);
 
   useEffect(() => {
     if (!db) return;

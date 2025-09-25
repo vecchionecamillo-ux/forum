@@ -3,16 +3,17 @@
 import { ActivityCard } from '@/components/activity-card';
 import { useEffect, useState } from 'react';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function CommunityPage() {
   const [communityItems, setCommunityItems] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const { db } = useAuth();
 
   useEffect(() => {
-    const { db } = getFirebaseInstances();
+    if (!db) return;
     // Query for activities in the 'Community' category.
     const q = query(collection(db, 'activities'), where('category', 'in', ['Community']));
 
@@ -26,7 +27,7 @@ export default function CommunityPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [db]);
 
   return (
     <div className="min-h-screen bg-background pt-24 pb-12">

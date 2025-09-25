@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { LogoCarousel, type Logo } from '@/components/logo-carousel';
 import { collection, onSnapshot, query } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
+import { useAuth } from '@/hooks/use-auth';
 
 type Selection = 'partner' | 'sponsor' | 'volunteer';
 
@@ -42,9 +42,10 @@ export default function CollaboraPage() {
   const [selection, setSelection] = useState<Selection | null>(null);
   const [partners, setPartners] = useState<Logo[]>([]);
   const [loading, setLoading] = useState(true);
+  const { db } = useAuth();
 
   useEffect(() => {
-    const { db } = getFirebaseInstances();
+    if (!db) return;
     const q = query(collection(db, 'partners'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const partnerList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Logo));
@@ -53,7 +54,7 @@ export default function CollaboraPage() {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [db]);
   
   const renderSelectionContent = () => {
     switch (selection) {

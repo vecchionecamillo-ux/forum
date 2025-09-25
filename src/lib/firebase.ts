@@ -23,34 +23,36 @@ type FirebaseInstances = {
 let instances: FirebaseInstances | null = null;
 
 function initializeFirebase(): FirebaseInstances {
-    if (getApps().length === 0) {
-        const app = initializeApp(firebaseConfig);
+    if (typeof window === "undefined") {
+        // Fallback for server-side rendering, although we aim for client-side Firebase
+        if (instances) return instances;
+        const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = initializeFirestore(app, {
-            localCache: memoryLocalCache(),
-        });
-        const database = getDatabase(app);
-        instances = { app, auth, db, database };
-        return instances;
-    } else {
-        const app = getApp();
-        if (instances) {
-            return instances;
-        }
-        const auth = getAuth(app);
-        const db = initializeFirestore(app, {
-            localCache: memoryLocalCache(),
-        });
+        const db = initializeFirestore(app, { localCache: memoryLocalCache() });
         const database = getDatabase(app);
         instances = { app, auth, db, database };
         return instances;
     }
+    
+    if (instances) {
+        return instances;
+    }
+
+    const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    // Use initializeFirestore to specify cache settings. This is the modern approach.
+    const db = initializeFirestore(app, {
+      localCache: memoryLocalCache(),
+    });
+    const database = getDatabase(app);
+    instances = { app, auth, db, database };
+    return instances;
 }
 
-
+// This function is now the single source of truth for Firebase instances.
 function getFirebaseInstances(): FirebaseInstances {
     if (!instances) {
-      instances = initializeFirebase();
+        instances = initializeFirebase();
     }
     return instances;
 }

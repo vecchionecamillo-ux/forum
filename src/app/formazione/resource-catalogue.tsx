@@ -16,8 +16,8 @@ import { RadioGroup } from '@/components/ui/radio-group';
 import { FilterCard } from '@/components/filter-card';
 import type { Activity } from '@/lib/activities';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { getFirebaseInstances } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/hooks/use-auth';
 
 const mainCategoryIcons: Record<string, React.ElementType> = {
     'Piattaforme Trasversali': Library,
@@ -69,6 +69,7 @@ function ResourceCard({ resource }: { resource: Activity }) {
 export function ResourceCatalogue() {
     const [allResources, setAllResources] = useState<Activity[]>([]);
     const [loading, setLoading] = useState(true);
+    const { db } = useAuth();
 
     const [mainCategories, setMainCategories] = useState<string[]>([]);
     const [activeCategory, setActiveCategory] = useState<string | 'all'>('all');
@@ -76,7 +77,7 @@ export function ResourceCatalogue() {
 
 
     useEffect(() => {
-        const { db } = getFirebaseInstances();
+        if (!db) return;
         const q = query(collection(db, 'activities'), where('isResource', '==', true));
         
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -93,7 +94,7 @@ export function ResourceCatalogue() {
         });
 
         return () => unsubscribe();
-    }, []);
+    }, [db]);
     
 
     const groupedResources = useMemo(() => {

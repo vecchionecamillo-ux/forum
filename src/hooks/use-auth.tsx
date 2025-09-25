@@ -40,15 +40,11 @@ type AuthContextType = {
   loading: boolean;
   isModerator: boolean;
   logout: () => void;
+  auth: ReturnType<typeof getFirebaseInstances>['auth'];
+  db: ReturnType<typeof getFirebaseInstances>['db'];
 };
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  userProfile: null,
-  loading: true,
-  isModerator: false,
-  logout: () => {},
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
 // Helper function to create user in Firestore
 const createOrUpdateUserInDb = async (db: Firestore, user: User) => {
@@ -81,10 +77,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isModerator, setIsModerator] = useState(false);
   const router = useRouter();
+
+  const { auth, db } = getFirebaseInstances();
   
   // Effect for handling redirect result from Google SignIn
   useEffect(() => {
-    const { auth, db } = getFirebaseInstances();
     setLoading(true);
     getRedirectResult(auth)
       .then(async (result) => {
@@ -92,21 +89,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await createOrUpdateUserInDb(db, result.user);
           router.push('/profile');
         }
-        // Even if there's no redirect result, we are done with this part of loading.
-        // The onAuthStateChanged listener will handle the user session.
-        setLoading(false);
+        // Let onAuthStateChanged handle the final loading state
       })
       .catch((error) => {
         console.error("Error getting redirect result: ", error);
-        setLoading(false);
+        setLoading(false); // End loading on error
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Runs only once on component mount
 
   // Effect for handling auth state changes and profile listening
   useEffect(() => {
-    const { auth, db } = getFirebaseInstances();
-    
     const unsubscribeAuth = onAuthStateChanged(auth, async (authUser) => {
       if (authUser) {
         setUser(authUser);
@@ -140,12 +133,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => unsubscribeAuth();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Re-runs if auth or db instance changes (which they shouldn't)
+  }, []);
 
 
   const logout = async () => {
     setLoading(true);
-    const { auth } = getFirebaseInstances();
     try {
       await signOut(auth);
       // onAuthStateChanged will handle the state update
@@ -156,17 +148,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const value = {
+  const value: AuthContextType = {
     user,
     userProfile,
     loading,
     isModerator,
     logout,
+    auth,
+    db
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 };
