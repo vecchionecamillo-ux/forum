@@ -1,3 +1,5 @@
+// This file is dynamically imported by a server action, so it should not be a client component.
+
 import { PlaceHolderImages } from './placeholder-images';
 import { Activity } from './activities';
 

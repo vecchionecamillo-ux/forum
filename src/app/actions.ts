@@ -2,12 +2,6 @@
 
 import { revalidatePath } from 'next/cache';
 import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction, type Firestore, getDocs, query } from 'firebase/firestore';
-// NOTE: We cannot use the client-side `getFirebaseInstances` in server actions.
-// We need a separate admin-like initialization for server-side operations if needed,
-// but for now, these actions seem to be designed to be called from the client, where an instance is passed.
-// For simplicity, we'll assume a separate admin initialization if these were to run purely on the server.
-// However, the current project structure uses them as client-invoked server actions.
-// This is a placeholder for a proper server-side Firebase admin initialization.
 import { initializeApp, getApp, getApps } from 'firebase/app';
 
 const firebaseConfig = {
@@ -20,16 +14,19 @@ const firebaseConfig = {
   databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
 };
 
-function getDb() {
-    if (getApps().length === 0) {
-        initializeApp(firebaseConfig);
-    }
-    return getFirestore(getApp());
+let db: Firestore;
+
+try {
+    const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+    db = getFirestore(app);
+} catch (error) {
+    console.error("Firebase Admin initialization error:", error);
+    // Handle the error appropriately. Maybe throw it or use a mock DB.
+    // For now, we'll let it fail, but in production, you might want a fallback.
 }
 
 
 export async function addPoints(formData: FormData): Promise<{ success: boolean; message: string }> {
-  const db = getDb();
   const userId = formData.get('userId') as string;
   const points = formData.get('points');
 
@@ -100,7 +97,6 @@ export async function createMembershipCard(formData: FormData): Promise<{ succes
 }
 
 export async function updateUserRank(formData: FormData): Promise<{ success: boolean; message: string }> {
-  const db = getDb();
   const userId = formData.get('userId') as string;
   const newRankLevel = Number(formData.get('rank'));
 
@@ -123,7 +119,6 @@ export async function updateUserRank(formData: FormData): Promise<{ success: boo
 }
 
 export async function registerUserForActivity(formData: FormData): Promise<{ success: boolean; message: string }> {
-  const db = getDb();
   const userId = formData.get('userId') as string;
   const itemId = formData.get('itemId') as string;
   const itemTitle = formData.get('itemTitle') as string;
@@ -208,7 +203,6 @@ export async function registerUserForActivity(formData: FormData): Promise<{ suc
 }
 
 export async function confirmActivityParticipation(formData: FormData): Promise<{ success: boolean; message: string }> {
-  const db = getDb();
   const logId = formData.get('logId') as string;
   
   if (!logId) {
@@ -261,7 +255,6 @@ export async function confirmActivityParticipation(formData: FormData): Promise<
 
 
 export async function submitCollaborationProposal(formData: FormData): Promise<{ success: boolean; message: string }> {
-  const db = getDb();
   const data = Object.fromEntries(formData.entries());
 
   // Basic validation
@@ -288,8 +281,10 @@ export async function submitCollaborationProposal(formData: FormData): Promise<{
 }
 
 export async function seedDatabaseAction(): Promise<{ success: boolean; message: string }> {
-    const db = getDb();
     console.log('Starting database seed...');
+    
+    const { allActivities } = await import('@/lib/seed-data');
+    const { partnerLogos } = await import('@/lib/seed-data');
     
     // Seed activities
     const activitiesCollection = collection(db, 'activities');
