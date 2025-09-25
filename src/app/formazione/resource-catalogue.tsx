@@ -13,9 +13,9 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle, Code, Paintbrush, Landmark, BrainCircuit, FlaskConical, Lightbulb, Library, Layers, Zap, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Skeleton } from '../ui/skeleton';
-import { RadioGroup } from '../ui/radio-group';
-import { FilterCard } from '../filter-card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { RadioGroup } from '@/components/ui/radio-group';
+import { FilterCard } from '@/components/filter-card';
 
 
 export type Resource = {
