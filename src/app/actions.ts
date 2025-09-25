@@ -274,3 +274,5 @@ export async function submitCollaborationProposal(formData: FormData): Promise<{
     return { success: false, message: "Si è verificato un errore durante l'invio della proposta. Riprova più tardi." };
   }
 }
+
+    

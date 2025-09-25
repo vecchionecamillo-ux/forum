@@ -1,6 +1,6 @@
 'use client';
-import { ModeratorPanel } from '@/components/admin/moderator-panel';
-import { ActivityDashboard } from '@/components/admin/activity-dashboard';
+import { ModeratorPanel } from '@/app/admin/moderator-panel';
+import { ActivityDashboard } from '@/app/admin/activity-dashboard';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -51,3 +51,5 @@ export default function AdminPage() {
     </section>
   );
 }
+
+    

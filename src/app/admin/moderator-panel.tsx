@@ -1,12 +1,11 @@
 'use client';
 
 import { useEffect, useState, useTransition } from 'react';
-import { addPoints, updateUserRank } from '@/app/actions';
+import { addPoints } from '@/app/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { MoreHorizontal, Search } from 'lucide-react';
 import {
@@ -30,17 +29,15 @@ import { getFirebaseInstances } from '@/lib/firebase';
 import { getUserTier } from '@/lib/membership-tiers';
 
 
-function UserTableRow({ user, onAction, isPending }: { user: UserProfile, onAction: (formData: FormData, actionType: 'addPoints' | 'changeRank') => void, isPending: boolean }) {
+function UserTableRow({ user, onAction, isPending }: { user: UserProfile, onAction: (formData: FormData, actionType: 'addPoints') => void, isPending: boolean }) {
   const userTier = getUserTier(user.xp || 0);
   const [pointsToAdd, setPointsToAdd] = useState('');
 
-  const handleFormAction = (actionType: 'addPoints' | 'changeRank', value?: string) => {
+  const handleFormAction = (actionType: 'addPoints') => {
     const formData = new FormData();
     formData.append('userId', user.uid);
     if (actionType === 'addPoints') {
       formData.append('points', pointsToAdd);
-    } else if (actionType === 'changeRank' && value) {
-      formData.append('rank', value);
     }
     onAction(formData, actionType);
     if (actionType === 'addPoints') setPointsToAdd('');
@@ -89,7 +86,7 @@ function UserTableRow({ user, onAction, isPending }: { user: UserProfile, onActi
   );
 }
 
-function UserTable({ users, onAction, isPending }: { users: UserProfile[], onAction: (formData: FormData, actionType: 'addPoints' | 'changeRank') => void, isPending: boolean }) {
+function UserTable({ users, onAction, isPending }: { users: UserProfile[], onAction: (formData: FormData, actionType: 'addPoints') => void, isPending: boolean }) {
   return (
     <div className="w-full overflow-x-auto">
         <Table>
@@ -151,13 +148,11 @@ export function ModeratorPanel() {
     setFilteredUsers(filtered);
   }, [filter, users]);
 
-  const handleAction = (formData: FormData, actionType: 'addPoints' | 'changeRank') => {
+  const handleAction = (formData: FormData, actionType: 'addPoints') => {
     startTransition(async () => {
         let result: { success: boolean; message: string };
         if (actionType === 'addPoints') {
             result = await addPoints(formData);
-        } else if (actionType === 'changeRank') {
-            result = await updateUserRank(formData);
         } else {
             result = { success: false, message: 'Azione non riconosciuta.' };
         }
@@ -198,3 +193,5 @@ export function ModeratorPanel() {
     </Card>
   );
 }
+
+    
