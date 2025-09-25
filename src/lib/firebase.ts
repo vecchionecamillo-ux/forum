@@ -29,8 +29,9 @@ function getFirebaseInstances(): FirebaseInstances {
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
         
+        // Use memory cache to avoid IndexedDB issues in some environments
         const db = initializeFirestore(app, {
-          localCache: persistentLocalCache(/* settings */),
+          localCache: memoryLocalCache(),
         });
         
         const database = getDatabase(app);
