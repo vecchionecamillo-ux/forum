@@ -1,9 +1,10 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction, type Firestore } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction, type Firestore, getDocs, query } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
-
+import { allActivities } from '@/lib/seed-data';
+import { partnerLogos } from '@/lib/seed-data';
 
 // This is a temporary solution to initialize Firebase Admin on the server.
 // In a real application, you would use the Firebase Admin SDK with a service account.
@@ -262,4 +263,46 @@ export async function submitCollaborationProposal(formData: FormData): Promise<{
     console.error("Error submitting proposal: ", error);
     return { success: false, message: "Si è verificato un errore durante l'invio della proposta. Riprova più tardi." };
   }
+}
+
+export async function seedDatabaseAction(): Promise<{ success: boolean; message: string }> {
+    console.log('Starting database seed...');
+    
+    // Seed activities
+    const activitiesCollection = collection(db, 'activities');
+    const activitiesSnapshot = await getDocs(query(activitiesCollection));
+    if (activitiesSnapshot.empty) {
+        try {
+            for (const activity of allActivities) {
+                await addDoc(activitiesCollection, activity);
+                console.log(`Added activity: ${activity.title}`);
+            }
+            console.log('Activities seeded successfully!');
+        } catch (error: any) {
+            console.error('Error seeding activities:', error);
+            return { success: false, message: `Error seeding activities: ${error.message}`};
+        }
+    } else {
+        console.log('Activities collection already contains data. Seeding aborted.');
+    }
+
+    // Seed partners
+    const partnersCollection = collection(db, 'partners');
+    const partnersSnapshot = await getDocs(query(partnersCollection));
+    if (partnersSnapshot.empty) {
+        try {
+            for (const partner of partnerLogos) {
+                await addDoc(partnersCollection, partner);
+                console.log(`Added partner: ${partner.name}`);
+            }
+            console.log('Partners seeded successfully!');
+        } catch (error: any) {
+            console.error('Error seeding partners:', error);
+            return { success: false, message: `Error seeding partners: ${error.message}`};
+        }
+    } else {
+        console.log('Partners collection already contains data. Seeding aborted.');
+    }
+
+    return { success: true, message: 'Database seeding completed (or was not needed).' };
 }

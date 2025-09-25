@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { seedDatabaseAction } from '@/app/actions';
 
 /**
  * A client component that triggers the database seeding API endpoint.
@@ -15,18 +16,17 @@ export function DatabaseSeeder() {
 
       if (!hasSeeded) {
         console.log('Database not seeded in this session. Triggering seed...');
-        fetch('/api/seed')
-          .then(async (res) => {
-            if (res.ok) {
+        seedDatabaseAction()
+          .then((result) => {
+            if (result.success) {
               console.log('Database seeding triggered successfully.');
               sessionStorage.setItem('db_seeded', 'true');
             } else {
-              const errorText = await res.text();
-              console.error('Failed to trigger database seeding:', res.status, errorText);
+              console.error('Failed to trigger database seeding:', result.message);
             }
           })
           .catch((error) => {
-            console.error('Error fetching seed endpoint:', error);
+            console.error('Error calling seed action:', error);
           });
       } else {
         console.log('Database has already been seeded in this session.');
