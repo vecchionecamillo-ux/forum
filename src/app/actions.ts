@@ -24,7 +24,7 @@ function getDb(): Firestore {
 }
 
 const db = getDb();
-export { db };
+// Do not export 'db' directly from a 'use server' file.
 
 
 export async function addPoints(formData: FormData): Promise<{ success: boolean; message: string }> {
@@ -280,5 +280,3 @@ export async function submitCollaborationProposal(formData: FormData): Promise<{
     return { success: false, message: "Si è verificato un errore durante l'invio della proposta. Riprova più tardi." };
   }
 }
-
-    

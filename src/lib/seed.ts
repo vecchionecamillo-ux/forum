@@ -2,10 +2,30 @@
 // THIS SCRIPT IS FOR ONE-TIME DATABASE SEEDING.
 // DO NOT RUN THIS IN PRODUCTION OR AFTER THE INITIAL SEEDING.
 
-import { collection, addDoc, getDocs, query } from 'firebase/firestore';
-import { db } from '@/app/actions'; // Use the server-side db instance
+import { collection, addDoc, getDocs, query, getFirestore, type Firestore } from 'firebase/firestore';
+import { initializeApp, getApps, getApp } from 'firebase/app';
 import { PlaceHolderImages } from './placeholder-images';
 import { Activity } from './activities';
+
+// This is a separate, server-only Firebase initialization for the seeding script.
+function getSeedDb(): Firestore {
+    const firebaseConfig = {
+      apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+      authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+      messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+      appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    };
+    if (getApps().find(app => app.name === 'seeder')) {
+        return getFirestore(getApp('seeder'));
+    }
+    const app = initializeApp(firebaseConfig, 'seeder');
+    return getFirestore(app);
+}
+
+const db = getSeedDb();
+
 
 const partnerLogos = [
   { id: '1', name: 'Partner 1', logoUrl: 'https://placehold.co/120x60/EFEFEF/31343C?text=Partner1', websiteUrl: '#' },
