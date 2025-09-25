@@ -35,6 +35,12 @@
       "description": "Un gruppo eterogeneo di amici che ridono e si divertono all'aperto.",
       "imageUrl": "https://images.unsplash.com/photo-1509099836639-18ba1795216d?q=80&w=600&h=400&auto=format&fit=crop",
       "imageHint": "group fun"
+    },
+    {
+      "id": "elearning-placeholder",
+      "description": "Una persona seduta a una scrivania con un laptop aperto, che impara online con cuffie.",
+      "imageUrl": "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=600&h=400&auto=format&fit=crop",
+      "imageHint": "elearning online"
     }
   ]
 }

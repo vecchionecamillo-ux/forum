@@ -2,14 +2,48 @@
 // THIS SCRIPT IS FOR ONE-TIME DATABASE SEEDING.
 // DO NOT RUN THIS IN PRODUCTION OR AFTER THE INITIAL SEEDING.
 
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs, query } from 'firebase/firestore';
 import { getFirebaseInstances } from './firebase';
 import { PlaceHolderImages } from './placeholder-images';
 import { Activity } from './activities';
 
 
 const allActivities: Activity[] = [
-    // --- FORMAZIONE ---
+    // --- FEATURED ITEMS FOR HOMEPAGE ---
+    {
+        title: 'Formazione by lab039',
+        slug: 'formazione-lab039',
+        category: 'Formazione',
+        description: 'Accedi a workshop, masterclass e corsi tenuti da professionisti del settore creativo e tecnologico.',
+        image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+        link: '/formazione',
+        cta: 'Scopri di più',
+        featured: true,
+        type: 'earn'
+    },
+    {
+        title: 'Eventi & Community',
+        slug: 'eventi-community',
+        category: 'Evento',
+        description: 'Partecipa a mostre, talk e festival. Connettiti e collabora con una rete di artisti e innovatori.',
+        image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
+        link: '/eventi',
+        cta: 'Scopri di più',
+        featured: true,
+        type: 'earn'
+    },
+    {
+        title: 'Marketplace',
+        slug: 'marketplace',
+        category: 'Premio',
+        description: 'Usa i tuoi punti per riscattare premi esclusivi, accedere a contenuti unici e molto altro.',
+        image: PlaceHolderImages.find(img => img.id === 'art-placeholder'),
+        link: '/marketplace',
+        cta: 'Scopri di più',
+        featured: true,
+        type: 'spend'
+    },
+    // --- FORMAZIONE (INTERNAL) ---
     {
         title: 'Laboratorio di Arte Generativa',
         slug: 'lab-arte-generativa',
@@ -297,12 +331,215 @@ const allActivities: Activity[] = [
         xp: 150,
         type: 'spend',
     },
+    // --- E-LEARNING RESOURCES ---
+    {
+        isResource: true,
+        mainCategory: 'Piattaforme Trasversali',
+        slug: 'resource-coursera',
+        category: 'Piattaforme MOOC',
+        subCategory: 'Piattaforme MOOC',
+        title: 'Coursera',
+        description: 'Piattaforma in partnership con università di prestigio e giganti del settore come Google e IBM. Molti corsi possono essere visionati gratuitamente, ma per ottenere un certificato professionale è spesso richiesto un pagamento.',
+        examples: ['Corsi brevi (MOOC) e lauree online.', 'Certificati professionali in Data Science, AI e altro.', 'Corsi da Yale, Harvard, Università Bocconi.'],
+        link: 'https://www.coursera.org',
+        durationDetail: 'Long-term',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Piattaforme Trasversali',
+        slug: 'resource-edx',
+        category: 'Piattaforme MOOC',
+        subCategory: 'Piattaforme MOOC',
+        title: 'edX',
+        description: 'Co-fondata da Harvard e MIT, offre un\'offerta formativa di altissima qualità accademica. Ideale per chi cerca certificazioni riconosciute a livello internazionale.',
+        examples: ['Corsi in matematica, scienze umane e tecnologia.', 'Programmi MicroMasters e lauree online.'],
+        link: 'https://www.edx.org',
+        durationDetail: 'Long-term',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Piattaforme Trasversali',
+        slug: 'resource-udemy',
+        category: 'Piattaforme "Creator-Centric"',
+        subCategory: 'Piattaforme "Creator-Centric"',
+        title: 'Udemy',
+        description: 'Piattaforma con una vastissima diversità di argomenti, da competenze pratiche come fotografia e musica a corsi professionali. Spesso a pagamento ma con frequenti sconti.',
+        examples: ['Corsi on-demand su migliaia di argomenti.', 'Lezioni tenute da esperti di settore.'],
+        link: 'https://www.udemy.com',
+        durationDetail: 'Intensive',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Piattaforme Trasversali',
+        slug: 'resource-khan-academy',
+        category: 'Istruzione Gratuita',
+        subCategory: 'Istruzione Gratuita',
+        title: 'Khan Academy',
+        description: 'Organizzazione no-profit con la missione di fornire un\'istruzione gratuita di primo livello. Eccellente per matematica e scienze, con percorsi personalizzati.',
+        examples: ['Lezioni di matematica dall\'aritmetica di base al calcolo avanzato.', 'Corsi di scienze, economia e storia.'],
+        link: 'https://www.khanacademy.org',
+        durationDetail: 'Long-term',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Piattaforme Trasversali',
+        slug: 'resource-google-garage',
+        category: 'Competenze Digitali',
+        subCategory: 'Competenze Digitali',
+        title: 'Google Digital Garage',
+        description: 'Hub formativo gratuito di Google per acquisire competenze nel mondo del web marketing. Include corsi completi su SEO, social media e pubblicità online.',
+        examples: ['Certificazione sui principi del marketing digitale.', 'Corsi su Google Ads e Analytics.'],
+        link: 'https://learndigital.withgoogle.com/digitalgarage',
+        durationDetail: 'Intensive',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Informatica e Programmazione',
+        slug: 'resource-freecodecamp',
+        category: 'Sviluppo Web (HTML, CSS, JavaScript)',
+        subCategory: 'Sviluppo Web (HTML, CSS, JavaScript)',
+        title: 'freeCodeCamp',
+        description: 'Un punto di riferimento per il responsive web design. Offre un curriculum completo e gratuito di oltre 300 ore che copre HTML, CSS e JavaScript con un approccio basato su progetti e certificazioni.',
+        examples: ['Responsive Web Design Certification', 'JavaScript Algorithms and Data Structures'],
+        link: 'https://www.freecodecamp.org',
+        durationDetail: 'Long-term',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Informatica e Programmazione',
+        slug: 'resource-odin-project',
+        category: 'Sviluppo Web (HTML, CSS, JavaScript)',
+        subCategory: 'Sviluppo Web (HTML, CSS, JavaScript)',
+        title: 'The Odin Project',
+        description: 'Un progetto open-source che cura i migliori tutorial per diventare sviluppatore full-stack (Ruby on Rails o JavaScript), con una forte community di supporto.',
+        examples: ['Foundations Path', 'Full Stack JavaScript Path'],
+        link: 'https://www.theodinproject.com',
+        durationDetail: 'Long-term',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Informatica e Programmazione',
+        slug: 'resource-codecademy',
+        category: 'Sviluppo App e Software (Python, Java, C++)',
+        subCategory: 'Sviluppo App e Software (Python, Java, C++)',
+        title: 'Codecademy',
+        description: 'Si distingue per i suoi corsi interattivi, perfetti per i principianti assoluti. Guida l\'utente passo dopo passo alla scoperta di linguaggi come Python e JavaScript.',
+        examples: ['Learn Python 3', 'Learn Java'],
+        link: 'https://www.codecademy.com',
+        durationDetail: 'Intensive',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Informatica e Programmazione',
+        slug: 'resource-itlab360',
+        category: 'Sviluppo App e Software (Python, Java, C++)',
+        subCategory: 'Sviluppo App e Software (Python, Java, C++)',
+        title: 'ITLab360',
+        description: 'Propone una selezione di corsi online gratuiti su librerie e framework moderni come React e Vue.js, nonché su linguaggi come SQL, PHP e Golang.',
+        examples: ['Corso React', 'Corso Vue.js', 'Corso SQL'],
+        link: 'https://www.itlab360.com',
+        durationDetail: 'Intensive',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Informatica e Programmazione',
+        slug: 'resource-coursera-datasci',
+        category: 'Data Science, Intelligenza Artificiale e Cyber Security',
+        subCategory: 'Data Science, Intelligenza Artificiale e Cyber Security',
+        title: 'Certificazioni AI/Data Science su Coursera',
+        description: 'Offre certificati professionali con prova gratuita in settori di punta come il Google Data Analytics Professional Certificate, l\'IBM Data Science e il Generative AI Engineering.',
+        examples: ['Google Data Analytics', 'IBM Data Science', 'Generative AI Engineering'],
+        link: 'https://www.coursera.org',
+        durationDetail: 'Long-term',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Informatica e Programmazione',
+        slug: 'resource-dicolab',
+        category: 'Data Science, Intelligenza Artificiale e Cyber Security',
+        subCategory: 'Data Science, Intelligenza Artificiale e Cyber Security',
+        title: 'Dicolab (Ministero Cultura)',
+        description: 'Corso online certificato e gratuito sulla Cyber Security, focalizzato sulla difesa delle organizzazioni culturali dagli attacchi informatici.',
+        examples: ['Corso Cyber Security per la Cultura'],
+        link: 'https://www.dicolab.cultura.gov.it',
+        durationDetail: 'Intensive',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Arte e Design',
+        slug: 'resource-canva-design',
+        category: 'Grafica e Design',
+        subCategory: 'Grafica e Design',
+        title: 'Canva Design School',
+        description: 'Un eccellente punto di partenza per creare grafiche professionali. Offre un corso video gratuito che copre i principi base del design.',
+        examples: ['Introduzione alla progettazione grafica'],
+        link: 'https://www.canva.com/designschool/',
+        durationDetail: 'Intensive',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    },
+    {
+        isResource: true,
+        mainCategory: 'Arte e Design',
+        slug: 'resource-etass',
+        category: 'Grafica e Design',
+        subCategory: 'Grafica e Design',
+        title: 'ETAss Formazione',
+        description: 'Corsi gratuiti di Grafica Digitale e Siti Web finanziati da enti come la Regione Lombardia, spesso con stage garantito e attestato riconosciuto.',
+        examples: ['Grafica Digitale Adobe e Siti Web'],
+        link: '#',
+        durationDetail: 'Long-term',
+        cta: 'Visita la piattaforma',
+        type: 'earn',
+        image: PlaceHolderImages.find(img => img.id === 'elearning-placeholder'),
+    }
 ];
 
 export async function seedDatabase() {
     console.log('Starting database seed...');
     const { db } = getFirebaseInstances();
     const activitiesCollection = collection(db, 'activities');
+    
+    // Check if the collection is empty to prevent re-seeding
+    const snapshot = await getDocs(query(activitiesCollection));
+    if (!snapshot.empty) {
+        console.log('Database already contains data. Seeding aborted.');
+        return;
+    }
 
     try {
         for (const activity of allActivities) {
@@ -314,12 +551,3 @@ export async function seedDatabase() {
         console.error('Error seeding database:', error);
     }
 }
-
-// Per eseguire il seeding, potresti voler esporre una funzione eseguibile
-// tramite un endpoint API di sviluppo o uno script separato.
-// Esempio (non eseguire automaticamente):
-// if (process.env.NODE_ENV === 'development') {
-//   // Potresti avere una logica qui per triggerare il seed
-//   // ad esempio, tramite un comando specifico.
-//   console.log('Seed script is ready. Call seedDatabase() to run.');
-// }
