@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction, type Firestore, getDocs, query } from 'firebase/firestore';
 import { initializeApp, getApp, getApps } from 'firebase/app';
+import { allActivities, partnerLogos } from '@/lib/seed-data';
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -282,9 +283,6 @@ export async function submitCollaborationProposal(formData: FormData): Promise<{
 
 export async function seedDatabaseAction(): Promise<{ success: boolean; message: string }> {
     console.log('Starting database seed...');
-    
-    const { allActivities } = await import('@/lib/seed-data');
-    const { partnerLogos } = await import('@/lib/seed-data');
     
     // Seed activities
     const activitiesCollection = collection(db, 'activities');
