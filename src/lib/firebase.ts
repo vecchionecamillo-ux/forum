@@ -1,6 +1,6 @@
 import { initializeApp, getApp, getApps, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-import { type Firestore, memoryLocalCache, initializeFirestore, persistentLocalCache, enableIndexedDbPersistence } from 'firebase/firestore';
+import { type Firestore, memoryLocalCache, initializeFirestore, persistentLocalCache } from 'firebase/firestore';
 import { getDatabase, type Database } from 'firebase/database';
 
 const firebaseConfig: FirebaseOptions = {
