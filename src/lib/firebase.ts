@@ -25,37 +25,29 @@ let instances: FirebaseInstances | null = null;
 
 function getFirebaseInstances(): FirebaseInstances {
     if (typeof window !== 'undefined' && !instances) {
-        // Initialize the app only if it hasn't been initialized yet.
+        // Initialize on the client-side
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
         
-        let db: Firestore;
-        try {
-            // Try to initialize with persistent cache first.
-            db = initializeFirestore(app, {
-                localCache: persistentLocalCache(/*{ tabManager: 'single-tab' }*/),
-            });
-        } catch (e) {
-            // If persistent cache fails (e.g., IndexedDB not supported or blocked),
-            // fallback to memory cache.
-            console.warn("Firestore persistent cache initialization failed, falling back to memory cache.", e);
-            db = initializeFirestore(app, {
-                localCache: memoryLocalCache(),
-            });
-        }
+        // Use memory cache which is more reliable in complex environments (like iframes)
+        const db = initializeFirestore(app, {
+            localCache: memoryLocalCache(),
+        });
         
         const database = getDatabase(app);
         instances = { app, auth, db, database };
-    }
-    // Fallback for server-side or already initialized instances.
-    if (!instances) {
+
+    } else if (typeof window === 'undefined' && !instances) {
+        // Initialize on the server-side
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
         const db = initializeFirestore(app, { localCache: memoryLocalCache() });
         const database = getDatabase(app);
         instances = { app, auth, db, database };
     }
-    return instances;
+    
+    // This should now always return a valid instance
+    return instances!;
 }
 
 // We will export a function to get instances instead of instances directly
