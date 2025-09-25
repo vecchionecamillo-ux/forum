@@ -23,7 +23,7 @@ type FirebaseInstances = {
 let instances: FirebaseInstances | null = null;
 
 function getFirebaseInstances(): FirebaseInstances {
-    if (!instances) {
+    if (typeof window !== 'undefined' && !instances) {
         // Initialize the app only if it hasn't been initialized yet.
         const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
         const auth = getAuth(app);
@@ -31,6 +31,14 @@ function getFirebaseInstances(): FirebaseInstances {
         const db = initializeFirestore(app, {
           localCache: memoryLocalCache(),
         });
+        const database = getDatabase(app);
+        instances = { app, auth, db, database };
+    }
+    // Fallback for server-side rendering
+    if (!instances) {
+        const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+        const auth = getAuth(app);
+        const db = initializeFirestore(app, { localCache: memoryLocalCache() });
         const database = getDatabase(app);
         instances = { app, auth, db, database };
     }
