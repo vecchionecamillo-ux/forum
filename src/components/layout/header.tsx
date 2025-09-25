@@ -2,7 +2,7 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, LogOut, User, Shield, PenSquare } from 'lucide-react';
+import { Menu, LogOut, User, Shield, Bot } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/hooks/use-auth';
@@ -45,6 +45,9 @@ export function Header() {
           {link.label}
         </Link>
       ))}
+      <Link href="/ai-assistant" onClick={handleLinkClick} className="text-sm font-medium transition-colors text-foreground/70 hover:text-foreground flex items-center">
+        <Bot className="mr-2 h-4 w-4" /> AI Assistant
+      </Link>
       {isModerator && (
          <Link href="/admin" onClick={handleLinkClick} className="text-sm font-medium transition-colors text-foreground/70 hover:text-foreground flex items-center">
            <Shield className="mr-2 h-4 w-4" /> Admin
