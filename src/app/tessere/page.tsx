@@ -18,7 +18,7 @@ export default function TesserePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCheck, setShowCheck] = useState(false);
-  const { db } = useAuth(); // Use the stable db instance from context
+  const { db } = useAuth(); // Usa l'istanza stabile del DB dal contesto
 
   const handleFetchPoints = async () => {
     if (!userId) {
@@ -34,18 +34,29 @@ export default function TesserePage() {
     setUserTokens(null);
 
     try {
-      const userDocRef = doc(db, 'users', userId);
+      // 1. Crea un riferimento al documento dell'utente
+      const userDocRef = doc(db, 'users', userId.trim());
+
+      // 2. Recupera il documento da Firestore
       const docSnap = await getDoc(userDocRef);
 
+      // 3. Controlla se il documento esiste
       if (docSnap.exists()) {
         const userData = docSnap.data();
-        setUserTokens(userData.token !== undefined ? userData.token : null);
+        // 4. Legge il valore dal campo 'token' (o 'points' come fallback se 'token' non esiste)
+        const tokens = userData.token !== undefined ? userData.token : (userData.points !== undefined ? userData.points : null);
+
+        if (tokens !== null) {
+            setUserTokens(tokens);
+        } else {
+            setError(`L'utente ${userId} non ha un campo 'token' o 'points' valido.`);
+        }
       } else {
         setError('Nessun utente trovato con questo ID.');
       }
     } catch (e) {
+      console.error("Errore nel recupero dei dati:", e);
       setError("Si è verificato un errore durante il recupero dei dati.");
-      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -107,16 +118,15 @@ export default function TesserePage() {
                     </div>
                     <Button onClick={handleFetchPoints} disabled={loading || !userId} className="w-full">
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    {loading ? 'Caricamento...' : 'Verifica Token'}
+                    {loading ? 'Caricamento...' : 'Verifica Saldo'}
                     </Button>
 
-                    {error && <p className="text-sm text-center text-destructive">{error}</p>}
+                    {error && <p className="text-sm text-center text-destructive mt-2">{error}</p>}
                     
                     {userTokens !== null && (
-                    <div className="text-center pt-4">
-                        <p className="text-muted-foreground">L'utente ha</p>
+                    <div className="text-center pt-4 border-t mt-4">
+                        <p className="text-muted-foreground">Saldo token per l'utente:</p>
                         <p className="text-4xl font-black text-primary">{userTokens}</p>
-                        <p className="text-muted-foreground">token</p>
                     </div>
                     )}
                 </CardContent>
