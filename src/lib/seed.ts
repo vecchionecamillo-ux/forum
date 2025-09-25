@@ -46,7 +46,7 @@ const allActivities: Activity[] = [
         xp: 250,
         date: '2024-11-05',
         time: '19:00 - 21:00',
-        duration: '4 settimane',
+        duration: '4 settimane, 2h/sett',
         durationDetail: 'Lungo Termine',
         type: 'earn',
         supporters: [
@@ -73,12 +73,73 @@ const allActivities: Activity[] = [
         durationDetail: 'Lungo Termine',
         type: 'earn',
     },
+     {
+        title: 'Corso Base di Python',
+        slug: 'corso-base-python',
+        category: 'Formazione',
+        mainCategory: 'Informatica e Programmazione',
+        description: 'Parti da zero e impara le basi di Python, uno dei linguaggi di programmazione più richiesti al mondo. Ideale per principianti assoluti.',
+        image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+        cta: 'Inizia a Imparare',
+        points: 80,
+        xp: 200,
+        date: '2024-10-01',
+        duration: '4 settimane',
+        durationDetail: 'Lungo Termine',
+        type: 'earn',
+        supporters: [
+            {
+                name: 'DevAcademy',
+                bio: 'Piattaforma online per la formazione di sviluppatori software.',
+                avatarUrl: 'https://i.pravatar.cc/150?u=devacademy',
+                websiteUrl: 'https://example.com'
+            }
+        ]
+    },
+    {
+        title: 'Public Speaking per Creativi',
+        slug: 'public-speaking-creativi',
+        category: 'Workshop',
+        mainCategory: 'Sviluppo Personale e Professionale',
+        description: 'Impara a presentare le tue idee e i tuoi progetti con sicurezza e carisma. Un workshop intensivo per superare la paura del palcoscenico.',
+        image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
+        cta: 'Iscriviti al Workshop',
+        points: 60,
+        xp: 120,
+        date: '2024-11-20',
+        time: '10:00 - 13:00',
+        duration: '3 ore',
+        durationDetail: 'Workshop Intensivo',
+        type: 'earn',
+    },
+    {
+        title: 'Introduzione alla Finanza Decentralizzata (DeFi)',
+        slug: 'intro-defi',
+        category: 'Formazione',
+        mainCategory: 'Economia e Finanza',
+        description: 'Scopri i principi fondamentali della DeFi, dalle criptovalute agli smart contract. Un corso per capire la rivoluzione finanziaria in atto.',
+        image: PlaceHolderImages.find(img => img.id === 'nft-placeholder'),
+        cta: 'Scopri di più',
+        points: 70,
+        xp: 180,
+        date: '2024-10-28',
+        duration: '2 settimane',
+        durationDetail: 'Lungo Termine',
+        type: 'earn',
+        supporters: [
+            {
+                name: 'Laura Bianchi',
+                bio: 'FinTech Expert e consulente per startup innovative nel settore blockchain.',
+                avatarUrl: 'https://i.pravatar.cc/150?u=laura',
+                websiteUrl: 'https://example.com'
+            }
+        ]
+    },
     // --- EVENTI & COMMUNITY ---
     {
         title: 'Mostra d\'Arte Digitale: "Futuri Possibili"',
         slug: 'mostra-futuri-possibili',
         category: 'Mostra',
-        mainCategory: 'Arte e Design',
         description: 'Esplora le visioni del futuro attraverso le opere di artisti digitali emergenti. Un viaggio immersivo tra NFT, realtà virtuale e arte generativa.',
         image: PlaceHolderImages.find(img => img.id === 'nft-placeholder'),
         cta: 'Esplora la Mostra',
@@ -126,6 +187,47 @@ const allActivities: Activity[] = [
             }
         ]
     },
+    {
+        title: 'Festival del Cinema Indipendente Online',
+        slug: 'festival-cinema-indie',
+        category: 'Evento',
+        description: 'Una settimana di proiezioni gratuite dedicate al cinema indipendente da tutto il mondo. Vota il tuo film preferito e partecipa ai Q&A con i registi.',
+        image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
+        cta: 'Guarda il programma',
+        points: 40,
+        xp: 100,
+        date: '2024-11-12',
+        duration: '1 settimana',
+        type: 'earn',
+    },
+    {
+        title: 'Concerto Musica Elettronica Live Streaming',
+        slug: 'concerto-elettronica',
+        category: 'Evento',
+        description: 'Unisciti a noi per una serata di musica elettronica con DJ set e performance live in streaming esclusivo per la nostra community.',
+        image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
+        cta: 'Partecipa all\'evento',
+        points: 20,
+        xp: 40,
+        date: '2024-11-30',
+        time: '21:00',
+        duration: '3 ore',
+        type: 'earn',
+    },
+    {
+        title: 'Gruppo di Lettura Mensile',
+        slug: 'gruppo-lettura',
+        category: 'Community',
+        mainCategory: 'Scienze Umane',
+        description: 'Ogni mese esploriamo un libro su arte, tecnologia o creatività. Unisciti alla discussione e condividi le tue riflessioni.',
+        image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+        cta: 'Unisciti al gruppo',
+        points: 15,
+        xp: 30,
+        duration: 'Mensile',
+        type: 'earn',
+    },
+
     // --- MARKETPLACE ---
     {
         title: 'Consulenza Portfolio Personalizzata',
@@ -153,6 +255,7 @@ const allActivities: Activity[] = [
         title: 'Stampa Fine Art in Edizione Limitata',
         slug: 'stampa-fine-art',
         category: 'Premio',
+        mainCategory: 'Arte e Design',
         description: 'Possiedi un pezzo unico. Riscatta una stampa fine art in edizione limitata di un\'opera selezionata dalla nostra galleria digitale.',
         image: PlaceHolderImages.find(img => img.id === 'art-placeholder'),
         cta: 'Riscatta con Punti',
@@ -160,28 +263,39 @@ const allActivities: Activity[] = [
         xp: 250,
         type: 'spend',
     },
-    // --- ELEARNING ---
      {
-        title: 'Google Digital Garage',
-        slug: 'elearning-google-garage',
-        category: 'Formazione',
-        mainCategory: 'Economia e Finanza',
-        description: 'Hub formativo gratuito di Google per acquisire competenze nel mondo del web marketing. Include corsi completi su SEO, social media e pubblicità online.',
-        link: 'https://learndigital.withgoogle.com/digitalgarage',
-        cta: 'Visita la Piattaforma',
-        type: 'earn',
-        xp: 10,
+        title: 'Biglietti VIP per Eventi Esclusivi',
+        slug: 'biglietti-vip',
+        category: 'Premio',
+        description: 'Ottieni due biglietti VIP per un nostro evento a scelta. Include accesso backstage o incontro con gli artisti (dove disponibile).',
+        image: PlaceHolderImages.find(img => img.id === 'events-placeholder'),
+        cta: 'Riscatta con Punti',
+        points: 2000,
+        xp: 400,
+        type: 'spend',
     },
     {
-        title: 'freeCodeCamp',
-        slug: 'elearning-freecodecamp',
-        category: 'Formazione',
-        mainCategory: 'Informatica e Programmazione',
-        description: 'Un punto di riferimento per il responsive web design. Offre un curriculum completo e gratuito di oltre 300 ore che copre HTML, CSS e JavaScript con un approccio basato su progetti e certificazioni.',
-        link: 'https://www.freecodecamp.org',
-        cta: 'Visita la Piattaforma',
-        type: 'earn',
-        xp: 10,
+        title: 'Merchandising Ufficiale Cantiere Culturale',
+        slug: 'merchandising',
+        category: 'Premio',
+        description: 'Scegli tra T-shirt, borse e altri gadget esclusivi con il logo del Cantiere Culturale. Mostra il tuo supporto alla community.',
+        image: PlaceHolderImages.find(img => img.id === 'community-placeholder'),
+        cta: 'Riscatta con Punti',
+        points: 350,
+        xp: 50,
+        type: 'spend',
+    },
+    {
+        title: 'Pubblica un Articolo sul Blog',
+        slug: 'pubblica-articolo',
+        category: 'Premio',
+        mainCategory: 'Scienze Umane',
+        description: 'Hai una storia da raccontare o un\'idea da condividere? Riscatta questo premio per pubblicare un tuo articolo sul blog ufficiale del Cantiere Culturale.',
+        image: PlaceHolderImages.find(img => img.id === 'training-placeholder'),
+        cta: 'Riscatta con Punti',
+        points: 750,
+        xp: 150,
+        type: 'spend',
     },
 ];
 
@@ -201,6 +315,11 @@ export async function seedDatabase() {
     }
 }
 
-if (typeof window === 'undefined' && process.env.NODE_ENV === 'development') {
-    console.log('To seed the database, you would typically run a separate script.');
-}
+// Per eseguire il seeding, potresti voler esporre una funzione eseguibile
+// tramite un endpoint API di sviluppo o uno script separato.
+// Esempio (non eseguire automaticamente):
+// if (process.env.NODE_ENV === 'development') {
+//   // Potresti avere una logica qui per triggerare il seed
+//   // ad esempio, tramite un comando specifico.
+//   console.log('Seed script is ready. Call seedDatabase() to run.');
+// }
