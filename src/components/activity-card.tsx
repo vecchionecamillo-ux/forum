@@ -69,6 +69,8 @@ export function ActivityCard({ item }: { item: Activity }) {
     item.type === 'earn'
       ? 'bg-green-500 hover:bg-green-600 text-white'
       : 'bg-destructive hover:bg-destructive/90 text-destructive-foreground';
+      
+  const linkHref = item.link || `/news/${item.slug}`;
 
   return (
     <Card
@@ -125,7 +127,7 @@ export function ActivityCard({ item }: { item: Activity }) {
       <CardFooter>
         {item.type === 'earn' || !item.points ? (
           <Button asChild variant="link" className="text-primary p-0">
-            <Link href={item.link || `/news/${item.slug}`}>
+            <Link href={linkHref}>
               {item.cta}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

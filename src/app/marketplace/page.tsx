@@ -1,36 +1,50 @@
 'use client';
 
-import { useState, useMemo, useTransition } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Award, Filter, Loader2 } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Slider } from '@/components/ui/slider';
 import { Separator } from '@/components/ui/separator';
-import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
-import { registerUserForActivity } from '../actions';
-import { allActivities } from '@/lib/activities';
 import { ActivityCard } from '@/components/activity-card';
-
-const allCategories = [...new Set(allActivities.map(item => item.category))];
-const maxPoints = Math.max(...allActivities.map(item => item.points || 0));
+import { collection, onSnapshot } from 'firebase/firestore';
+import { getFirebaseInstances } from '@/lib/firebase';
+import type { Activity } from '@/lib/activities';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function MarketplacePage() {
-    const { user, userProfile } = useAuth();
-    const { toast } = useToast();
-    const [isPending, startTransition] = useTransition();
+    const [activities, setActivities] = useState<Activity[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [allCategories, setAllCategories] = useState<string[]>([]);
+    const [maxPoints, setMaxPoints] = useState(1000);
+
     const [activeTab, setActiveTab] = useState<'spend' | 'earn'>('spend');
     const [pointRange, setPointRange] = useState<[number]>([maxPoints]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    
+
+    useEffect(() => {
+      const { db } = getFirebaseInstances();
+      const unsubscribe = onSnapshot(collection(db, 'activities'), (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+        setActivities(items);
+        setAllCategories([...new Set(items.map(item => item.category))]);
+        const max = Math.max(...items.map(item => item.points || 0));
+        setMaxPoints(max);
+        setPointRange([max]); // Set initial range to max
+        setLoading(false);
+      });
+  
+      return () => unsubscribe();
+    }, []);
+
     const filteredItems = useMemo(() => {
-        return allActivities.filter(item => 
+        return activities.filter(item => 
             item.type === activeTab &&
             (item.points || 0) <= pointRange[0] &&
             (selectedCategories.length === 0 || selectedCategories.includes(item.category))
         );
-    }, [activeTab, pointRange, selectedCategories]);
+    }, [activeTab, pointRange, selectedCategories, activities]);
 
     const handleCategoryChange = (category: string) => {
         setSelectedCategories(prev => 
@@ -108,10 +122,14 @@ export default function MarketplacePage() {
                      </button>
                 </div>
 
-                {filteredItems.length > 0 ? (
+                {loading ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-[450px] w-full rounded-lg" />)}
+                  </div>
+                ) : filteredItems.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredItems.map((item) => (
-                            <ActivityCard key={item.slug} item={item} />
+                            <ActivityCard key={item.id} item={item} />
                         ))}
                     </div>
                 ) : (

@@ -1,8 +1,7 @@
 'use client';
 
-import { allActivities } from '@/lib/activities';
 import { ActivityCard } from '@/components/activity-card';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,22 +9,38 @@ import { SlidersHorizontal } from 'lucide-react';
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, isWithinInterval, parseISO } from 'date-fns';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-
-// Definiamo le categorie formative da escludere
-const formazioneCategories = ['Laboratorio', 'Workshop'];
-// Filtriamo una sola volta le attività pertinenti per questa pagina
-const eventItems = allActivities.filter(item => !formazioneCategories.includes(item.category));
-// Estraiamo dinamicamente le categorie disponibili dai soli eventi
-const allCategories = [...new Set(eventItems.map(item => item.category))];
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { getFirebaseInstances } from '@/lib/firebase';
+import type { Activity } from '@/lib/activities';
+import { Skeleton } from '@/components/ui/skeleton';
 
 
 type Timeframe = 'all' | 'week' | 'month';
 type PointFilter = 'all' | 'earn' | 'spend' | 'free';
 
 export default function EventiPage() {
+  const [eventItems, setEventItems] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+
   const [timeframe, setTimeframe] = useState<Timeframe>('all');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [pointFilter, setPointFilter] = useState<PointFilter>('all');
+
+  useEffect(() => {
+    const { db } = getFirebaseInstances();
+    const formationCategories = ['Laboratorio', 'Workshop'];
+    const q = query(collection(db, 'activities'), where('category', 'not-in', formationCategories));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+      setEventItems(items);
+      setAllCategories([...new Set(items.map(item => item.category))]);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const filteredItems = useMemo(() => {
     const now = new Date();
@@ -46,7 +61,9 @@ export default function EventiPage() {
       const matchesTimeframe = () => {
         if (timeframe === 'all') return true;
         if (item.date && interval) {
-          return isWithinInterval(parseISO(item.date), interval);
+          try {
+            return isWithinInterval(parseISO(item.date), interval);
+          } catch(e) { return false; }
         }
         return timeframe === 'all';
       }
@@ -70,7 +87,7 @@ export default function EventiPage() {
 
       return true;
     });
-  }, [timeframe, selectedCategories, pointFilter]);
+  }, [timeframe, selectedCategories, pointFilter, eventItems]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategories(prev => 
@@ -157,10 +174,14 @@ export default function EventiPage() {
 
         <div>
             <h2 className="text-3xl font-bold tracking-tight text-center mb-8">Risultati</h2>
-            {filteredItems.length > 0 ? (
+            {loading ? (
+               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                 {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-[450px] w-full rounded-lg" />)}
+               </div>
+            ) : filteredItems.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredItems.map((item) => (
-                <ActivityCard key={item.slug} item={item} />
+                  <ActivityCard key={item.id} item={item} />
                 ))}
             </div>
             ) : (

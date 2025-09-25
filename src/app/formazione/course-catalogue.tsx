@@ -1,26 +1,40 @@
 'use client';
 
-import { allActivities } from '@/lib/activities';
 import { ActivityCard } from '@/components/activity-card';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { SlidersHorizontal, Layers, FlaskConical, Zap, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-// Definiamo quali categorie appartengono alla formazione
-const formazioneCategories = ['Laboratorio', 'Workshop'];
-// Filtriamo una sola volta le attività pertinenti
-const formazioneItems = allActivities.filter(item => formazioneCategories.includes(item.category));
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { getFirebaseInstances } from '@/lib/firebase';
+import type { Activity } from '@/lib/activities';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type CategoryFilter = 'all' | 'Laboratorio' | 'Workshop';
 type DurationFilter = 'all' | 'intensive' | 'long-term';
 
-
 export function CourseCatalogue() {
+  const [formazioneItems, setFormazioneItems] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
   const [durationFilter, setDurationFilter] = useState<DurationFilter>('all');
+
+  useEffect(() => {
+    const { db } = getFirebaseInstances();
+    const formationCategories = ['Laboratorio', 'Workshop'];
+    const q = query(collection(db, 'activities'), where('category', 'in', formationCategories));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+      setFormazioneItems(items);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const filteredItems = useMemo(() => {
     return formazioneItems.filter(item => {
@@ -39,7 +53,7 @@ export function CourseCatalogue() {
       
       return true;
     });
-  }, [categoryFilter, durationFilter]);
+  }, [categoryFilter, durationFilter, formazioneItems]);
 
   const FilterCard = ({ value, label, icon: Icon, group, selectedValue, onSelect }: { value: string, label: string, icon: React.ElementType, group: string, selectedValue: string, onSelect: (value: any) => void }) => {
     const isSelected = selectedValue === value;
@@ -85,10 +99,14 @@ export function CourseCatalogue() {
 
         {/* Results Section */}
         <div>
-            {filteredItems.length > 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-[450px] w-full rounded-lg" />)}
+              </div>
+            ) : filteredItems.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                     {filteredItems.map((item) => (
-                    <ActivityCard key={item.slug} item={item} />
+                    <ActivityCard key={item.id} item={item} />
                     ))}
                 </div>
             ) : (

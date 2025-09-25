@@ -1,11 +1,30 @@
-import { allActivities } from '@/lib/activities';
+'use client';
+
 import { ActivityCard } from '@/components/activity-card';
-
-const communityCategories = ['Opportunità', 'Approfondimento', 'Community'];
-const communityItems = allActivities.filter(item => communityCategories.includes(item.category));
-
+import { useEffect, useState } from 'react';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { getFirebaseInstances } from '@/lib/firebase';
+import type { Activity } from '@/lib/activities';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CommunityPage() {
+  const [communityItems, setCommunityItems] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const { db } = getFirebaseInstances();
+    const communityCategories = ['Community'];
+    const q = query(collection(db, 'activities'), where('category', 'in', communityCategories));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+      setCommunityItems(items);
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background pt-24 pb-12">
       <main className="container mx-auto px-4">
@@ -16,10 +35,14 @@ export default function CommunityPage() {
           </p>
         </div>
 
-        {communityItems.length > 0 ? (
+        {loading ? (
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-[450px] w-full rounded-lg" />)}
+           </div>
+        ) : communityItems.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {communityItems.map((item) => (
-              <ActivityCard key={item.slug} item={item} />
+              <ActivityCard key={item.id} item={item} />
             ))}
           </div>
         ) : (

@@ -1,38 +1,70 @@
 'use client';
 
-import { allActivities } from '@/lib/activities';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { ArrowLeft, Calendar, Clock, Gem, Loader2, Star } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
-import { useEffect, useTransition } from 'react';
+import { useEffect, useTransition, useState } from 'react';
 import { registerUserForActivity } from '@/app/actions';
 import { cn } from '@/lib/utils';
+import { doc, getDoc } from 'firebase/firestore';
+import { getFirebaseInstances } from '@/lib/firebase';
+import type { Activity } from '@/lib/activities';
+import { Skeleton } from '@/components/ui/skeleton';
 
-export default function NewsDetailPage({ params }: { params: { slug: string } }) {
-  const item = allActivities.find((p) => p.slug === params.slug);
+export default function NewsDetailPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const [item, setItem] = useState<Activity | null>(null);
+  const [loading, setLoading] = useState(true);
   const { user, userProfile } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    if (!item) {
-      router.push('/');
-    }
-  }, [item, router]);
+    if (!slug) return;
+    const { db } = getFirebaseInstances();
+    // Assuming slugs are unique and used as document IDs
+    const docRef = doc(db, 'activities', slug);
+    getDoc(docRef).then(docSnap => {
+      if (docSnap.exists()) {
+        setItem({ id: docSnap.id, ...docSnap.data() } as Activity);
+      } else {
+        // Handle not found
+        router.push('/eventi');
+      }
+      setLoading(false);
+    }).catch(() => {
+      // Handle error
+      router.push('/eventi');
+      setLoading(false);
+    });
+  }, [slug, router]);
 
-  if (!item) {
-    // Render a loading state or null while redirecting
-    return null;
+
+  if (loading || !item) {
+    return (
+       <main className="pt-24 pb-12">
+        <div className="container mx-auto px-4 max-w-4xl">
+           <Skeleton className="h-8 w-32 mb-8" />
+           <Skeleton className="h-10 w-full mb-4" />
+           <Skeleton className="h-6 w-3/4 mb-8" />
+           <Skeleton className="aspect-video w-full rounded-lg mb-8" />
+           <Skeleton className="h-6 w-full mb-4" />
+           <Skeleton className="h-6 w-full mb-4" />
+           <Skeleton className="h-6 w-2/3 mb-12" />
+           <Skeleton className="h-12 w-40" />
+        </div>
+      </main>
+    );
   }
 
-  const image = item.image || PlaceHolderImages.find(img => img.id === 'art-placeholder');
+  const image = item.image; // Placeholder images are now part of the activity data
 
   const handleAction = () => {
     if (!user) {
