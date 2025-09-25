@@ -13,7 +13,7 @@ import {
   type User,
   getRedirectResult,
 } from 'firebase/auth';
-import { auth, db } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase'; // Import singleton instances
 import { doc, getDoc, setDoc, serverTimestamp, onSnapshot, type Firestore } from 'firebase/firestore';
 import { useRouter } from 'next/navigation';
 
@@ -40,19 +40,19 @@ type AuthContextType = {
   loading: boolean;
   isModerator: boolean;
   logout: () => void;
-  auth: Auth;
-  db: Firestore;
+  auth: typeof auth; // Use the type of the imported auth instance
+  db: typeof db; // Use the type of the imported db instance
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 // Helper function to create user in Firestore
-const createOrUpdateUserInDb = async (db: Firestore, user: User) => {
+const createOrUpdateUserInDb = async (dbInstance: Firestore, user: User) => {
   if (!user.email) {
     console.warn("User object is missing email, skipping DB creation.");
     return;
   }
-  const userDocRef = doc(db, 'users', user.uid);
+  const userDocRef = doc(dbInstance, 'users', user.uid);
   const userDoc = await getDoc(userDocRef);
 
   if (!userDoc.exists()) {
@@ -62,7 +62,7 @@ const createOrUpdateUserInDb = async (db: Firestore, user: User) => {
           photoURL: user.photoURL,
           points: 0,
           xp: 0,
-          rankLevel: 1, // Obsoleto, ma lo teniamo per compatibilità iniziale
+          rankLevel: 1, 
           createdAt: serverTimestamp(),
           history: [],
       };
@@ -88,14 +88,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await createOrUpdateUserInDb(db, result.user);
           router.push('/profile');
         }
-        // Let onAuthStateChanged handle the final loading state
       })
       .catch((error) => {
         console.error("Error getting redirect result: ", error);
-        setLoading(false); // End loading on error
+      })
+      .finally(() => {
+         // Let onAuthStateChanged handle the final loading state
       });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Runs only once on component mount
+  }, []);
 
   // Effect for handling auth state changes and profile listening
   useEffect(() => {
@@ -104,13 +105,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(authUser);
         setIsModerator(authUser.email ? MODERATOR_EMAILS.includes(authUser.email) : false);
 
-        // User is logged in, now listen for their profile
         const userDocRef = doc(db, 'users', authUser.uid);
-        const unsubscribeProfile = onSnapshot(userDocRef, (doc) => {
-          if (doc.exists()) {
-            setUserProfile({ uid: doc.id, ...doc.data() } as UserProfile);
+        const unsubscribeProfile = onSnapshot(userDocRef, (docSnap) => {
+          if (docSnap.exists()) {
+            setUserProfile({ uid: docSnap.id, ...docSnap.data() } as UserProfile);
           } else {
-             // If profile doesn't exist, create it. This can happen on first email/pass signup
             createOrUpdateUserInDb(db, authUser);
           }
           setLoading(false);
@@ -139,7 +138,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true);
     try {
       await signOut(auth);
-      // onAuthStateChanged will handle the state update
       router.push('/');
     } catch (error) {
       console.error('Error signing out:', error);
@@ -153,8 +151,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     isModerator,
     logout,
-    auth,
-    db
+    auth, // Provide the singleton instance
+    db,   // Provide the singleton instance
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
