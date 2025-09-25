@@ -14,7 +14,6 @@ import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
 
-
 type Timeframe = 'all' | 'week' | 'month';
 type PointFilter = 'all' | 'earn' | 'spend' | 'free';
 
@@ -29,13 +28,17 @@ export default function EventiPage() {
 
   useEffect(() => {
     const { db } = getFirebaseInstances();
-    const formationCategories = ['Laboratorio', 'Workshop'];
-    const q = query(collection(db, 'activities'), where('category', 'not-in', formationCategories));
+    // Query for all activities that are NOT 'Laboratorio' or 'Workshop'
+    const q = query(collection(db, 'activities'), where('category', 'not-in', ['Laboratorio', 'Workshop']));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
       setEventItems(items);
+      // Dynamically generate categories from fetched data
       setAllCategories([...new Set(items.map(item => item.category))]);
+      setLoading(false);
+    }, (error) => {
+      console.error("Error fetching event items:", error);
       setLoading(false);
     });
 
@@ -59,13 +62,13 @@ export default function EventiPage() {
 
       // Timeframe Filter
       const matchesTimeframe = () => {
-        if (timeframe === 'all') return true;
-        if (item.date && interval) {
+        if (timeframe === 'all' || !item.date) return true;
+        if (interval) {
           try {
             return isWithinInterval(parseISO(item.date), interval);
           } catch(e) { return false; }
         }
-        return timeframe === 'all';
+        return true;
       }
       if (!matchesTimeframe()) return false;
 
@@ -154,20 +157,26 @@ export default function EventiPage() {
                 </div>
                  <div>
                     <h4 className="font-semibold mb-3">Cosa ti interessa?</h4>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                        {allCategories.map(category => (
-                            <div key={category} className="flex items-center space-x-2 p-2 rounded-md bg-muted/50">
-                                <Checkbox 
-                                    id={`cat-${category}`}
-                                    onCheckedChange={() => handleCategoryChange(category)}
-                                    checked={selectedCategories.includes(category)}
-                                />
-                                <label htmlFor={`cat-${category}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1">
-                                    {category}
-                                </label>
-                            </div>
-                        ))}
-                    </div>
+                    {loading ? (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                           {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-10 w-full" />)}
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            {allCategories.map(category => (
+                                <div key={category} className="flex items-center space-x-2 p-2 rounded-md bg-muted/50">
+                                    <Checkbox 
+                                        id={`cat-${category}`}
+                                        onCheckedChange={() => handleCategoryChange(category)}
+                                        checked={selectedCategories.includes(category)}
+                                    />
+                                    <label htmlFor={`cat-${category}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 flex-1">
+                                        {category}
+                                    </label>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>

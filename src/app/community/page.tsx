@@ -13,13 +13,16 @@ export default function CommunityPage() {
 
   useEffect(() => {
     const { db } = getFirebaseInstances();
-    const communityCategories = ['Community'];
-    const q = query(collection(db, 'activities'), where('category', 'in', communityCategories));
+    // Query for activities in the 'Community' category.
+    const q = query(collection(db, 'activities'), where('category', 'in', ['Community']));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
       setCommunityItems(items);
       setLoading(false);
+    }, (error) => {
+        console.error("Error fetching community items:", error);
+        setLoading(false);
     });
 
     return () => unsubscribe();

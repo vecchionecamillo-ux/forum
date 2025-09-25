@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useMemo, useTransition } from 'react';
-import { collection, onSnapshot, query, where, type Firestore, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot, query, type Firestore, orderBy } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -9,14 +9,14 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Ticket, Gift, Users, CheckCircle, Clock } from 'lucide-react';
+import { Search, Gift, CheckCircle, Clock } from 'lucide-react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { confirmActivityParticipation } from '@/app/actions';
 
 type ActivityLog = {

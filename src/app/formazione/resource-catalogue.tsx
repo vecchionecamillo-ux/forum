@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -30,8 +29,9 @@ type ResourceCategory = {
   mainCategory: MainCategory;
 };
 
-type MainCategory = 'Informatica e Programmazione' | 'Arte e Design' | 'Economia e Finanza' | 'Scienze Umane' | 'Scienza e Matematica' | 'Sviluppo Personale e Professionale' | 'Piattaforme Trasversali';
+type MainCategory = 'Piattaforme Trasversali' | 'Informatica e Programmazione' | 'Arte e Design' | 'Economia e Finanza' | 'Scienze Umane' | 'Scienza e Matematica' | 'Sviluppo Personale e Professionale';
 
+// In a real application, this data would come from a database (e.g., Firestore).
 const allResources: ResourceCategory[] = [
     {
         mainCategory: 'Piattaforme Trasversali',
@@ -213,7 +213,7 @@ const allResources: ResourceCategory[] = [
     }
 ];
 
-const mainCategories: { name: MainCategory, icon: React.ElementType }[] = [
+const mainCategories: { name: MainCategory; icon: React.ElementType }[] = [
     { name: 'Piattaforme Trasversali', icon: Library },
     { name: 'Informatica e Programmazione', icon: Code },
     { name: 'Arte e Design', icon: Paintbrush },
@@ -221,7 +221,7 @@ const mainCategories: { name: MainCategory, icon: React.ElementType }[] = [
     { name: 'Scienze Umane', icon: BrainCircuit },
     { name: 'Scienza e Matematica', icon: FlaskConical },
     { name: 'Sviluppo Personale e Professionale', icon: Lightbulb },
-]
+];
 
 const groupedResources = mainCategories.map(cat => ({
     ...cat,
@@ -235,7 +235,7 @@ const groupedResources = mainCategories.map(cat => ({
             }
             sub.resources.push(...current.resources);
             return acc;
-        }, [] as { name: string, resources: Resource[] }[])
+        }, [] as { name: string; resources: Resource[] }[])
 }));
 
 
@@ -248,8 +248,8 @@ function ResourceCard({ resource }: { resource: Resource }) {
       <CardContent className="flex-grow">
         <CardDescription className="mb-4">{resource.description}</CardDescription>
         <ul className="space-y-2 text-sm text-muted-foreground">
-            {resource.examples.map((example) => (
-                <li key={example} className="flex items-start gap-2">
+            {resource.examples.map((example, index) => (
+                <li key={index} className="flex items-start gap-2">
                     <CheckCircle className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                     <span>{example}</span>
                 </li>

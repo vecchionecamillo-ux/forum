@@ -20,7 +20,7 @@ export default function MarketplacePage() {
     const [maxPoints, setMaxPoints] = useState(1000);
 
     const [activeTab, setActiveTab] = useState<'spend' | 'earn'>('spend');
-    const [pointRange, setPointRange] = useState<[number]>([maxPoints]);
+    const [pointRange, setPointRange] = useState<[number]>([1000]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
     useEffect(() => {
@@ -28,10 +28,18 @@ export default function MarketplacePage() {
       const unsubscribe = onSnapshot(collection(db, 'activities'), (snapshot) => {
         const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
         setActivities(items);
-        setAllCategories([...new Set(items.map(item => item.category))]);
-        const max = Math.max(...items.map(item => item.points || 0));
-        setMaxPoints(max);
-        setPointRange([max]); // Set initial range to max
+        
+        // Dynamically set categories and max points from fetched data
+        const categories = [...new Set(items.map(item => item.category))];
+        setAllCategories(categories);
+
+        const max = Math.max(0, ...items.map(item => item.points || 0));
+        setMaxPoints(max > 0 ? max : 1000); // Avoid setting max to 0
+        setPointRange([max > 0 ? max : 1000]); // Set initial range to max
+        
+        setLoading(false);
+      }, (error) => {
+        console.error("Error fetching marketplace activities:", error);
         setLoading(false);
       });
   
@@ -72,7 +80,7 @@ export default function MarketplacePage() {
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 lg:gap-12">
-            {/* Sidebar Filtri */}
+            {/* Sidebar Filters */}
             <aside className="w-full md:w-1/4 lg:w-1/5">
                 <Card>
                     <CardHeader>
@@ -82,36 +90,43 @@ export default function MarketplacePage() {
                         <div>
                             <h4 className="font-semibold mb-3">Punti Massimi</h4>
                              <Slider
-                                defaultValue={[maxPoints]}
+                                value={pointRange}
                                 max={maxPoints}
                                 step={10}
                                 onValueChange={(value) => setPointRange(value as [number])}
+                                disabled={loading}
                             />
                             <div className="text-sm text-muted-foreground mt-2 text-center">Fino a {pointRange[0]} punti</div>
                         </div>
                         <Separator />
                         <div>
                             <h4 className="font-semibold mb-3">Categorie</h4>
-                            <div className="space-y-3">
-                                {allCategories.map(category => (
-                                    <div key={category} className="flex items-center space-x-2">
-                                        <Checkbox 
-                                            id={category} 
-                                            onCheckedChange={() => handleCategoryChange(category)}
-                                            checked={selectedCategories.includes(category)}
-                                        />
-                                        <label htmlFor={category} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                                            {category}
-                                        </label>
-                                    </div>
-                                ))}
-                            </div>
+                            {loading ? (
+                                <div className="space-y-3">
+                                    {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-6 w-full" />)}
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    {allCategories.map(category => (
+                                        <div key={category} className="flex items-center space-x-2">
+                                            <Checkbox 
+                                                id={category} 
+                                                onCheckedChange={() => handleCategoryChange(category)}
+                                                checked={selectedCategories.includes(category)}
+                                            />
+                                            <label htmlFor={category} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                                {category}
+                                            </label>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     </CardContent>
                 </Card>
             </aside>
 
-            {/* Contenuto Principale */}
+            {/* Main Content */}
             <div className="flex-1">
                 <div className="flex border-b mb-8">
                      <button onClick={() => setActiveTab('spend')} className={tabButtonStyle('spend')}>
