@@ -3,7 +3,7 @@
 // DO NOT RUN THIS IN PRODUCTION OR AFTER THE INITIAL SEEDING.
 
 import { collection, addDoc, getDocs, query } from 'firebase/firestore';
-import { getFirebaseInstances } from './firebase';
+import { db } from '@/app/actions'; // Use the server-side db instance
 import { PlaceHolderImages } from './placeholder-images';
 import { Activity } from './activities';
 
@@ -541,7 +541,6 @@ const allActivities: Activity[] = [
 
 export async function seedDatabase() {
     console.log('Starting database seed...');
-    const { db } = getFirebaseInstances();
     
     // Seed activities
     const activitiesCollection = collection(db, 'activities');

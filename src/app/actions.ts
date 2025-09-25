@@ -1,7 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction, type Firestore } from 'firebase/firestore';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 
 
@@ -16,9 +16,15 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-// Ensure Firebase is initialized for server-side operations
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
+function getDb(): Firestore {
+    if (getApps().length === 0) {
+        initializeApp(firebaseConfig);
+    }
+    return getFirestore(getApp());
+}
+
+const db = getDb();
+export { db };
 
 
 export async function addPoints(formData: FormData): Promise<{ success: boolean; message: string }> {
