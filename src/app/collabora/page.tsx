@@ -6,7 +6,7 @@ import { Handshake, Heart, Building, ArrowLeft } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { PartnerCarousel } from './partner-carousel';
+import { LogoCarousel } from '@/components/logo-carousel';
 
 type Selection = 'partner' | 'sponsor' | 'volunteer';
 
@@ -163,10 +163,21 @@ export default function CollaboraPage() {
         </div>
       </main>
 
-      {/* Nuova sezione per il carosello dei partner */}
-      <div className="mt-24">
-        <PartnerCarousel />
-      </div>
+      <section className="bg-muted/40 py-16 sm:py-24 mt-24">
+        <div className="container mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-black tracking-tight text-foreground mb-4">
+            I Nostri Partner
+            </h2>
+            <p className="max-w-2xl mx-auto text-lg text-foreground/80 mb-12">
+            Collaboriamo con istituzioni, aziende e realtà creative che condividono la nostra visione e supportano la nostra missione.
+            </p>
+            <div className="relative overflow-hidden group space-y-8">
+                <LogoCarousel />
+                <div className="absolute inset-y-0 left-0 w-16 bg-gradient-to-r from-muted/40 to-transparent"></div>
+                <div className="absolute inset-y-0 right-0 w-16 bg-gradient-to-l from-muted/40 to-transparent"></div>
+            </div>
+        </div>
+      </section>
     </div>
   );
 }
