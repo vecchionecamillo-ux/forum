@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { SlidersHorizontal, Layers, FlaskConical, Zap, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query } from 'firebase/firestore';
 import { getFirebaseInstances } from '@/lib/firebase';
 import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -15,22 +15,27 @@ import { Skeleton } from '@/components/ui/skeleton';
 type DurationFilter = 'all' | 'intensive' | 'long-term';
 
 export function CourseCatalogue() {
-  const [formazioneItems, setFormazioneItems] = useState<Activity[]>([]);
+  const [allActivities, setAllActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
   const [allCategories, setAllCategories] = useState<string[]>([]);
   
   const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [durationFilter, setDurationFilter] = useState<DurationFilter>('all');
 
+  const formationCategories = ['Laboratorio', 'Workshop', 'Formazione'];
+
   useEffect(() => {
     const { db } = getFirebaseInstances();
-    const formationCategories = ['Laboratorio', 'Workshop', 'Formazione'];
-    const q = query(collection(db, 'activities'), where('category', 'in', formationCategories));
+    const q = query(collection(db, 'activities'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
-      setFormazioneItems(items);
-      setAllCategories([...new Set(items.map(item => item.category))]);
+      setAllActivities(items);
+
+      // Dynamically generate categories only from formation-related items
+      const formationItems = items.filter(item => formationCategories.includes(item.category as any));
+      setAllCategories([...new Set(formationItems.map(item => item.category))]);
+      
       setLoading(false);
     }, (error) => {
         console.error("Error fetching course items:", error);
@@ -41,7 +46,9 @@ export function CourseCatalogue() {
   }, []);
 
   const filteredItems = useMemo(() => {
-    return formazioneItems.filter(item => {
+    return allActivities
+    .filter(item => formationCategories.includes(item.category as any)) // First, get only formation items
+    .filter(item => {
       // Category Filter
       const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
       if (!matchesCategory) return false;
@@ -49,7 +56,6 @@ export function CourseCatalogue() {
       // Duration Filter
       const matchesDuration = () => {
         if (durationFilter === 'all') return true;
-        // This logic assumes specific `durationDetail` values. Adjust if your data is different.
         if (durationFilter === 'intensive') return item.durationDetail === 'Workshop Intensivo';
         if (durationFilter === 'long-term') return item.durationDetail === 'Lungo Termine';
         return true;
@@ -58,7 +64,7 @@ export function CourseCatalogue() {
       
       return true;
     });
-  }, [categoryFilter, durationFilter, formazioneItems]);
+  }, [categoryFilter, durationFilter, allActivities]);
   
   const getIconForCategory = (category: string) => {
     switch(category) {
@@ -94,6 +100,11 @@ export function CourseCatalogue() {
             <CardContent className="space-y-8">
                 <div>
                     <h4 className="font-semibold text-lg mb-4 text-center md:text-left">Tipo di Corso</h4>
+                    {loading ? (
+                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                           {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-28 w-full" />)}
+                        </div>
+                    ) : (
                     <RadioGroup value={categoryFilter} onValueChange={(value: string) => setCategoryFilter(value)} className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <FilterCard value="all" label="Tutti" icon={Layers} group="category" selectedValue={categoryFilter} onSelect={setCategoryFilter} />
                         {allCategories.map(cat => {
@@ -101,6 +112,7 @@ export function CourseCatalogue() {
                            return <FilterCard key={cat} value={cat} label={cat} icon={Icon} group="category" selectedValue={categoryFilter} onSelect={setCategoryFilter} />
                         })}
                     </RadioGroup>
+                    )}
                 </div>
                 <div>
                     <h4 className="font-semibold text-lg mb-4 text-center md:text-left">Durata</h4>

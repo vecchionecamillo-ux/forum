@@ -28,12 +28,16 @@ export default function EventiPage() {
 
   useEffect(() => {
     const { db } = getFirebaseInstances();
-    // Query for all activities that are NOT 'Laboratorio' or 'Workshop'
-    const q = query(collection(db, 'activities'), where('category', 'not-in', ['Laboratorio', 'Workshop']));
+    // Query for all activities
+    const q = query(collection(db, 'activities'));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+      const allItems = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+      
+      // Filter for event items on the client
+      const items = allItems.filter(item => !['Laboratorio', 'Workshop'].includes(item.category));
       setEventItems(items);
+
       // Dynamically generate categories from fetched data
       setAllCategories([...new Set(items.map(item => item.category))]);
       setLoading(false);
