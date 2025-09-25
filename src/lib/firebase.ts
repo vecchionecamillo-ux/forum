@@ -1,6 +1,6 @@
 import { initializeApp, getApp, getApps, type FirebaseApp, type FirebaseOptions } from 'firebase/app';
 import { getAuth, type Auth } from 'firebase/auth';
-import { type Firestore, memoryLocalCache, initializeFirestore, persistentLocalCache } from 'firebase/firestore';
+import { type Firestore, memoryLocalCache, initializeFirestore } from 'firebase/firestore';
 import { getDatabase, type Database } from 'firebase/database';
 
 const firebaseConfig: FirebaseOptions = {
@@ -20,35 +20,39 @@ type FirebaseInstances = {
     database: Database;
 };
 
-// This variable will hold the single initialized instance.
 let instances: FirebaseInstances | null = null;
 
-function getFirebaseInstances(): FirebaseInstances {
-    if (typeof window !== 'undefined' && !instances) {
-        // Initialize on the client-side
-        const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+function initializeFirebase(): FirebaseInstances {
+    if (getApps().length === 0) {
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        
-        // Use memory cache which is more reliable in complex environments (like iframes)
         const db = initializeFirestore(app, {
             localCache: memoryLocalCache(),
         });
-        
         const database = getDatabase(app);
         instances = { app, auth, db, database };
-
-    } else if (typeof window === 'undefined' && !instances) {
-        // Initialize on the server-side
-        const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+        return instances;
+    } else {
+        const app = getApp();
+        if (instances) {
+            return instances;
+        }
         const auth = getAuth(app);
-        const db = initializeFirestore(app, { localCache: memoryLocalCache() });
+        const db = initializeFirestore(app, {
+            localCache: memoryLocalCache(),
+        });
         const database = getDatabase(app);
         instances = { app, auth, db, database };
+        return instances;
     }
-    
-    // This should now always return a valid instance
-    return instances!;
 }
 
-// We will export a function to get instances instead of instances directly
+
+function getFirebaseInstances(): FirebaseInstances {
+    if (!instances) {
+      instances = initializeFirebase();
+    }
+    return instances;
+}
+
 export { getFirebaseInstances };
