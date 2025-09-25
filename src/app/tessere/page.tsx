@@ -87,8 +87,8 @@ export default function TesserePage() {
            {showCheck && (
              <Card className="w-full mt-8 animate-in fade-in-50 duration-500">
                 <CardHeader>
-                    <CardTitle>Verifica Saldo Punti</CardTitle>
-                    <CardDescription>Inserisci il tuo ID utente per visualizzare i tuoi punti (token).</CardDescription>
+                    <CardTitle>Verifica Saldo Punti (Token)</CardTitle>
+                    <CardDescription>Inserisci il tuo ID utente per visualizzare i tuoi punti.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="space-y-2">
