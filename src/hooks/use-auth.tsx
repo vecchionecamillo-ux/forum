@@ -40,8 +40,8 @@ type AuthContextType = {
   loading: boolean;
   isModerator: boolean;
   logout: () => void;
-  auth: typeof auth; // Use the type of the imported auth instance
-  db: typeof db; // Use the type of the imported db instance
+  auth: typeof auth;
+  db: Firestore;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
