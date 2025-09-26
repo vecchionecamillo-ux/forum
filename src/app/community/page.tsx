@@ -7,26 +7,36 @@ import type { Activity } from '@/lib/activities';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAuth } from '@/hooks/use-auth';
 
-export default function CommunityPage() {
+export default function CommunityPageGestita() {
   const [communityItems, setCommunityItems] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { db } = useAuth();
 
   useEffect(() => {
     if (!db) return;
     // Query for activities in the 'Community' category.
-    const q = query(collection(db, 'activities'), where('category', 'in', ['Community']));
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
-      setCommunityItems(items);
-      setLoading(false);
-    }, (error) => {
-        console.error("Error fetching community items:", error);
+    let unsubscribe: (() => void) | undefined;
+    setError(null);
+    try {
+      const q = query(collection(db, 'activities'), where('category', 'in', ['Community']));
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        const items = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Activity));
+        setCommunityItems(items);
         setLoading(false);
-    });
-
-    return () => unsubscribe();
+      }, (err) => {
+        console.error("Errore di connessione al database:", err);
+        setError("Impossibile connettersi al database. Verifica la connessione a Internet e riprova.");
+        setLoading(false);
+      });
+    } catch (err: any) {
+      console.error("Errore di connessione al database:", err);
+      setError("Impossibile connettersi al database. Verifica la connessione a Internet e riprova.");
+      setLoading(false);
+    }
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [db]);
 
   return (
@@ -39,7 +49,11 @@ export default function CommunityPage() {
           </p>
         </div>
 
-        {loading ? (
+        {error ? (
+          <div className="text-center py-16 text-red-600 dark:text-red-400">
+            <p className="text-lg font-semibold">{error}</p>
+          </div>
+        ) : loading ? (
            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-[450px] w-full rounded-lg" />)}
            </div>

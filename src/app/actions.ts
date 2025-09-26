@@ -1,4 +1,20 @@
+
 'use server';
+// Funzione per popolare la collection PROVA1
+async function seedProva1() {
+  const prova1Collection = collection(db, "PROVA1");
+  const prova1Snapshot = await getDocs(prova1Collection);
+  if (prova1Snapshot.empty) {
+    const data = {
+      PROVA2: "SI FUNZIONA",
+      PROVA3: 50
+    };
+    await addDoc(prova1Collection, data);
+    console.log("Collection PROVA1 seeded successfully.");
+  } else {
+    console.log("Collection PROVA1 already contains data. Seeding aborted.");
+  }
+}
 
 import { revalidatePath } from 'next/cache';
 import { doc, getDoc, updateDoc, collection, addDoc, serverTimestamp, runTransaction, getDocs, query } from 'firebase/firestore';
@@ -262,6 +278,13 @@ export async function submitCollaborationProposal(formData: FormData): Promise<{
 
 export async function seedDatabaseAction(): Promise<{ success: boolean; message: string }> {
     console.log('Starting database seed...');
+    // Seed PROVA1
+    try {
+      await seedProva1();
+    } catch (error) {
+      console.error('Error seeding PROVA1:', error);
+      return { success: false, message: `Error seeding PROVA1: ${error}` };
+    }
     
     // Seed activities
     const activitiesCollection = collection(db, 'activities');

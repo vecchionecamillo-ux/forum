@@ -56,6 +56,7 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     try {
+      console.log("Tentativo di login con l'email:", email);
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/profile');
     } catch (error: any) {
@@ -113,8 +114,14 @@ export default function LoginPage() {
     setError(null);
     setMessage(null);
     const provider = new GoogleAuthProvider();
-    // The redirect will be handled by the useAuth hook
-    await signInWithRedirect(auth, provider);
+    try {
+      console.log('[DEBUG] Tentativo di login con Google');
+      await signInWithRedirect(auth, provider);
+    } catch (error: any) {
+      console.error('[DEBUG] Errore Google Sign-In:', error);
+      setError('Errore durante il login con Google: ' + (error?.message || '')); 
+      setLoading(false);
+    }
   };
 
   const toggleResetMode = (e: React.MouseEvent<HTMLButtonElement>) => {

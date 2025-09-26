@@ -20,15 +20,22 @@ const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseCon
 const auth: Auth = getAuth(app);
 
 // Use a variable to hold the initialized Firestore instance
-let db: Firestore;
 
+let db: Firestore;
 try {
-    db = initializeFirestore(app, {
-      localCache: memoryLocalCache(),
-    });
+  // Primo tentativo: inizializzazione con cache in memoria
+  db = initializeFirestore(app, {
+    localCache: memoryLocalCache(),
+  });
 } catch (error) {
-    console.warn("Could not initialize Firestore with memory cache, falling back to default. Error:", error);
+  console.warn("[Firebase] Impossibile inizializzare Firestore con memory cache. Errore:", error);
+  try {
+    // Secondo tentativo: fallback a getFirestore classico
     db = getFirestore(app);
+  } catch (fallbackError) {
+    console.error("[Firebase] Errore critico nell'inizializzazione di Firestore:", fallbackError);
+    throw new Error("Impossibile inizializzare Firestore. Controlla la configurazione Firebase e la connessione di rete.");
+  }
 }
 
 const database: Database = getDatabase(app);
